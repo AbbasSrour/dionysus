@@ -15,6 +15,7 @@ const authRoute = require("./routes/authRoute");
 const app = express();
 dotenv.config();
 app.use(express.json());
+const port = process.env.PORT || 8000;
 
 //-------------------------------------------------------------------------------------------------------//
 //------------------------------------------ Routes ----------------------------------------------------//
@@ -35,6 +36,6 @@ app.use("/api/v1/series", seriesRoute);
 // Authentications
 app.use("/api/v1/auth", authRoute);
 
-app.listen(8000, () => {
+app.listen(port, () => {
   console.log("hello world");
 });
