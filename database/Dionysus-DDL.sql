@@ -23,13 +23,13 @@ CREATE  TABLE dionysus.movie (
 	movie_name           varchar(100)    ,
 	movie_wallpaper      varchar(480)    ,
 	movie_location       varchar(480)    ,
-    movie_release_year   integer         ,
-    summery              varchar(480)    ,
+  movie_release_year   integer         ,
+  summery              varchar(480)    ,
 	yt_trailer           varchar(480)    ,
 	imdb_link            varchar(480)    ,
 	CONSTRAINT pk_movie PRIMARY KEY ( movie_id ),
-    UNIQUE ( movie_name, movie_release_year ),
-    UNIQUE (movie_location)
+  UNIQUE ( movie_name, movie_release_year ),
+  UNIQUE (movie_location)
  );
 
 CREATE  TABLE dionysus.movie_cast ( 
@@ -38,7 +38,7 @@ CREATE  TABLE dionysus.movie_cast (
 	actor_role           varchar(100)    ,
 	CONSTRAINT fk_movie_cast_actor FOREIGN KEY ( actor_id ) REFERENCES dionysus.actor( actor_id ) ON DELETE CASCADE ON UPDATE CASCADE ,
 	CONSTRAINT fk_movie_cast_movie FOREIGN KEY ( movie_id ) REFERENCES dionysus.movie( movie_id ) ON DELETE CASCADE ON UPDATE CASCADE ,
-    CONSTRAINT unique_role UNIQUE ( actor_id, movie_id, actor_role)
+  CONSTRAINT unique_role UNIQUE ( actor_id, movie_id, actor_role)
  );
 
 CREATE  TABLE dionysus.movie_genres ( 
@@ -46,7 +46,7 @@ CREATE  TABLE dionysus.movie_genres (
 	movie_id             bigserial    ,
 	CONSTRAINT fk_movie_genres_genre FOREIGN KEY ( genre_id ) REFERENCES dionysus.genre( genre_id ) ON DELETE CASCADE ON UPDATE CASCADE ,
 	CONSTRAINT fk_movie_genres_movie FOREIGN KEY ( movie_id ) REFERENCES dionysus.movie( movie_id ) ON DELETE CASCADE ON UPDATE CASCADE ,
-    UNIQUE ( genre_id , movie_id )
+  UNIQUE ( genre_id , movie_id )
  );
 
 CREATE  TABLE dionysus.series ( 
@@ -66,7 +66,7 @@ CREATE  TABLE dionysus.series_genres (
 	series_id            bigserial    ,
 	CONSTRAINT fk_series_genres_series FOREIGN KEY ( series_id ) REFERENCES dionysus.series( series_id ) ON DELETE CASCADE ON UPDATE CASCADE ,
 	CONSTRAINT fk_series_genres_genre FOREIGN KEY ( genre_id ) REFERENCES dionysus.genre( genre_id ) ON DELETE CASCADE ON UPDATE CASCADE ,
-    UNIQUE ( genre_id , series_id )
+  UNIQUE ( genre_id , series_id )
  );
 
 CREATE  TABLE dionysus.users ( 
@@ -75,7 +75,7 @@ CREATE  TABLE dionysus.users (
 	user_email           varchar(480)    ,
 	user_password        varchar(480)    ,
 	CONSTRAINT pk_users PRIMARY KEY ( user_id )  ,
-    UNIQUE ( user_email )
+  UNIQUE ( user_email )
  );
 
 CREATE  TABLE dionysus.movie_history ( 
@@ -97,7 +97,7 @@ CREATE  TABLE dionysus.season (
 	imdb_link            varchar(480)    ,
 	CONSTRAINT pk_season PRIMARY KEY ( season_id ),
 	CONSTRAINT fk_season_series FOREIGN KEY ( series_id ) REFERENCES dionysus.series( series_id ) ON DELETE CASCADE ON UPDATE CASCADE ,
-    UNIQUE ( season_number, series_id )
+  UNIQUE ( season_number, series_id )
  );
 
 CREATE  TABLE dionysus.episode ( 
@@ -108,12 +108,12 @@ CREATE  TABLE dionysus.episode (
 	episode_name         varchar(100)    ,
 	episode_location     varchar(480)    ,
 	episode_wallpaper    varchar(480)    ,
-    summery              varchar(480)    ,
+  summery              varchar(480)    ,
 	CONSTRAINT pk_episode PRIMARY KEY ( episode_id ),
 	CONSTRAINT fk_episode_series FOREIGN KEY ( series_id ) REFERENCES dionysus.series( series_id ) ON DELETE CASCADE ON UPDATE CASCADE ,
 	CONSTRAINT fk_episode_season FOREIGN KEY ( season_id ) REFERENCES dionysus.season( season_id ) ON DELETE CASCADE ON UPDATE CASCADE ,
-    UNIQUE ( episode_number, season_id, series_id ),
-    UNIQUE (episode_location)
+  UNIQUE ( episode_number, season_id, series_id ),
+  UNIQUE (episode_location)
  );
 
 CREATE  TABLE dionysus.series_cast ( 
@@ -122,7 +122,7 @@ CREATE  TABLE dionysus.series_cast (
 	actor_role           varchar(100)    ,
 	CONSTRAINT fk_series_cast_episode FOREIGN KEY ( series_id ) REFERENCES dionysus.series( series_id ) ON DELETE CASCADE ON UPDATE CASCADE ,
 	CONSTRAINT fk_series_cast_actor FOREIGN KEY ( actor_id ) REFERENCES dionysus.actor( actor_id ) ON DELETE CASCADE ON UPDATE CASCADE ,
-    UNIQUE ( actor_id, actor_role, series_id )
+  UNIQUE ( actor_id, actor_role, series_id )
  );
 
 CREATE  TABLE dionysus.series_history ( 

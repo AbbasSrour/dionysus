@@ -107,14 +107,14 @@ select dionysus.movie_history.user_id,
 from dionysus.movie_history
 UNION ALL
 select dionysus.series_history.user_id,
-       null,
+       null as movie_id,
        dionysus.series_history.episode_id,
        dionysus.series_history.watch_date,
        dionysus.series_history.watch_time
 from dionysus.series_history
 where user_id = 1
 order by watch_time desc
-    );
+);
 
 ------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------- Aggregation --------------------------------------------------------------
