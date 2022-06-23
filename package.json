@@ -15,12 +15,9 @@
   },
   "dependencies": {
     "cheerio": "1.0.0-rc.11",
-    "crypto-js": "^4.1.1",
     "dotenv": "^16.0.1",
     "express": "^4.18.0",
     "got": "11.8.3",
-    "jssoup": "^0.0.15",
-    "parse5": "^7.0.0",
     "pg": "^8.7.3"
   }
 }
