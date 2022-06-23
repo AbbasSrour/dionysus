@@ -1,5 +1,4 @@
-const pg = require("pg");
-const db = require("../db.js");
+const db = require("../database/db.js");
 
 const getMovie = async (req, res) => {
   try {

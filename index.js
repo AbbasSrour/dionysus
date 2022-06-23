@@ -2,7 +2,7 @@
 //------------------------------------------ Imports ---------------------------------------------------//
 //-----------------------------------------------------------------------------------------------------//
 const express = require("express");
-const db = require("./db");
+const db = require("./database/db");
 const dotenv = require("dotenv");
 
 const movieRoute = require("./routes/movieRoute");
