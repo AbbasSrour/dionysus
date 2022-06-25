@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const EmailError = require("../errors/dberrors.js").EmailError;
-const db = require("../db");
+const db = require("../database/db");
 
 const emailCheck = async (req, res) => {
   const email = req.body.email;

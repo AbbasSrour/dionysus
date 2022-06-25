@@ -27,8 +27,15 @@ CREATE  TABLE dionysus.movie (
   summery              varchar(480)    ,
 	yt_trailer           varchar(480)    ,
 	imdb_link            varchar(480)    ,
-	imdb_rating          integer    ,
-	CONSTRAINT pk_movie PRIMARY KEY ( movie_id ),
+	imdb_rating          integer         ,
+
+  imdb_vote_count      integer         ,
+  budget               integer         ,
+  revenue              integer         ,
+  movie_length         integer         ,
+  langauge             varchar(100)    ,
+	
+  CONSTRAINT pk_movie PRIMARY KEY ( movie_id ),
   UNIQUE ( movie_name, movie_release_year ),
   UNIQUE (movie_location)
  );
@@ -145,7 +152,7 @@ CREATE  TABLE dionysus.episode (
 
 CREATE  TABLE dionysus.series_cast ( 
 	actor_id             bigserial    ,
-	series_id           bigserial    ,
+	series_id            bigserial    ,
 	actor_role           varchar(100)    ,
 	CONSTRAINT fk_series_cast_episode FOREIGN KEY ( series_id ) REFERENCES dionysus.series( series_id ) ON DELETE CASCADE ON UPDATE CASCADE ,
 	CONSTRAINT fk_series_cast_actor FOREIGN KEY ( actor_id ) REFERENCES dionysus.actor( actor_id ) ON DELETE CASCADE ON UPDATE CASCADE ,
@@ -153,10 +160,10 @@ CREATE  TABLE dionysus.series_cast (
  );
 
 CREATE  TABLE dionysus.series_history ( 
-	user_id              bigserial    ,
-	episode_id           bigserial    ,
-	watch_date           date DEFAULT CURRENT_DATE   ,
-	watch_time           time DEFAULT CURRENT_TIME   ,
+	user_id                bigserial    ,
+	episode_id             bigserial    ,
+	watch_date             date DEFAULT CURRENT_DATE   ,
+	watch_time             time DEFAULT CURRENT_TIME   ,
     minutes_watched      integer        ,
 	CONSTRAINT fk_series_history_users FOREIGN KEY ( user_id ) REFERENCES dionysus.users( user_id ) ON DELETE CASCADE ON UPDATE CASCADE ,
 	CONSTRAINT fk_series_history_episode FOREIGN KEY ( episode_id ) REFERENCES dionysus.episode( episode_id ) ON DELETE CASCADE ON UPDATE CASCADE 

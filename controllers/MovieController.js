@@ -1,6 +1,6 @@
 const db = require("../database/db.js");
 
-const getMovie = async (req, res) => {
+const GetMovie = async (req, res) => {
   try {
     const { id } = req.params;
     const movie = await db.query(
@@ -13,7 +13,7 @@ const getMovie = async (req, res) => {
   }
 };
 
-const moviesPerGenre = async (req, res) => {
+const MoviesPerGenre = async (req, res) => {
   try {
     const { id } = req.params;
     const movie = await db.query(
@@ -26,4 +26,4 @@ const moviesPerGenre = async (req, res) => {
   }
 };
 
-module.exports = { getMovie, moviesPerGenre };
+module.exports = { GetMovie, MoviesPerGenre };

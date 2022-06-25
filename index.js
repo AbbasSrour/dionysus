@@ -1,13 +1,8 @@
 //-------------------------------------------------------------------------------------------------------//
-//------------------------------------------ Imports ---------------------------------------------------//
-//-----------------------------------------------------------------------------------------------------//
-const express = require("express");
-const db = require("./database/db");
-const dotenv = require("dotenv");
-
-const movieRoute = require("./routes/movieRoute");
-const seriesRoute = require("./routes/seriesRoute");
-const authRoute = require("./routes/authRoute");
+//
+const MovieRoute = require("./routes/MovieRoute");
+const SeriesRoute = require("./routes/SeriesRoute");
+const AuthRoute = require("./routes/AuthRoute");
 
 //-------------------------------------------------------------------------------------------------------//
 //------------------------------------------ Middleware ------------------------------------------------//
@@ -15,32 +10,20 @@ const authRoute = require("./routes/authRoute");
 dotenv.config();
 const port = process.env.PORT || 8000;
 
-const app = express();
-app.use(express.json());
-
 //-------------------------------------------------------------------------------------------------------//
 //------------------------------------------ Routes ----------------------------------------------------//
 //-----------------------------------------------------------------------------------------------------//
 
-// Test
-const test = require("./scraper/scraper.js");
-app.get("/", async (req, res) => {
-  const test = await pool.query("select * from dionysus.movie");
-  res.json(test.rows);
-});
-
-// Movie
-app.use("/api/v1/movies", movieRoute);
-
-// Series
-app.use("/api/v1/series", seriesRoute);
-
-// Authentications
-app.use("/api/v1/auth", authRoute);
+app.register(MovieRoute);
+app.register(SeriesRoute);
+app.register(AuthRoute);
 
 //-------------------------------------------------------------------------------------------------------//
 //------------------------------------------ Listen ----------------------------------------------------//
 //-----------------------------------------------------------------------------------------------------//
-app.listen(port, () => {
-  console.log("hello world");
+app.listen({ port: port }, (err, address) => {
+  if (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
 });
