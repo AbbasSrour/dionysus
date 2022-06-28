@@ -1,21 +1,27 @@
-require('dotenv').config();
-import express, { Request, Response } from 'express';
-import config from 'config';
-import ValidateEnv from './utils/ValidateEnv';
-import { AppDataSource } from './utils/data-source';
-import RedisClient from './utils/ConnectRedis';
+import express, { Request, Response } from "express";
+
+require("dotenv").config();
+import config from "config";
+import ValidateEnv from "./utils/ValidateEnv";
+
+import { AppDataSource } from "./utils/data-source";
+import { RedisClient, ConnectRedis } from "./utils/ConnectRedis";
+
+import AuthRouter from "./routes/AuthRoute";
+// import MoviesRouter from "./src/routes/MovieRoute";
+// import SearchRouter from "./src/routes/SearchRoute";
+// import SeriesRouter from "./src/routes/SeriesRoute";
 
 AppDataSource.initialize()
   .then(async () => {
-    // VALIDATE ENV
+    //------------------------------------------ Setup ------------------------------------------------------//
     ValidateEnv();
-
+    ConnectRedis();
     const app = express();
 
-    // MIDDLEWARE
+    //------------------------------------------ Middleware ------------------------------------------------//
 
-    // 1. Body parser
-    app.use(express.json({ limit: '10kb' }));
+    app.use(express.json({ limit: "10kb" }));
 
     // 2. Logger
 
@@ -23,26 +29,36 @@ AppDataSource.initialize()
 
     // 4. Cors
 
-    // ROUTES
+    //------------------------------------------ Routes ----------------------------------------------------//
 
-    // HEALTH CHECKER
-    app.get('/api/healthchecker', async (req: Request, res: Response) => {
-      const message = await RedisClient.get('try');
+    app.get("/", (req: Request, res: Response) => {
+      res.send("Express + TypeScript Server");
+      console.log("hello world");
+    });
+
+    app.get("/api/v1/healthchecker", async (req: Request, res: Response) => {
+      const message = await RedisClient.get("try");
       res.status(200).json({
-        status: 'success',
+        status: "success",
         message,
       });
     });
+
+    app.use("/api/v1/auth", AuthRouter);
+    // app.use("/api/v1/movies")
+    // app.use("/api/v1/search")
+    // app.use("/api/v1/series")
 
     // UNHANDLED ROUTE
 
     // GLOBAL ERROR HANDLER
 
-    const port = config.get<number>('port');
-    app.listen(port);
-
-    console.log(`Server started on port: ${port}`);
+    //------------------------------------------ Listen ----------------------------------------------------//
+    const port = config.get<number>("port");
+    app.listen(port, () => {
+      console.log(
+        `⚡️[server]: Server is running at https://localhost:${port}`
+      );
+    });
   })
   .catch((error) => console.log(error));
-
-

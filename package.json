@@ -10,7 +10,8 @@
     "test": "jest --watchAll --coverage --verbose",
     "start": "ts-node-dev --respawn --transpile-only --exit-child src/index.ts",
     "build": "pnpm tsc",
-    "dev": "concurrently \"pnpm tsc --watch\" \"nodemon -q build/src/index.js\"",
+    "dev": "concurrently -k \"pnpm tsc --watch\" \"nodemon ./build/src/index.js\"",
+    "dev2": "concurrently \"pnpm tsc --watch\" \"pnpm nodemon -q build/src/index.js\"",
     "typeorm": "typeorm-ts-node-commonjs"
   },
   "dependencies": {
