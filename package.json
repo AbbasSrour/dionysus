@@ -10,9 +10,14 @@
     "test": "jest --watchAll --coverage --verbose",
     "start": "ts-node-dev --respawn --transpile-only --exit-child src/index.ts",
     "build": "pnpm tsc",
-    "dev": "concurrently -k \"pnpm tsc --watch\" \"nodemon ./build/src/index.js\"",
-    "dev2": "concurrently \"pnpm tsc --watch\" \"pnpm nodemon -q build/src/index.js\"",
-    "typeorm": "typeorm-ts-node-commonjs"
+    "dev": "concurrently -k \"pnpm tsc --watch\" \"nodemon build/src/index.js\"",
+    "ndev": "nodemon --watch './src/*.ts' --exec 'ts-node' src/index.ts",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "typeorm:cli": "ts-node --transpile-only ./node_modules/typeorm/cli.js",
+    "migration:generate": "pnpm run typeorm:cli migration:generate",
+    "migration:create": "pnpm run typeorm:cli migration:create",
+    "migration:run": "pnpm run typeorm:cli migration:run",
+    "migration:revert": "pnpm run typeorm:cli migration:revert"
   },
   "dependencies": {
     "cheerio": "1.0.0-rc.12",
