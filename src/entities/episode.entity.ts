@@ -33,7 +33,7 @@ export class Episode extends BaseEntity {
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "series_id", referencedColumnName: "seriesId" }])
-  series: Series;
+  seriesId: Series;
 
   @Column("integer", { name: "number" })
   number: number;
@@ -74,6 +74,6 @@ export class Episode extends BaseEntity {
   @OneToMany(() => SeriesHistory, (seriesHistory) => seriesHistory.episodeId)
   seriesHistory: SeriesHistory[];
 
-  @OneToMany(() => SeriesServers, (seriesServers) => seriesServers.episode)
+  @OneToMany(() => SeriesServers, (seriesServers) => seriesServers.episodeId)
   seriesServers: SeriesServers[];
 }

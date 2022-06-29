@@ -23,7 +23,7 @@ export class SeriesServers extends BaseEntity {
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "episode_id", referencedColumnName: "episodeId" }])
-  episode: Episode;
+  episodeId: Episode;
 
   @ManyToOne(() => Servers, (servers) => servers.seriesServers, {
     onDelete: "CASCADE",

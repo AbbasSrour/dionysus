@@ -37,7 +37,7 @@ export class SeriesCast extends BaseEntity {
     nullable: true,
     length: 100,
   })
-  actorRole: string | null;
+  role: string | null;
 
   @CreateDateColumn()
   created_at: Date;

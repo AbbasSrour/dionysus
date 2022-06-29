@@ -13,7 +13,7 @@ import { SeriesProductionCompany } from "./series-production-company.entity";
 @Entity("production_company", { schema: "dionysus" })
 export class ProductionCompany extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "production_company_id" })
-  productionCompanyid: number;
+  productionCompanyId: number;
 
   @Column("character varying", { name: "name", length: 100, unique: true })
   name: string;

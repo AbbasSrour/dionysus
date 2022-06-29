@@ -14,7 +14,7 @@ import { SeriesGenres } from "./series-genres.entity";
 @Entity("genre", { schema: "dionysus" })
 export default class Genre extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "genre_id" })
-  genre_id: number;
+  genreId: number;
 
   @Column("character varying", {
     name: "genre_name",

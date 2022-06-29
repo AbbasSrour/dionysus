@@ -76,7 +76,7 @@ export class Series extends BaseEntity {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => Episode, (episode) => episode.series)
+  @OneToMany(() => Episode, (episode) => episode.seriesId)
   episodes: Episode[];
 
   @OneToMany(() => Season, (season) => season.seriesId)
