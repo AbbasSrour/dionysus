@@ -1,35 +1,39 @@
 import {
+  BaseEntity,
+  CreateDateColumn,
   Entity,
-  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn,
 } from "typeorm";
-import { Genre } from "./Genre";
-import { Series } from "./Series";
+import Genre from "./genre.entity";
+import { Series } from "./series.entity";
 
-@Index("series_genres_genre_id_series_id_key", ["genreId", "seriesId"], {
-  unique: true,
-})
 @Entity("series_genres", { schema: "dionysus" })
-export class SeriesGenres {
-  @PrimaryGeneratedColumn({ type: "bigint", name: "genre_id", unique: true })
-  genreId: string;
-
-  @PrimaryGeneratedColumn({ type: "bigint", name: "series_id", unique: true })
-  seriesId: string;
+@Unique(["genreId", "seriesId"])
+export class SeriesGenres extends BaseEntity {
+  @PrimaryGeneratedColumn({ name: "series_genres" })
+  seriesGenreId: number;
 
   @ManyToOne(() => Genre, (genre) => genre.seriesGenres, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "genre_id", referencedColumnName: "genreId" }])
-  genre: Genre;
+  genreId: Genre;
 
   @ManyToOne(() => Series, (series) => series.seriesGenres, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "series_id", referencedColumnName: "seriesId" }])
-  series: Series;
+  seriesId: Series;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 }
