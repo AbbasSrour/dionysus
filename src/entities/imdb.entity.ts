@@ -12,7 +12,7 @@ export default class Imdb extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "imdb_id" })
   imdbId: number;
 
-  @Column("real", { name: "rating", nullable: true, precision: 24 })
+  @Column("real", { name: "rating", nullable: true })
   rating: number | null;
 
   @Column("integer", { name: "vote", nullable: true })

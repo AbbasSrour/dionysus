@@ -14,18 +14,14 @@
     "outDir": "./build",
     "rootDir": "."
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "tests"
-  ],
+  "exclude": ["tests", "./jest.config.ts", "src/migrations", "src/database"],
   "ts-node": {
     "transpileOnly": true,
     "files": true,
     "compilerOptions": {
       "rootDir": "."
-    }
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "tests"]
   }
 }

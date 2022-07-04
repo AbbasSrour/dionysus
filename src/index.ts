@@ -1,64 +1,127 @@
-import express, { Request, Response } from "express";
-
-require("dotenv").config();
+//------------------------------------------ Imports --------------------------------------------------------//
+// Enviroment
+import path from "path";
+import dotenv from "dotenv";
+dotenv.config({
+  path: path.resolve(__dirname, `../${process.env.NODE_ENV}.env`),
+});
 import config from "config";
-import ValidateEnv from "./utils/ValidateEnv";
+import ValidateEnv from "./utils/validate-env.util";
 
-import { AppDataSource } from "./utils/data-source";
-import { RedisClient, ConnectRedis } from "./utils/ConnectRedis";
+// Rest
+import express, { NextFunction, Request, Response, Application } from "express";
+import AppError from "./errors/app.error";
 
-import AuthRouter from "./routes/AuthRoute";
-// import MoviesRouter from "./src/routes/MovieRoute";
-// import SearchRouter from "./src/routes/SearchRoute";
-// import SeriesRouter from "./src/routes/SeriesRoute";
+// Database
+import { AppDataSource } from "./utils/data-source.util";
+import { RedisClient, ConnectRedis } from "./utils/redis.util";
+
+// Middleware
+import cors from "cors";
+import morgan from "morgan";
+import cookieParser from "cookie-parser";
+
+// Documentation
+import swaggerUI from "swagger-ui-express";
+import swaggerDocs from "./docs/swagger";
+
+// Routes
+import authRoute from "./routes/auth.route";
+import userRoute from "./routes/user.route";
 
 AppDataSource.initialize()
   .then(async () => {
     //------------------------------------------ Setup ------------------------------------------------------//
     ValidateEnv();
-    ConnectRedis();
-    const app = express();
+    const redis = await ConnectRedis();
+    const app: Application = express();
 
     //------------------------------------------ Middleware ------------------------------------------------//
 
-    app.use(express.json({ limit: "10kb" }));
+    // Json Parser
+    app.use(express.json());
 
-    // 2. Logger
+    // Cookie Parser
+    app.use(cookieParser());
 
-    // 3. Cookie Parser
+    // logger
+    if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
-    // 4. Cors
+    // Cors
+    app.use(
+      cors({
+        origin: config.get<string>("origin"),
+        credentials: true,
+      })
+    );
+
+    // Swagger Api Documentation
+    const swaggerOpts = {
+      explorer: true,
+    };
+    app.use(
+      "/docs",
+      swaggerUI.serve,
+      swaggerUI.setup(swaggerDocs, swaggerOpts)
+    );
+
+    // Template Engine
+    app.set("view engine", "pug");
+    app.set("views", `${__dirname}/views`);
 
     //------------------------------------------ Routes ----------------------------------------------------//
 
+    // Default Route
     app.get("/", (req: Request, res: Response) => {
       res.send("Express + TypeScript Server");
       console.log("hello world");
     });
 
+    // Health Check Route
     app.get("/api/v1/healthchecker", async (req: Request, res: Response) => {
       const message = await RedisClient.get("try");
-      res.status(200).json({
-        status: "success",
-        message,
-      });
+      res.status(200).json({ status: "success", message });
     });
 
-    app.use("/api/v1/auth", AuthRouter);
-    // app.use("/api/v1/movies")
-    // app.use("/api/v1/search")
-    // app.use("/api/v1/series")
+    // Authentication Route
+    app.use("/api/v1/auth", authRoute);
+
+    // User Route
+    app.use("/api/v1/users", userRoute);
 
     // UNHANDLED ROUTE
+    app.all("*", (req: Request, res: Response, next: NextFunction) => {
+      next(new AppError(404, `Route ${req.originalUrl} not found`));
+    });
 
     // GLOBAL ERROR HANDLER
+    app.use(
+      (error: AppError, req: Request, res: Response, next: NextFunction) => {
+        error.status = error.status || "error";
+        error.statusCode = error.statusCode || 500;
+
+        res.status(error.statusCode).json({
+          status: error.status,
+          message: error.message,
+        });
+      }
+    );
 
     //------------------------------------------ Listen ----------------------------------------------------//
     const port = config.get<number>("port");
-    app.listen(port, () => {
-      console.log(
-        `⚡️[server]: Server is running at https://localhost:${port}`
-      );
+    const env = config.get<string>("enviroment");
+    const dbName = config.get<{ database: string }>("postgresConfig")[
+      "database"
+    ];
+    const dbPort = config.get<{ database: string; port: number }>(
+      "postgresConfig"
+    )["port"];
+
+    app.listen(config.get<number>("port"), () => {
+      console.log(`⚡️[server]: Server running at https://localhost:${port}`);
+      console.log(`🌱[enviroment]: Server running on ${env} enviroment`);
+      console.log(`🗄️[Database]: Psql db ${dbName} running on port ${dbPort}`);
+      if (redis) console.log("📕[redis]: Redis client connected successfully");
     });
   })
   .catch((error) => console.log(error));

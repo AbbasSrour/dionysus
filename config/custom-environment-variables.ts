@@ -1,5 +1,8 @@
 export default {
+  enviroment: 'NODE_ENV',
   port: 'PORT',
+  key: 'ENC_KEY',
+  redis_port: 'REDIS_PORT',
   postgresConfig: {
     host: 'PSQL_DB_URL',
     port: 'PSQL_DB_PORT',
@@ -11,4 +14,10 @@ export default {
   accessTokenPublicKey: 'JWT_ACCESS_TOKEN_PUBLIC_KEY',
   refreshTokenPrivateKey: 'JWT_REFRESH_TOKEN_PRIVATE_KEY',
   refreshTokenPublicKey: 'JWT_REFRESH_TOKEN_PUBLIC_KEY',
+  smtp:{
+    user: "EMAIL_USER",
+    pass: "EMAIL_PASS",
+    host: "EMAIL_HOST",
+    port: "EMAIL_PASS"
+  },
 };

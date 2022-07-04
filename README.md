@@ -25,7 +25,8 @@ This repository holds the backend side of the website powered by NodeJS, Express
   - [ ] Season Takes The Default Wallpaper Of Series If Null
 - [ ] User Intrests
 - [ ] User Recomendation System
-
+- [ ] Since History is unique, you need to update the watch time and date when a user rewatches the same thing
+ 
 ### Backend
 - [ ] Routes
 - [ ] Crawler That Automatically Adds Data From Searches

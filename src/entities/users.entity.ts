@@ -1,8 +1,10 @@
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -12,6 +14,16 @@ import { MovieHistory } from "./movie-history.entity";
 import { MovieRating } from "./movie-rating.entity";
 import { SeriesHistory } from "./series-history.entity";
 import { SeriesRating } from "./series-rating.entity";
+
+import {
+  EncryptPassword,
+  DecryptPassword,
+  HashPassword,
+  VerifyPassword,
+} from "../utils/cryptography.util";
+import config from "config";
+
+import crypto from "crypto";
 
 @Entity("users", { schema: "dionysus" })
 export class Users extends BaseEntity {
@@ -34,10 +46,10 @@ export class Users extends BaseEntity {
 
   @Column("character varying", {
     name: "user_password",
-    nullable: true,
+    default: "default",
     length: 200,
   })
-  password: string | null;
+  password: string;
 
   @Column("character varying", {
     name: "first_name",
@@ -46,7 +58,7 @@ export class Users extends BaseEntity {
   firstName: string;
 
   @Column("character varying", {
-    name: "first_name",
+    name: "last_name",
     length: 100,
   })
   lastName: string;
@@ -60,6 +72,18 @@ export class Users extends BaseEntity {
     length: 280,
   })
   image: string;
+
+  @Column({
+    default: false,
+  })
+  verified: boolean;
+
+  @Index('verificationCode_index')
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  verificationCode!: string | null;
 
   @CreateDateColumn()
   created_at: Date;
@@ -81,4 +105,38 @@ export class Users extends BaseEntity {
 
   @OneToMany(() => SeriesRating, (seriesRating) => seriesRating.userId)
   seriesRatings: SeriesRating[];
+
+  @BeforeInsert()
+  async securePassword(): Promise<string | null> {
+    if (this.password) {
+      const hashedPassword: string = await HashPassword(this.password);
+      this.password = await EncryptPassword(
+        hashedPassword,
+        config.get<string>("key")
+      );
+    }
+    return this.password;
+  }
+
+  //  Validate password
+  static async comparePasswords(
+    candidatePassword: string,
+    encryptedPassword: string
+  ) {
+    candidatePassword = await HashPassword(candidatePassword);
+    const decryptedPassword = await DecryptPassword(
+      encryptedPassword,
+      config.get<string>("key")
+    );
+    return await VerifyPassword(candidatePassword, decryptedPassword);
+  }
+
+  static createVerificationCode() {
+    const verificationCode = crypto.randomBytes(32).toString("hex");
+    const hashedVerificationCode = crypto
+      .createHash("sha256")
+      .update(verificationCode)
+      .digest("hex");
+    return { verificationCode, hashedVerificationCode };
+  }
 }
