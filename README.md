@@ -1,6 +1,7 @@
 # Dionysus: Backend
 
 ## Description:
+
 Dionysus is a free Movie and TV-Serieses streaming website, with all the features expected from modren streaming services
 mainly user accounts that hold user watch history, recommendation system based on this history and a slick UI.
 
@@ -9,6 +10,7 @@ This repository holds the backend side of the website powered by NodeJS, Express
 ## Todo:
 
 ### Database
+
 - [x] ER Diagram
 - [x] Relation Data Model
 - [x] Normalization
@@ -26,11 +28,24 @@ This repository holds the backend side of the website powered by NodeJS, Express
 - [ ] User Intrests
 - [ ] User Recomendation System
 - [ ] Since History is unique, you need to update the watch time and date when a user rewatches the same thing
- 
+
 ### Backend
+
+- [x] TypeScript
+- [x] TypeOrm
+- [x] Redis
+- [x] Jwt And User Auth
+- [x] Email Verification
 - [ ] Routes
+  - [x] Auth Route
+  - [x] User Route
+  - [ ] Movie Route
+  - [ ] Searies Route
+  - [ ] Search Route
 - [ ] Crawler That Automatically Adds Data From Searches
-- [ ] User Intrests
-- [ ] User Recomendation System
+- [ ] logger
 
+### Documentation
 
+- [ ] Authentication Documentation
+- [ ] Swagger
