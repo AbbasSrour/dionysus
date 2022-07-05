@@ -47,7 +47,7 @@ export class Users extends BaseEntity {
   @Column("character varying", {
     name: "user_password",
     default: "default",
-    length: 200,
+    length: 400,
   })
   password: string;
 
