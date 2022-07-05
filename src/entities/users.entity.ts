@@ -80,6 +80,7 @@ export class Users extends BaseEntity {
 
   @Index('verificationCode_index')
   @Column({
+    name: "verification_code",
     type: 'text',
     nullable: true,
   })
