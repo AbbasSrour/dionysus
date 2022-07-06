@@ -1,21 +1,42 @@
-version: '3'
+version: "3"
+
+networks:
+  loki:
+
+volumes:
+  progresDB:
+  redisDB:
+  promtail:
+
 services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4001:3000"
   postgres:
     image: postgres:latest
     container_name: postgres
     ports:
-      - '6500:5432'
+      - "6500:5432"
     volumes:
       - progresDB:/data/postgres
     env_file:
-      - ./.env
+      - ./development.env
   redis:
     image: redis:alpine
     container_name: redis
     ports:
-      - '6379:6379'
+      - "6479:6379"
     volumes:
       - redisDB:/data
-volumes:
-  progresDB:
-  redisDB:
+  promtail:
+    image: grafana/promtail:main
+    container_name: promtail
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - /home/ubuntu/docker-config.yml:/etc/promtail/docker-config.yml
+    command: -config.file=/etc/promtail/docker-config.yml
+    networks:
+      - loki

@@ -18,6 +18,7 @@ export class Email {
   constructor(public user: Users, public url: string) {
     this.firstName = user.firstName;
     this.to = user.email;
+    // BUG: Email form not defined
     this.from = `Dionysus Streaming ${config.get<string>("emailFrom")}`;
   }
 

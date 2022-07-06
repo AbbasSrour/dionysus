@@ -1,4 +1,4 @@
- const props = {
+const props = {
   openapi: "3.0.1",
   info: {
     version: "1.0.0",
@@ -10,5 +10,14 @@
       url: "https://abbassrour.ml",
     },
   },
+  servers: [
+    {
+      url: "http://localhost:5000",
+      description: "Local server"
+    },
+  ],
+  tags: {
+    name: 'User Authentication'
+  }
 };
 export default props;

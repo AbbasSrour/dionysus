@@ -12,9 +12,10 @@ import ValidateEnv from "./utils/validate-env.util";
 import express, { NextFunction, Request, Response, Application } from "express";
 import AppError from "./errors/app.error";
 
-// Database
+// Utils
 import { AppDataSource } from "./utils/data-source.util";
 import { RedisClient, ConnectRedis } from "./utils/redis.util";
+import log from "./utils/logger.util";
 
 // Middleware
 import cors from "cors";
@@ -23,7 +24,7 @@ import cookieParser from "cookie-parser";
 
 // Documentation
 import swaggerUI from "swagger-ui-express";
-import swaggerDocs from "./docs/swagger";
+import swaggerDocs from "./docs/swagger.doc";
 
 // Routes
 import authRoute from "./routes/auth.route";
@@ -45,7 +46,13 @@ AppDataSource.initialize()
     app.use(cookieParser());
 
     // logger
-    if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
+    // if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
+    const loggerstream = {
+      write: function(message: any, encoding: any) {
+        log.info(message);
+      },
+    };
+    app.use(require("morgan")("combined", { stream: loggerstream }));
 
     // Cors
     app.use(
@@ -55,19 +62,14 @@ AppDataSource.initialize()
       })
     );
 
+    // Template Engine
+    app.set("view engine", "pug");
+    app.set("views", `${__dirname}/views`);
+
     // Swagger Api Documentation
     const swaggerOpts = {
       explorer: true,
     };
-    app.use(
-      "/docs",
-      swaggerUI.serve,
-      swaggerUI.setup(swaggerDocs, swaggerOpts)
-    );
-
-    // Template Engine
-    app.set("view engine", "pug");
-    app.set("views", `${__dirname}/views`);
 
     //------------------------------------------ Routes ----------------------------------------------------//
 
@@ -78,10 +80,13 @@ AppDataSource.initialize()
     });
 
     // Health Check Route
-    app.get("/api/v1/healthchecker", async (req: Request, res: Response) => {
+    app.get("/health", async (req: Request, res: Response) => {
       const message = await RedisClient.get("try");
       res.status(200).json({ status: "success", message });
     });
+
+    // Documentation
+    app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs, swaggerOpts));
 
     // Authentication Route
     app.use("/api/v1/auth", authRoute);
@@ -118,10 +123,10 @@ AppDataSource.initialize()
     )["port"];
 
     app.listen(config.get<number>("port"), () => {
-      console.log(`⚡️[server]: Server running at https://localhost:${port}`);
-      console.log(`🌱[enviroment]: Server running on ${env} enviroment`);
-      console.log(`🗄️[Database]: Psql db ${dbName} running on port ${dbPort}`);
-      if (redis) console.log("📕[redis]: Redis client connected successfully");
+      log.info(`⚡️[server]: Server running at https://localhost:${port}`);
+      log.info(`🌱[enviroment]: Server running on ${env} enviroment`);
+      log.info(`🗄️[Database]: Psql db ${dbName} running on port ${dbPort}`);
+      if (redis) log.info("📕[redis]: Redis client connected successfully");
     });
   })
   .catch((error) => console.log(error));
