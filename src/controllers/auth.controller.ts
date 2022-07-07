@@ -151,7 +151,7 @@ export const refreshAccessTokenHandler = async (
     );
     if (!decoded) return next(new AppError(403, message));
 
-    const session = await RedisClient.get(decoded.sub);
+    const session = await RedisClient.get(`user: ${decoded.sub}`);
     if (!session) return next(new AppError(403, message));
 
     const user = await findUserById(JSON.parse(session).userId);
@@ -184,7 +184,7 @@ export const logoutHandler = async (
   try {
     const user = res.locals.user;
 
-    await RedisClient.del(user.id);
+    await RedisClient.del(`user: ${user.id}`);
 
     res.cookie("accessToken", "", { maxAge: -1 });
     res.cookie("refreshToken", "", { maxAge: -1 });

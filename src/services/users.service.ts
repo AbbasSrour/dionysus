@@ -31,7 +31,7 @@ export const findUser = async (object: object): Promise<Users | null> => {
 
 export const signTokens = async (user: Users) => {
   // create an entry for the user in the redis database
-  await RedisClient.set(`${user.userId}`, JSON.stringify(user), {
+  await RedisClient.set(`user: ${user.userId}`, JSON.stringify(user), {
     EX: config.get<number>("redisCacheExpiresIn") * 60,
   });
 
