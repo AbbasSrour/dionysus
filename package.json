@@ -7,12 +7,15 @@
   "keywords": [],
   "main": "index.js",
   "scripts": {
+    "start": "npm cross-env NODE_ENV=production node build/src/index.js",
+    "start:docker": "npm run build && npm run start",
+    "build": "npm rimraf ./build && npm tsc",
+
     "production": "NODE_ENV=production node ./src/index.js",
-    "start": "pnpm cross-env NODE_ENV=production nodemon build/src/index.js",
     "dev:ts": "pnpm cross-env NODE_ENV=development ts-node-dev --respawn --transpile-only --exit-child src/index.ts",
     "dev:js": "concurrently -k \"pnpm tsc --watch\" \"pnpm cross-env NODE_ENV=development nodemon './build/src/index.js'\"",
     "test": "jest --watchAll --coverage --verbose",
-    "build": "pnpm tsc",
+
     "typeorm:cli": "pnpm cross-env NODE_ENV=development ts-node --transpile-only ./node_modules/typeorm/cli.js",
     "migration:generate": "NODE_ENV=development pnpm run typeorm:cli migration:generate",
     "migration:create": "pnpm run typeorm:cli migration:create",
@@ -68,6 +71,7 @@
     "morgan": "^1.10.0",
     "nodemon": "^2.0.19",
     "openapi-types": "^12.0.0",
+    "rimraf": "^3.0.2",
     "ts-jest": "^28.0.5",
     "ts-node": "10.7.0",
     "ts-node-dev": "^2.0.0",

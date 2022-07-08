@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace engine.api.Models
+{
+    public partial class MovieDirector
+    {
+        public long? MovieId { get; set; }
+        public long DirectorId { get; set; }
+
+        public virtual Director Director { get; set; } = null!;
+        public virtual Movie? Movie { get; set; }
+    }
+}

@@ -29,6 +29,7 @@ import swaggerDocs from "./docs/swagger.doc";
 // Routes
 import authRoute from "./routes/auth.route";
 import userRoute from "./routes/user.route";
+import searchRoute from "./routes/search.route";
 
 AppDataSource.initialize()
   .then(async () => {
@@ -86,13 +87,24 @@ AppDataSource.initialize()
     });
 
     // Documentation
-    app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs, swaggerOpts));
+    app.use(
+      "/docs",
+      swaggerUI.serve,
+      swaggerUI.setup(swaggerDocs, swaggerOpts)
+    );
 
     // Authentication Route
     app.use("/api/v1/auth", authRoute);
 
     // User Route
     app.use("/api/v1/users", userRoute);
+
+    // Search Route
+    app.use("/api/v1/search", (req: Request, res: Response) => {
+      res.send("hello world");
+    });
+
+    app.use("/api/v1/search1", searchRoute);
 
     // UNHANDLED ROUTE
     app.all("*", (req: Request, res: Response, next: NextFunction) => {
@@ -122,7 +134,7 @@ AppDataSource.initialize()
       "postgresConfig"
     )["port"];
 
-    app.listen(config.get<number>("port"), () => {
+    app.listen(config.get<number>("port"),"0.0.0.0", () => {
       log.info(`⚡️[server]: Server running at https://localhost:${port}`);
       log.info(`🌱[enviroment]: Server running on ${env} enviroment`);
       log.info(`🗄️[Database]: Psql db ${dbName} running on port ${dbPort}`);
