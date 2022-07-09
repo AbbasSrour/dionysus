@@ -7,15 +7,11 @@
   "keywords": [],
   "main": "index.js",
   "scripts": {
-    "start": "npm cross-env NODE_ENV=production node build/src/index.js",
-    "start:docker": "npm run build && npm run start",
-    "build": "npm rimraf ./build && npm tsc",
-
-    "production": "NODE_ENV=production node ./src/index.js",
-    "dev:ts": "pnpm cross-env NODE_ENV=development ts-node-dev --respawn --transpile-only --exit-child src/index.ts",
-    "dev:js": "concurrently -k \"pnpm tsc --watch\" \"pnpm cross-env NODE_ENV=development nodemon './build/src/index.js'\"",
+    "start:docker": "pnpm run build && pnpm run start",
+    "start": "pnpm cross-env NODE_ENV=production node build/src/index.js",
+    "build": "pnpm rimraf ./build && pnpm swc ./src -d ./build",
+    "dev": "pnpm cross-env NODE_ENV=development ts-node-dev --respawn --transpile-only --exit-child src/index.ts",
     "test": "jest --watchAll --coverage --verbose",
-
     "typeorm:cli": "pnpm cross-env NODE_ENV=development ts-node --transpile-only ./node_modules/typeorm/cli.js",
     "migration:generate": "NODE_ENV=development pnpm run typeorm:cli migration:generate",
     "migration:create": "pnpm run typeorm:cli migration:create",
@@ -47,6 +43,8 @@
     "zod": "^3.17.3"
   },
   "devDependencies": {
+    "@swc/cli": "^0.1.57",
+    "@swc/core": "^1.2.210",
     "@types/body-parser": "^1.19.2",
     "@types/cheerio": "^0.22.31",
     "@types/config": "^0.0.41",

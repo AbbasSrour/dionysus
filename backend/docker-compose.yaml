@@ -7,5 +7,5 @@ services:
     ports:
       - "5000:5000"
       - "9229:9229"
+    command: pnpm start:docker 
     # restart: unless-stopped
-  # network_mode: "host"
