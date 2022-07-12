@@ -21,9 +21,9 @@ import {
   HashPassword,
   VerifyPassword,
 } from "../utils/cryptography.util";
-import config from "config";
 
 import crypto from "crypto";
+import { env } from "../utils/validate-env.util";
 
 @Entity("users", { schema: "dionysus" })
 export class Users extends BaseEntity {
@@ -113,7 +113,7 @@ export class Users extends BaseEntity {
       const hashedPassword: string = await HashPassword(this.password);
       this.password = await EncryptPassword(
         hashedPassword,
-        config.get<string>("key")
+        env.ENC_KEY
       );
     }
     return this.password;
@@ -127,7 +127,7 @@ export class Users extends BaseEntity {
     candidatePassword = await HashPassword(candidatePassword);
     const decryptedPassword = await DecryptPassword(
       encryptedPassword,
-      config.get<string>("key")
+      env.ENC_KEY
     );
     return await VerifyPassword(candidatePassword, decryptedPassword);
   }

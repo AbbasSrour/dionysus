@@ -1,8 +1,9 @@
 import { createClient } from "redis";
-import config from "config";
+
+import { env } from "./validate-env.util";
 
 export const RedisClient = createClient({
-  url: `redis://localhost:${config.get<number>("redis_port")}`,
+  url: `redis://localhost:${env.REDIS_PORT}`,
 });
 
 export const ConnectRedis = async () => {
@@ -14,4 +15,4 @@ export const ConnectRedis = async () => {
     console.log(error);
     setTimeout(ConnectRedis, 5000);
   }
-}
+};

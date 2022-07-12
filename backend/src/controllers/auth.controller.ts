@@ -1,5 +1,5 @@
 import { RedisClient } from "../utils/redis.util";
-import config from "config";
+
 import { CookieOptions, NextFunction, Request, Response } from "express";
 import { Users } from "../entities/users.entity";
 import AppError from "../errors/app.error";
@@ -18,6 +18,7 @@ import {
 import { signJwt, verifyJwt } from "../utils/jwt.util";
 import { Email } from "../utils/email.util";
 import crypto from "crypto";
+import { env } from "../utils/validate-env.util";
 
 // Setting Up Cookie Options
 const cookieOptions: CookieOptions = {
@@ -25,22 +26,18 @@ const cookieOptions: CookieOptions = {
   sameSite: "lax",
 };
 
-if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+if (env.NODE_ENV === "production") cookieOptions.secure = true;
 
 const accessTokenCookieOptions: CookieOptions = {
   ...cookieOptions,
-  expires: new Date(
-    Date.now() + config.get<number>("accessTokenExpiresIn") * 60 * 1000
-  ),
-  maxAge: config.get<number>("accessTokenExpiresIn") * 60 * 1000,
+  expires: new Date(Date.now() + env.ACCESS_TOKEN_EXPIRATION * 60 * 1000),
+  maxAge: env.ACCESS_TOKEN_EXPIRATION * 60 * 1000,
 };
 
 const refreshTokenCookieOptions: CookieOptions = {
   ...cookieOptions,
-  expires: new Date(
-    Date.now() + config.get<number>("refreshTokenExpiresIn") * 60 * 1000
-  ),
-  maxAge: config.get<number>("refreshTokenExpiresIn") * 60 * 1000,
+  expires: new Date(Date.now() + env.REFRESH_TOKEN_EXPIRATION * 60 * 1000),
+  maxAge: env.REFRESH_TOKEN_EXPIRATION * 60 * 1000,
 };
 
 // Register Controller
@@ -61,12 +58,11 @@ export const registerUserHandler = async (
     });
 
     // email verification process
-    const { hashedVerificationCode, verificationCode } = Users.createVerificationCode();
+    const { hashedVerificationCode, verificationCode } =
+      Users.createVerificationCode();
     user.verificationCode = hashedVerificationCode;
     await user.save();
-    const redirectUrl = `${config.get<string>(
-      "origin"
-    )}/verifyemail/${verificationCode}`;
+    const redirectUrl = `${env.ORIGIN}/verifyemail/${verificationCode}`;
     try {
       await new Email(user, redirectUrl).sendVerificationCode();
       res.status(201).json({
@@ -158,7 +154,7 @@ export const refreshAccessTokenHandler = async (
     if (!user) return next(new AppError(403, message));
 
     const accessToken = signJwt({ sub: user.userId }, "accessTokenPrivateKey", {
-      expiresIn: `${config.get<number>("accessTokenExpiresIn")}m`,
+      expiresIn: `${env.ACCESS_TOKEN_EXPIRATION}m`,
     });
 
     res.cookie("accessToken", accessToken, accessTokenCookieOptions);

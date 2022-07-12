@@ -1,30 +1,30 @@
-import config from "config";
 import { Users } from "../entities/users.entity";
 import nodemailer from "nodemailer";
 import { convert } from "html-to-text";
 import pug from "pug";
+import { env } from "./validate-env.util";
 
-const smtp = config.get<{
-  host: string;
-  user: string;
-  pass: string;
-  port: number;
-}>("smtp");
+const smtp = {
+  host: env.EMAIL_HOST,
+  user: env.EMAIL_USER,
+  pass: env.EMAIL_PASS,
+  port: env.EMAIL_PORT,
+};
 
 export class Email {
   firstName: string;
   to: string;
   from: string;
+
   constructor(public user: Users, public url: string) {
     this.firstName = user.firstName;
     this.to = user.email;
-    // BUG: Email form not defined
-    this.from = `Dionysus Streaming ${config.get<string>("emailFrom")}`;
+    // BUG: Email from not defined
+    // this.from = `Dionysus Streaming ${}`;
   }
 
   private newTransport() {
-    if (process.env.NODE_ENV === "production")
-      console.log("Hello from email class");
+    if (env.NODE_ENV === "production") console.log("Hello from email class");
     return nodemailer.createTransport({
       ...smtp,
       auth: {

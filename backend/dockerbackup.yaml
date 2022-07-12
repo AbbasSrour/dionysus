@@ -41,7 +41,7 @@ services:
     networks:
       - loki
 
-        ###############################################################################################
+      ###############################################################################################
 version: "3"
 
 services:
@@ -67,7 +67,7 @@ services:
   #   volumes:
   #     - postgresDB:/data/postgres
   #   env_file:
-  #     - ./production.env
+  #     - ./stage.env
   #     #- POSTGRES_HOST_AUTH_METHOD: trust
   #
 #   redis:

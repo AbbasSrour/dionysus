@@ -1,5 +1,5 @@
 export default {
-  enviroment: 'NODE_ENV',
+  environment: 'NODE_ENV',
   port: 'PORT',
   key: 'ENC_KEY',
   redis_port: 'REDIS_PORT',

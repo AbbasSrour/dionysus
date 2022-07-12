@@ -1,5 +1,5 @@
 # Specify a base image
-FROM node:alpine
+FROM node:alpine AS app
 
 # Add pnpm
 RUN apk add --no-cache curl \
@@ -9,22 +9,38 @@ RUN apk add --no-cache curl \
 WORKDIR /usr/share/app
 
 # Copy the dependencies file
-COPY ./package.json .
+COPY package.json tsconfig.json ./
 
 #Install dependencies
-RUN pnpm install
+RUN ["pnpm", "install"]
 
 # Copy source code files
 COPY ./src ./src
 
-# Copy config
-COPY ./config ./config
+# Default command
+RUN ["pnpm","build"]
 
-# Copy enviroment
-COPY production.env tsconfig.json ./
+# Specify a base image
+FROM node:alpine
 
-# Port
+# Add pnpm
+RUN apk add --no-cache curl \
+     && curl -sL https://unpkg.com/@pnpm/self-installer | node
+
+# Specify a working directory
+WORKDIR /usr/app
+
+# Copy some files
+COPY package.json development.env staging.env ./
+
+# Install production dependencies
+RUN ["pnpm", "install", "--only=production"]
+
+# Copy build
+COPY --from=app /usr/share/app/build ./build
+
+# Expose Port
 EXPOSE 5000
 
-# Default command
-CMD ["pnpm","production"]
+# Start application
+CMD ["pnpm","run", "stage"]

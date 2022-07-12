@@ -3,7 +3,7 @@
     "target": "es2017",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -14,14 +14,15 @@
     "outDir": "./build",
     "rootDir": "."
   },
-  "exclude": ["tests", "./jest.config.ts", "src/migrations", "src/database"],
+  "exclude": ["tests", "./jest.config.ts", "src/migrations"],
+  "include": ["config", "src/"],
   "ts-node": {
     "transpileOnly": true,
     "files": true,
     "compilerOptions": {
       "rootDir": "."
     },
-    "include": ["src/**/*"],
+    "include": ["src/", "config/"],
     "exclude": ["node_modules", "tests"]
   }
 }

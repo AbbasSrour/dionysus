@@ -1,5 +1,6 @@
 import jwt, { SignOptions } from "jsonwebtoken";
-import config from "config";
+
+import { env } from "./validate-env.util";
 
 // TODO: Remeber to change the encoding of keys in the .env to hex
 export const signJwt = async (
@@ -7,9 +8,16 @@ export const signJwt = async (
   keyName: "accessTokenPrivateKey" | "refreshTokenPrivateKey",
   options: SignOptions
 ) => {
-  const privateKey = Buffer.from(config.get<string>(keyName), "hex").toString(
-    "ascii"
-  );
+  var privateKey: string;
+  if (keyName == "accessTokenPrivateKey")
+    privateKey = Buffer.from(env.JWT_ACCESS_TOKEN_PRIVATE_KEY, "hex").toString(
+      "ascii"
+    );
+  else
+    privateKey = Buffer.from(env.JWT_REFRESH_TOKEN_PRIVATE_KEY, "hex").toString(
+      "ascii"
+    );
+
   return jwt.sign(payload, privateKey, {
     ...(options && options),
     algorithm: "RS256",
@@ -21,9 +29,15 @@ export const verifyJwt = <T>(
   keyName: "accessTokenPublicKey" | "refreshTokenPublicKey"
 ): T | null => {
   try {
-    const publicKey = Buffer.from(config.get<string>(keyName), "hex").toString(
-      "ascii"
-    );
+    var publicKey: string;
+    if (keyName === "accessTokenPublicKey")
+      publicKey = Buffer.from(env.JWT_ACCESS_TOKEN_PUBLIC_KEY, "hex").toString(
+        "ascii"
+      );
+    else
+      publicKey = Buffer.from(env.JWT_REFRESH_TOKEN_PUBLIC_KEY, "hex").toString(
+        "ascii"
+      );
     const decoded = jwt.verify(token, publicKey) as T;
     return decoded;
   } catch (error) {

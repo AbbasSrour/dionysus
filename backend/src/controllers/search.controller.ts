@@ -4,7 +4,7 @@ import Movie from "../entities/movie.entity";
 import { Series } from "../entities/series.entity";
 import { searchSeries } from "../services/series.service";
 import { searchMovies } from "../services/movies.service";
-import got from "got/dist/source";
+// import got from "got/dist/source";
 
 export const searchHandler = async (
   req: Request,
@@ -27,7 +27,8 @@ export const searchHandler = async (
       };
 
       // Send request to crawler
-      const crawlerRequest = got.post("");
+      // const crawlerRequest = got.post("");
+      const crawlerRequest = "helloworld";
 
       // TODO: More thought should go into this especially the expiration
       if (crawlerRequest != null)

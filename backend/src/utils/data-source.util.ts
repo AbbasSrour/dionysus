@@ -1,23 +1,13 @@
-import path from "path";
-import dotenv from "dotenv";
-dotenv.config({
-  path: path.resolve(__dirname, `../../${process.env.NODE_ENV}.env`),
-});
-
 import { DataSource } from "typeorm";
 import "reflect-metadata";
-import config from "config";
-
-const postgresConfig = config.get<{
-  host: string;
-  port: number;
-  username: string;
-  password: string;
-  database: string;
-}>("postgresConfig");
+import { env } from "./validate-env.util";
 
 export const AppDataSource = new DataSource({
-  ...postgresConfig,
+  host: env.PSQL_DB_URL,
+  port: env.PSQL_DB_PORT,
+  username: env.PSQL_DB_USER_NAME,
+  password: env.PSQL_DB_PASSWORD,
+  database: env.PSQL_DB_NAME,
   type: "postgres",
   synchronize: false,
   logging: false,

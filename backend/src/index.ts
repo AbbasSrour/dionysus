@@ -1,25 +1,30 @@
 //------------------------------------------ Imports --------------------------------------------------------//
-// Enviroment
+// Environment
 import path from "path";
 import dotenv from "dotenv";
-dotenv.config({
-  path: path.resolve(__dirname, `../${process.env.NODE_ENV}.env`),
-});
-import config from "config";
-import ValidateEnv from "./utils/validate-env.util";
 
+if (process.env.NODE_ENV === "development")
+  dotenv.config({
+    path: path.resolve(__dirname, `../${process.env.NODE_ENV}.env`),
+  });
+else if (process.env.NODE_ENV === "staging")
+  dotenv.config({
+    path: path.resolve(__dirname, `../../${process.env.NODE_ENV}.env`),
+  });
+else dotenv.config();
+
+import ValidateEnv, { env } from "./utils/validate-env.util";
 // Rest
-import express, { NextFunction, Request, Response, Application } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
 import AppError from "./errors/app.error";
 
 // Utils
 import { AppDataSource } from "./utils/data-source.util";
-import { RedisClient, ConnectRedis } from "./utils/redis.util";
+import { ConnectRedis, RedisClient } from "./utils/redis.util";
 import log from "./utils/logger.util";
 
 // Middleware
 import cors from "cors";
-import morgan from "morgan";
 import cookieParser from "cookie-parser";
 
 // Documentation
@@ -34,9 +39,9 @@ import searchRoute from "./routes/search.route";
 AppDataSource.initialize()
   .then(async () => {
     //------------------------------------------ Setup ------------------------------------------------------//
-    ValidateEnv();
     const redis = await ConnectRedis();
     const app: Application = express();
+    ValidateEnv();
 
     //------------------------------------------ Middleware ------------------------------------------------//
 
@@ -49,8 +54,8 @@ AppDataSource.initialize()
     // logger
     // if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
     // noinspection SpellCheckingInspection
-      const loggerstream = {
-      write: function(message: any, encoding: any) {
+    const loggerstream = {
+      write: function (message: any, encoding: any) {
         log.info(message);
       },
     };
@@ -59,7 +64,7 @@ AppDataSource.initialize()
     // Cors
     app.use(
       cors({
-        origin: config.get<string>("origin"),
+        origin: process.env.ORIGIN,
         credentials: true,
       })
     );
@@ -126,18 +131,13 @@ AppDataSource.initialize()
     );
 
     //------------------------------------------ Listen ----------------------------------------------------//
-    const port = config.get<number>("port");
-    const env = config.get<string>("environment");
-    const dbName = config.get<{ database: string }>("postgresConfig")[
-      "database"
-    ];
-    const dbPort = config.get<{ database: string; port: number }>(
-      "postgresConfig"
-    )["port"];
-
-    app.listen(config.get<number>("port"),"0.0.0.0", () => {
+    const port = env.PORT;
+    const environment = env.NODE_ENV;
+    const dbName = env.PSQL_DB_NAME;
+    const dbPort = env.PSQL_DB_PORT;
+    app.listen(port, "0.0.0.0", () => {
       log.info(`⚡️[server]: Server running at https://localhost:${port}`);
-      log.info(`🌱[environment]: Server running on ${env} environment`);
+      log.info(`🌱[environment]: Server running on ${environment} environment`);
       log.info(`🗄️[Database]: Psql db ${dbName} running on port ${dbPort}`);
       if (redis) log.info("📕[redis]: Redis client connected successfully");
     });

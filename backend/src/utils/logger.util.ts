@@ -1,10 +1,10 @@
 import winston from "winston";
-import config from "config";
-var { Loggly } = require('winston-loggly-bulk');
+import { env } from "./validate-env.util";
 
 const { format, createLogger, transports } = winston;
 const { timestamp, combine, printf, errors, json } = format;
 
+var { Loggly } = require("winston-loggly-bulk");
 
 // Development Logger Configuration
 const devLogConfig = {
@@ -14,7 +14,7 @@ const devLogConfig = {
     errors({ stack: true }),
     printf(({ level, message, timestamp, stack }) => {
       return `${timestamp} ${level}: ${stack || message}`;
-    }),
+    })
   ),
   transports: [
     new transports.Console(),
@@ -37,13 +37,13 @@ const productionLogConfig = {
       token: "f502b35f-cc1e-4621-898f-0eb24d8ad1a8",
       subdomain: "abbassrour",
       tags: ["Winston-Dionysus-Pro"],
-      json: true
+      json: true,
     }),
   ],
 };
 
-// Choose logger based on the enviroment 
-if (config.get<string>("enviroment") == "development")
+// Choose logger based on the environment
+if (env.NODE_ENV === "development")
   var logger = winston.createLogger(productionLogConfig);
 else var logger = winston.createLogger(devLogConfig);
 
