@@ -56,7 +56,7 @@ AppDataSource.initialize()
     // noinspection SpellCheckingInspection
     const loggerstream = {
       write: function (message: any, encoding: any) {
-        log.info(message);
+        log.error(message);
       },
     };
     app.use(require("morgan")("combined", { stream: loggerstream }));
@@ -136,9 +136,11 @@ AppDataSource.initialize()
     const dbName = env.PSQL_DB_NAME;
     const dbPort = env.PSQL_DB_PORT;
     app.listen(port, "0.0.0.0", () => {
-      log.info(`⚡️[server]: Server running at https://localhost:${port}`);
-      log.info(`🌱[environment]: Server running on ${environment} environment`);
-      log.info(`🗄️[Database]: Psql db ${dbName} running on port ${dbPort}`);
+      log.error(`⚡️[server]: Server running at https://localhost:${port}`);
+      log.error(
+        `🌱[environment]: Server running on ${environment} environment`
+      );
+      log.error(`🗄️[Database]: Psql db ${dbName} running on port ${dbPort}`);
       if (redis) log.info("📕[redis]: Redis client connected successfully");
     });
   })

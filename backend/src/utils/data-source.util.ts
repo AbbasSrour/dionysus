@@ -1,3 +1,17 @@
+// For running migrations since creating the migration doesn't go through index
+import dotenv from "dotenv";
+import path from "path";
+
+if (process.env.NODE_ENV === "development")
+  dotenv.config({
+    path: path.resolve(__dirname, `../../${process.env.NODE_ENV}.env`),
+  });
+else if (process.env.NODE_ENV === "staging")
+  dotenv.config({
+    path: path.resolve(__dirname, `../../../${process.env.NODE_ENV}.env`),
+  });
+else dotenv.config();
+
 import { DataSource } from "typeorm";
 import "reflect-metadata";
 import { env } from "./validate-env.util";

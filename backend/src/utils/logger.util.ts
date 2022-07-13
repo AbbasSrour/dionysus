@@ -1,23 +1,21 @@
-import winston from "winston";
+import winston, { Logger } from "winston";
 import { env } from "./validate-env.util";
-
-const { format, createLogger, transports } = winston;
-const { timestamp, combine, printf, errors, json } = format;
+import LokiTransport from "winston-loki";
 
 var { Loggly } = require("winston-loggly-bulk");
 
 // Development Logger Configuration
 const devLogConfig = {
-  format: combine(
-    format.colorize(),
-    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-    errors({ stack: true }),
-    printf(({ level, message, timestamp, stack }) => {
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+    winston.format.errors({ stack: true }),
+    winston.format.printf(({ level, message, timestamp, stack }) => {
       return `${timestamp} ${level}: ${stack || message}`;
     })
   ),
   transports: [
-    new transports.Console(),
+    new winston.transports.Console(),
     // new Loggly({
     //   token: "f502b35f-cc1e-4621-898f-0eb24d8ad1a8",
     //   subdomain: "abbassrour",
@@ -29,22 +27,34 @@ const devLogConfig = {
 
 // Production Logger Configuration
 const productionLogConfig = {
-  format: combine(timestamp(), errors({ stack: true }), json()),
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
   defaultMeta: { service: "user-service" },
   transports: [
     new winston.transports.Console(),
-    new Loggly({
-      token: "f502b35f-cc1e-4621-898f-0eb24d8ad1a8",
-      subdomain: "abbassrour",
-      tags: ["Winston-Dionysus-Pro"],
+    new LokiTransport({
+      host: "http://loki:3100/loki/api/push",
+      labels: { app: "api" },
       json: true,
+      format: winston.format.json(),
+      replaceTimestamp: true,
+      onConnectionError: (err) => console.error(err),
     }),
+    // new Loggly({
+    //   token: "f502b35f-cc1e-4621-898f-0eb24d8ad1a8",
+    //   subdomain: "abbassrour",
+    //   tags: ["Winston-Dionysus-Pro"],
+    //   json: true,
+    // }),
   ],
 };
 
-// Choose logger based on the environment
-if (env.NODE_ENV === "development")
-  var logger = winston.createLogger(productionLogConfig);
-else var logger = winston.createLogger(devLogConfig);
+let logger: Logger;
+
+if (env.NODE_ENV === "development") logger = winston.createLogger(devLogConfig);
+else logger = winston.createLogger(productionLogConfig);
 
 export default logger;

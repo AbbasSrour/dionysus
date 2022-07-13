@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "KFV6kLFgBAkWG8knfmb5cxMU5seNeBvHnpLw5LM9RXL9JVzatZ+v9mjlbpv06glureCrniVV2P8N7M3lcicnAg==",
+  "dgSpecHash": "0MxqETgy0uDz6vZINz2SsU8nLSNe3ivvoyT/irH72qNSBi5xypFVqd+TAloRmBC39aKKTKRITkePVkLu2/7PYg==",
   "success": true,
   "projectFilePath": "/home/ares/Projects/dionysus/engine/engine.tests/engine.tests.csproj",
   "expectedPackageFiles": [
@@ -95,8 +95,7 @@
     "/home/ares/.nuget/packages/xunit.core/2.4.1/xunit.core.2.4.1.nupkg.sha512",
     "/home/ares/.nuget/packages/xunit.extensibility.core/2.4.1/xunit.extensibility.core.2.4.1.nupkg.sha512",
     "/home/ares/.nuget/packages/xunit.extensibility.execution/2.4.1/xunit.extensibility.execution.2.4.1.nupkg.sha512",
-    "/home/ares/.nuget/packages/xunit.runner.visualstudio/2.4.3/xunit.runner.visualstudio.2.4.3.nupkg.sha512",
-    "/home/ares/.nuget/packages/microsoft.aspnetcore.app.ref/6.0.2/microsoft.aspnetcore.app.ref.6.0.2.nupkg.sha512"
+    "/home/ares/.nuget/packages/xunit.runner.visualstudio/2.4.3/xunit.runner.visualstudio.2.4.3.nupkg.sha512"
   ],
   "logs": []
 }

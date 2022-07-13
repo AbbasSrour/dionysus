@@ -1,0 +1,125 @@
+version: "3"
+
+volumes:
+  RedisDB:
+  Loki:
+  LokiTmp:
+  LokiChunks:
+  LokiRules:
+  Promtail:
+  Prometheus:
+  Grafana:
+
+networks:
+  loki:
+  redis:
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: api
+    ports:
+      - "5000:5000"
+      - "9229:9229"
+    networks:
+      - loki
+      - redis
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6479:6379"
+    volumes:
+      - RedisDB:/data
+    networks:
+      - redis
+
+  loki:
+    build:
+      context: ./monitoring/loki
+      dockerfile: Dockerfile
+    container_name: loki
+    user: "0"
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - Loki:/etc/loki
+      - LokiChunks:/tmp/loki/chunks
+      - LokiRules:/tmp/loki/rules
+    ports:
+      - "3100:3100"
+    restart: unless-stopped
+    networks:
+      - loki
+
+  promtail:
+    build:
+      context: ./monitoring/promtail
+      dockerfile: Dockerfile
+    container_name: promtail
+    command: -config.file=/etc/promtail/config.yaml
+    volumes:
+      - Promtail:/etc/promtail
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - /var/log:/var/log
+    restart: unless-stopped
+    depends_on:
+      - loki
+    networks:
+      - loki
+
+  prometheus:
+    build:
+      context: ./monitoring/prometheus
+      dockerfile: Dockerfile
+    container_name: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    volumes:
+      - Prometheus:/etc/prometheus
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  grafana:
+    build:
+      context: ./monitoring/grafana
+      dockerfile: Dockerfile
+    container_name: grafana
+    user: "0"
+    volumes:
+#      - Grafana:/etc/grafana
+      - ./monitoring/grafana:/var/lib/grafana
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    depends_on:
+      - prometheus
+      - promtail
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - loki
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /sys:/sys:ro
+      - /var/run:/var/run:rw
+      - /var/lib/docker:/var/lib/docker:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    restart: unless-stopped
+    depends_on:
+      - api
