@@ -20,6 +20,8 @@ export const env = cleanEnv(process.env, {
   EMAIL_HOST: str(),
   EMAIL_PORT: port(),
   LOKI: str(),
+  LOKI_HOST:str(),
+  LOKI_API: str(),
   ORIGIN: str(),
   ACCESS_TOKEN_EXPIRATION: num(),
   REFRESH_TOKEN_EXPIRATION: num(),

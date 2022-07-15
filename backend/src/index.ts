@@ -21,7 +21,7 @@ import AppError from "./errors/app.error";
 // Utils
 import { AppDataSource } from "./utils/data-source.util";
 import { ConnectRedis, RedisClient } from "./utils/redis.util";
-import log from "./utils/logger.util";
+import {getLogger} from "./utils/logger.util";
 
 // Middleware
 import cors from "cors";
@@ -42,6 +42,7 @@ AppDataSource.initialize()
     const redis = await ConnectRedis();
     const app: Application = express();
     ValidateEnv();
+    const log = getLogger();
 
     //------------------------------------------ Middleware ------------------------------------------------//
 

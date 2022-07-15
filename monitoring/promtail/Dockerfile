@@ -1,5 +1,5 @@
-FROM grafana/promtail:2.4.0
+FROM grafana/promtail:2.3.0
 
 WORKDIR /etc/promtail
 
-COPY config.yaml ./
+COPY config.yml ./

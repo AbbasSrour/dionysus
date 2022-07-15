@@ -5,9 +5,8 @@ import got from "got";
 const aes_encrypt = (data: string, key: Buffer, iv: Buffer): string => {
   const cipher = crypto.createCipheriv("AES-256-CBC", key, iv);
   cipher.setAutoPadding(true);
-  const encrypted = cipher.update(data);
-  const encryptedData = cipher.final("base64");
-  return encryptedData;
+  const encryptedData = Buffer.concat([cipher.update(data), cipher.final()]);
+  return encryptedData.toString("base64");
 };
 
 const aes_decrypt = (encrypted: string, key: Buffer, iv: Buffer): string => {
