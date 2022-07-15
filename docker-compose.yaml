@@ -1,5 +1,5 @@
 ############################################### Setup #######################################################
-version: "3"
+version: "3.3"
 
 volumes:
   RedisDB:
@@ -9,9 +9,9 @@ volumes:
   GrafanaConfig: {}
   Caddy: {}
   AlertManager: {}
+  Syslog: {}
   Loki: {}
   Promtail: {}
-  Syslog: {}
 
 networks:
   redis:
@@ -31,7 +31,6 @@ services:
       - "9229:9229"
     networks:
       redis:
-      loki: null
     depends_on:
       - redis
     restart: unless-stopped
@@ -151,14 +150,13 @@ services:
       dockerfile: Dockerfile
     container_name: loki
     volumes:
-    - Loki:/etc/loki
-    command: -config.file=/etc/loki/loki.yml
+      - Loki:/etc/loki
+    command: -config.file=/etc/loki/loki-config.yml
     restart: always
     expose:
       - 3100
     networks:
       monitor-net:
-      loki: null
     labels:
       org.label-schema.group: "logging"
 
@@ -166,25 +164,21 @@ services:
     build:
       context: ./monitoring/promtail
       dockerfile: Dockerfile
-    command: -config.file=/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/promtail-config.yml
     container_name: promtail
     volumes:
       - Promtail:/etc/promtail
       - /var/log:/var/log
   #     - /var/lib/docker/containers:/var/lib/docker/containers
     expose:
+      - 1514
       - 9080
-    ports:
-    - protocol: tcp
-      published: 1514
-      target: 1514
     networks:
       monitor-net:
-      loki: null
-    restart: unless-stopped
+    restart: always
     labels:
       org.label-schema.group: "logging"
-    
+  
   syslog-ng:
     build: 
       context: ./monitoring/syslog
@@ -195,7 +189,6 @@ services:
     - Syslog:/etc/syslog-ng
     networks:
       monitor-net:
-      loki: null
     ports:
       - protocol: udp
         published: 514
@@ -204,8 +197,8 @@ services:
         published: 601
         target: 601
     restart: always
-    depends_on:
-      - promtail
+    labels:
+      org.label-schema.group: "logging"
 
 ############################################## Visualization ###################################################
   grafana:
