@@ -11,11 +11,11 @@ volumes:
   AlertManager: {}
   Syslog: {}
   Loki: {}
+  LokiData: {}
   Promtail: {}
 
 networks:
-  redis:
-  loki: {}
+  api-net:
   monitor-net:
     driver: bridge
 
@@ -26,24 +26,26 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: api
+    # expose:
+    #   - 5000
     ports:
       - "5000:5000"
       - "9229:9229"
     networks:
-      redis:
-    depends_on:
-      - redis
+      api-net:
     restart: unless-stopped
 
   redis:
     image: redis:alpine
     container_name: redis
-    ports:
-      - "6479:6379"
+    # ports:
+    #   - "6479:6379"
+    expose:
+      - 6379
     volumes:
       - RedisDB:/data
     networks:
-      - redis
+      api-net:
 
 ############################################ Prometheus #######################################################
   prometheus:
@@ -149,8 +151,11 @@ services:
       context: ./monitoring/loki
       dockerfile: Dockerfile
     container_name: loki
+    privileged: true
+    user: root
     volumes:
       - Loki:/etc/loki
+      - LokiData:/tmp/loki
     command: -config.file=/etc/loki/loki-config.yml
     restart: always
     expose:
@@ -164,15 +169,23 @@ services:
     build:
       context: ./monitoring/promtail
       dockerfile: Dockerfile
-    command: -config.file=/etc/promtail/promtail-config.yml
+    user: root
+    privileged: true
     container_name: promtail
+    command: -config.file=/etc/promtail/promtail-config.yml
     volumes:
       - Promtail:/etc/promtail
       - /var/log:/var/log
   #     - /var/lib/docker/containers:/var/lib/docker/containers
     expose:
-      - 1514
       - 9080
+    ports:
+      - protocol: tcp
+        published: 1514
+        target: 1514 
+      # - protocol: tcp
+      #   published: 1514
+      #   target: 1514 
     networks:
       monitor-net:
     restart: always
@@ -184,6 +197,8 @@ services:
       context: ./monitoring/syslog
       dockerfile: Dockerfile
     container_name: syslog-ng
+    user: root
+    privileged: true
     command: -edv
     volumes:
     - Syslog:/etc/syslog-ng
@@ -229,7 +244,9 @@ services:
       dockerfile: Dockerfile
     container_name: caddy
     ports:
-      - "3000:3000"
+      - "3000:3000"   ## Grafana
+      - "3100:3100"   ## Loki
+      # - "5000:5000"   ## Api
       - "9090:9090"
       - "9093:9093"
       - "9091:9091"

@@ -26,3 +26,10 @@ scrape_configs:
   relabel_configs:
     - source_labels: ['__syslog_message_hostname']
       target_label: 'host'
+- job_name: docker
+  pipleline_stages:
+    - docker: {}
+  static_configs:
+    - labels:
+        job: docker
+        __path__: /var/lib/docker/containers/*/*-json.log
