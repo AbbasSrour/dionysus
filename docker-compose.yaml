@@ -16,6 +16,7 @@ volumes:
   ConsulConfig: {}
   ConsulData: {}
   Vault: {}
+  Nginx: {}
 
 networks:
   test:
@@ -197,7 +198,7 @@ services:
         target: 1514 
     networks:
       monitor-net:
-    restart: always
+    restart: unless-stopped
     labels:
       org.label-schema.group: "logging"
   
@@ -249,29 +250,29 @@ services:
 
 ################################################# System ########################################################
 ### v2.3.0
-  caddy:
-    build:
-      context: ./system/caddy
-      dockerfile: Dockerfile
-    container_name: caddy
-    ports:
-      - "3000:3000"   ## Grafana
-      - "3100:3100"   ## Loki
-      - "5000:5000"   ## Api
-      - "9090:9090"
-      - "9093:9093"
-      - "9091:9091"
-    volumes:
-      - Caddy:/etc/caddy
-    environment:
-      - ADMIN_USER=${ADMIN_USER:-admin}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
-      - ADMIN_PASSWORD_HASH=${ADMIN_PASSWORD_HASH:-JDJhJDE0JE91S1FrN0Z0VEsyWmhrQVpON1VzdHVLSDkyWHdsN0xNbEZYdnNIZm1pb2d1blg4Y09mL0ZP}
-    restart: unless-stopped
-    networks:
-      - monitor-net
-    labels:
-      org.label-schema.group: "System"
+  # caddy:
+  #   build:
+  #     context: ./system/caddy
+  #     dockerfile: Dockerfile
+  #   container_name: caddy
+  #   ports:
+  #     - "3000:3000"   ## Grafana
+  #     - "3100:3100"   ## Loki
+  #     - "5000:5000"   ## Api
+  #     - "9090:9090"
+  #     - "9093:9093"
+  #     - "9091:9091"
+  #   volumes:
+  #     - Caddy:/etc/caddy
+  #   environment:
+  #     - ADMIN_USER=${ADMIN_USER:-admin}
+  #     - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+  #     - ADMIN_PASSWORD_HASH=${ADMIN_PASSWORD_HASH:-JDJhJDE0JE91S1FrN0Z0VEsyWmhrQVpON1VzdHVLSDkyWHdsN0xNbEZYdnNIZm1pb2d1blg4Y09mL0ZP}
+  #   restart: unless-stopped
+  #   networks:
+  #     - monitor-net
+  #   labels:
+  #     org.label-schema.group: "System"
 
 ### v1.5.0
   vault:
@@ -311,4 +312,20 @@ services:
       - ConsulData:/consul/data
     networks:
       - test
+
+  nginx:
+    build: 
+      context: ./system/nginx
+      dockerfile: Dockerfile
+    image: nginx:1.17.10
+    container_name: nginx
+    ports:
+      - "5000:80"
+      - "3000:3000"
+      - "3100:3100"
+    volumes:
+      - Nginx:/etc/nginx
+    networks:
+      - monitor-net
+    restart: unless-stopped
 ################################################################################################################
