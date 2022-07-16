@@ -8,7 +8,37 @@ positions:
 clients:
   - url: http://loki:3100/loki/api/v1/push
 
+## TODO: Work on this!!
 scrape_configs:
+- job_name: containers
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: containerlogs
+      __path__: /var/lib/docker/containers/*/*log
+  pipeline_stages:
+  - json:
+      expressions:
+        output: log
+        stream: stream
+        attrs:
+  - json:
+      expressions:
+        tag:
+      source: attrs
+  - regex:
+      expression: (?P<container_name>(?:[^|]*[^|]))
+      source: tag
+  - timestamp:
+      format: RFC3339Nano
+      source: time
+  - labels:
+      tag:
+      stream:
+      container_name:
+  - output:
+      source: output
 - job_name: system
   static_configs:
     - targets:
@@ -18,7 +48,7 @@ scrape_configs:
         __path__: /var/log/*.log
 - job_name: syslog
   syslog:
-    listen_address: 0.0.0.0:1514
+    listen_address: promtail:1514
     idle_timeout: 60s
     label_structured_data: yes
     labels:
@@ -26,10 +56,3 @@ scrape_configs:
   relabel_configs:
     - source_labels: ['__syslog_message_hostname']
       target_label: 'host'
-- job_name: docker
-  pipleline_stages:
-    - docker: {}
-  static_configs:
-    - labels:
-        job: docker
-        __path__: /var/lib/docker/containers/*/*-json.log

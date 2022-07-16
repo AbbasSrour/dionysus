@@ -15,7 +15,6 @@ volumes:
   Promtail: {}
 
 networks:
-  api-net:
   monitor-net:
     driver: bridge
 
@@ -26,28 +25,25 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: api
-    # expose:
-    #   - 5000
-    ports:
-      - "5000:5000"
-      - "9229:9229"
+    expose:
+      - 5000
+      - 9229
     networks:
-      api-net:
+      monitor-net:
     restart: unless-stopped
 
   redis:
     image: redis:alpine
     container_name: redis
-    # ports:
-    #   - "6479:6379"
     expose:
       - 6379
     volumes:
       - RedisDB:/data
     networks:
-      api-net:
+      monitor-net:
 
 ############################################ Prometheus #######################################################
+### v2.36.2
   prometheus:
     container_name: prometheus
     labels:
@@ -73,6 +69,7 @@ services:
       - '--web.enable-lifecycle'
     restart: unless-stopped
 
+### v0.24.0
   alertmanager:
     build: 
       context: ./monitoring/alertmanager
@@ -91,6 +88,7 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
+### v0.44.0
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.44.0
     container_name: cadvisor
@@ -113,6 +111,7 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
+### v1.4.3
   pushgateway:
     image: prom/pushgateway:v1.4.3
     container_name: pushgateway
@@ -124,9 +123,11 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
+### v1.3.1
   nodeexporter:
     image: prom/node-exporter:v1.3.1
     container_name: nodeexporter
+    user: root
     privileged: true
     volumes:
       - /proc:/host/proc:ro
@@ -146,6 +147,7 @@ services:
       org.label-schema.group: "monitoring"
 
 ################################################## Loki ######################################################
+### v2.5.0
   loki:
     build:
       context: ./monitoring/loki
@@ -165,6 +167,7 @@ services:
     labels:
       org.label-schema.group: "logging"
 
+### v2.5.0
   promtail:
     build:
       context: ./monitoring/promtail
@@ -176,22 +179,21 @@ services:
     volumes:
       - Promtail:/etc/promtail
       - /var/log:/var/log
-  #     - /var/lib/docker/containers:/var/lib/docker/containers
+      - /var/lib/docker/containers:/var/lib/docker/containers
     expose:
       - 9080
+      # - 1514
     ports:
       - protocol: tcp
         published: 1514
         target: 1514 
-      # - protocol: tcp
-      #   published: 1514
-      #   target: 1514 
     networks:
       monitor-net:
     restart: always
     labels:
       org.label-schema.group: "logging"
   
+## latest
   syslog-ng:
     build: 
       context: ./monitoring/syslog
@@ -216,6 +218,7 @@ services:
       org.label-schema.group: "logging"
 
 ############################################## Visualization ###################################################
+### v9.0.2
   grafana:
     build: 
       context: ./monitoring/grafana
@@ -237,8 +240,8 @@ services:
       org.label-schema.group: "monitoring"
 
 ################################################# Network ########################################################
+### v2.3.0
   caddy:
-    image: caddy:2.3.0
     build:
       context: ./ssl/caddy
       dockerfile: Dockerfile
@@ -246,7 +249,7 @@ services:
     ports:
       - "3000:3000"   ## Grafana
       - "3100:3100"   ## Loki
-      # - "5000:5000"   ## Api
+      - "5000:5000"   ## Api
       - "9090:9090"
       - "9093:9093"
       - "9091:9091"

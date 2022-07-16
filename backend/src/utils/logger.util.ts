@@ -2,7 +2,7 @@ import winston, { Logger } from "winston";
 import { env } from "./validate-env.util";
 import LokiTransport from "winston-loki";
 
-var { Loggly } = require("winston-loggly-bulk");
+// var { Loggly } = require("winston-loggly-bulk");
 
 // // Development Logger Configuration
 // const devLogConfig = {
@@ -68,18 +68,15 @@ var { Loggly } = require("winston-loggly-bulk");
 // if (env.NODE_ENV === "development") logger = winston.createLogger(devLogConfig);
 // else logger = winston.createLogger(productionLogConfig);
 
-let logger: Logger
+let logger: Logger;
 
 const initializeLogger = () => {
   if (logger) {
     return
   }
-
   logger = winston.createLogger({
     transports: [new LokiTransport({
-      // host: env.LOKI_HOST,
-      // basicAuth: env.LOKI_API,
-      host: "http://loki:3100/loki/api/v1/push",
+      host: "http://loki:3100",
       labels: { app: 'api'},
       json: true,
       format: winston.format.json(),

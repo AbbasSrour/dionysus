@@ -1,22 +1,12 @@
 :9090 {
-    basicauth /* {
-        {$ADMIN_USER} {$ADMIN_PASSWORD_HASH}
-    }
     reverse_proxy prometheus:9090
 }
 
 :9093 {
-    basicauth /* {
-        {$ADMIN_USER} {$ADMIN_PASSWORD_HASH}
-    }
     reverse_proxy alertmanager:9093
 }
 
 :9091 {
-    basicauth /* {
-        {$ADMIN_USER} {$ADMIN_PASSWORD_HASH}
-    }
-    
     reverse_proxy pushgateway:9091
 }
 
@@ -26,4 +16,8 @@
 
 :3100 {
     reverse_proxy loki:3100
+}
+
+:5000 {
+    reverse_proxy api:5000
 }
