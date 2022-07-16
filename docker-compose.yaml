@@ -31,6 +31,8 @@ services:
     networks:
       monitor-net:
     restart: unless-stopped
+    labels:
+      org.label-schema.group: "Api"
 
   redis:
     image: redis:alpine
@@ -41,16 +43,16 @@ services:
       - RedisDB:/data
     networks:
       monitor-net:
+    labels:
+      org.label-schema.group: "Api"
 
-############################################ Prometheus #######################################################
+############################################ Monitoring #######################################################
 ### v2.36.2
   prometheus:
-    container_name: prometheus
-    labels:
-      org.label-schema.group: "monitoring"
     build: 
       context: ./monitoring/prometheus
       dockerfile: Dockerfile
+    container_name: prometheus
     expose:
       - 9090
     networks:
@@ -68,6 +70,8 @@ services:
       - '--storage.tsdb.retention.time=200h'
       - '--web.enable-lifecycle'
     restart: unless-stopped
+    labels:
+      org.label-schema.group: "monitoring"
 
 ### v0.24.0
   alertmanager:
@@ -146,7 +150,7 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
-################################################## Loki ######################################################
+################################################## Logging ######################################################
 ### v2.5.0
   loki:
     build:
@@ -237,9 +241,9 @@ services:
     networks:
       - monitor-net
     labels:
-      org.label-schema.group: "monitoring"
+      org.label-schema.group: "Visualization"
 
-################################################# Network ########################################################
+################################################# System ########################################################
 ### v2.3.0
   caddy:
     build:
@@ -263,6 +267,6 @@ services:
     networks:
       - monitor-net
     labels:
-      org.label-schema.group: "monitoring"
+      org.label-schema.group: "System"
 
 ################################################################################################################
