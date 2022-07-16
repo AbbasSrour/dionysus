@@ -194,28 +194,28 @@ services:
       org.label-schema.group: "logging"
   
 ## latest
-  syslog-ng:
-    build: 
-      context: ./monitoring/syslog
-      dockerfile: Dockerfile
-    container_name: syslog-ng
-    user: root
-    privileged: true
-    command: -edv
-    volumes:
-    - Syslog:/etc/syslog-ng
-    networks:
-      monitor-net:
-    ports:
-      - protocol: udp
-        published: 514
-        target: 514
-      - protocol: tcp
-        published: 601
-        target: 601
-    restart: always
-    labels:
-      org.label-schema.group: "logging"
+  # syslog-ng:
+  #   build: 
+  #     context: ./monitoring/syslog
+  #     dockerfile: Dockerfile
+  #   container_name: syslog-ng
+  #   user: root
+  #   privileged: true
+  #   command: -edv
+  #   volumes:
+  #   - Syslog:/etc/syslog-ng
+  #   networks:
+  #     monitor-net:
+  #   ports:
+  #     - protocol: udp
+  #       published: 514
+  #       target: 514
+  #     - protocol: tcp
+  #       published: 601
+  #       target: 601
+  #   restart: always
+  #   labels:
+  #     org.label-schema.group: "logging"
 
 ############################################## Visualization ###################################################
 ### v9.0.2
