@@ -46,7 +46,7 @@ scrape_configs:
       labels:
         job: varlogs
         __path__: /var/log/*.log
-- job_name: syslog
+- job_name: syslog-ng
   syslog:
     listen_address: promtail:1514
     idle_timeout: 60s

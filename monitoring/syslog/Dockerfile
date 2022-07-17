@@ -1,4 +1,4 @@
-FROM balabit/syslog-ng:latest
+FROM linuxserver/syslog-ng:3.30.1
 
 WORKDIR /etc/syslog-ng
 

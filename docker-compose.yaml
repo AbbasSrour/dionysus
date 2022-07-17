@@ -206,39 +206,36 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers
     expose:
       - 9080
-    ports:
-      - protocol: tcp
-        published: 1514
-        target: 1514 
+      - 1514
     networks:
       monitor-net:
     restart: unless-stopped
     labels:
       org.label-schema.group: "logging"
   
-## latest
-  # syslog-ng:
-  #   build: 
-  #     context: ./monitoring/syslog
-  #     dockerfile: Dockerfile
-  #   container_name: syslog-ng
-  #   user: root
-  #   privileged: true
-  #   command: -edv
-  #   volumes:
-  #   - Syslog:/etc/syslog-ng
-  #   networks:
-  #     monitor-net:
-  #   ports:
-  #     - protocol: udp
-  #       published: 514
-  #       target: 514
-  #     - protocol: tcp
-  #       published: 601
-  #       target: 601
-  #   restart: always
-  #   labels:
-  #     org.label-schema.group: "logging"
+# v3.30.1
+  syslog-ng:
+    build: 
+      context: ./monitoring/syslog
+      dockerfile: Dockerfile
+    container_name: syslog-ng
+    user: root
+    privileged: true
+    volumes:
+      - Syslog:/etc/syslog-ng
+      - /var/log:/var/log
+    networks:
+      monitor-net:
+    ports:
+      - protocol: udp
+        published: 514
+        target: 514
+      - protocol: tcp
+        published: 601
+        target: 601
+    restart: always
+    labels:
+      org.label-schema.group: "logging"
 
 ############################################## Visualization ###################################################
 ### v9.0.2
