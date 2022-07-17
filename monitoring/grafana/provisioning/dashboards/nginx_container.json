@@ -57,7 +57,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(irate(nginx_connections_processed_total{stage=\"any\"}[5m])) by (stage)",
+              "expr": "sum(irate(nginx_connections_handeled{stage=\"any\"}[5m])) by (stage)",
               "hide": false,
               "interval": "",
               "intervalFactor": 10,
@@ -275,7 +275,7 @@
         {
           "aliasColors": {},
           "bars": false,
-          "datasource": null,
+          "datasource": "Prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
