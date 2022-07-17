@@ -304,6 +304,8 @@ services:
       - consul
     networks:
       - test
+    labels:
+      org.label-schema.group: "System"
 
 ### v1.8.2
   consul:
@@ -323,6 +325,8 @@ services:
       - ConsulData:/consul/data
     networks:
       - test
+    labels:
+      org.label-schema.group: "System"
 
 ### v1.23.0-alpine
   nginx:
@@ -341,4 +345,6 @@ services:
     networks:
       - monitor-net
     restart: unless-stopped
+    labels:
+      org.label-schema.group: "System"
 ################################################################################################################
