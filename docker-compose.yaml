@@ -1,5 +1,5 @@
 ############################################### Setup #######################################################
-version: "3.3"
+version: "3.8"
 
 volumes:
   RedisDB:
@@ -17,9 +17,16 @@ volumes:
   ConsulData: {}
   Vault: {}
   Nginx: {}
+  ElasticData: {}
+  ElasticConfig: {}
+  Kibana: {}
+  Filebeat: {}
+  LogstashConfig: {}
+  LogstashPipes: {}
+  elasticsearch: {}
 
 networks:
-  test:
+  elk:
   monitor-net:
     driver: bridge
 
@@ -50,12 +57,144 @@ services:
       monitor-net:
     labels:
       org.label-schema.group: "Api"
+############################################## Search Engine ########################################################
+########################## Base
+  elasticsearch:
+    build:
+      context: ./server/elk/elasticsearch
+      dockerfile: Dockerfile
+    container_name: elasticsearch
+    restart: unless-stopped
+    environment:
+      ELASTIC_USERNAME: elastic
+      ELASTIC_PASSWORD: changeme
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      discovery.type: single-node
+      # bootstrap.memory_lock: "true"
+    volumes:
+      - ElasticData:/usr/share/elasticsearch/data
+      - ElasticConfig:/usr/share/elasticsearch/config
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - monitor-net
+
+  # logstash:
+  #   build:
+  #     context: ./server/elk/logstash
+  #   container_name: logstash
+  #   restart: unless-stopped
+  #   volumes:
+  #     - LogstashConfig:/usr/share/logstash/config
+  #     - LogstashPipes:/usr/share/logstash/pipeline
+  #   environment:
+  #     ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+  #     ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+  #     ELASTICSEARCH_HOST_PORT: http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+  #     LS_JAVA_OPTS: "-Xmx${LOGSTASH_HEAP} -Xms${LOGSTASH_HEAP} -Dlog4j2.formatMsgNoLookups=true"
+  #   ports:
+  #     - "5044:5044"
+  #     - "9600:9600"
+
+
+  kibana:
+    build:
+      context: ./server/elk/kibana
+    container_name: kibana
+    restart: unless-stopped
+    volumes:
+      - Kibana:/usr/share/kibana
+    environment:
+      ELASTIC_USERNAME: elastic
+      ELASTIC_PASSWORD: changeme
+      ELASTICSEARCH_HOST_PORT: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - monitor-net
+
+  # rubban:
+  #   image: sherifabdlnaby/rubban:latest
+  #   restart: unless-stopped
+  #   container_name: rubban
+  #   environment:
+  #     RUBBAN_KIBANA_HOST: "https://${KIBANA_HOST}:${KIBANA_PORT}"
+  #     RUBBAN_KIBANA_USER: ${ELASTIC_USERNAME}
+  #     RUBBAN_KIBANA_PASSWORD: ${ELASTIC_PASSWORD}
+  #     RUBBAN_REFRESHINDEXPATTERN_ENABLED: 'true'
+  #     RUBBAN_REFRESHINDEXPATTERN_SCHEDULE: '*/5 * * * *'
+  #     RUBBAN_REFRESHINDEXPATTERN_PATTERNS: '*'
+  #     RUBBAN_AUTOINDEXPATTERN_ENABLED: 'true'
+  #     RUBBAN_AUTOINDEXPATTERN_SCHEDULE: '*/5 * * * *'
+  #     RUBBAN_AUTOINDEXPATTERN_GENERALPATTERNS: '[{"pattern":"filebeat?","timeFieldName":"@timestamp"},{"pattern":"logstash?","timeFieldName":"@timestamp"}]'
+
+  # Prometheus Exporters ----
+  # elasticsearch-exporter:
+  #   container_name: elasticsearch_exporter
+  #   image: justwatch/elasticsearch_exporter:1.1.0
+  #   restart: always
+  #   command: ["--es.uri", "https://${ELASTIC_USERNAME}:${ELASTIC_PASSWORD}@${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}",
+  #             "--es.ssl-skip-verify",
+  #             "--es.all",
+  #             "--es.snapshots",
+  #             "--es.indices"]
+  #   ports:
+  #     - "9114:9114"
+
+  # Logstash Exporters ----
+  # logstash-exporter:
+  #   image: alxrem/prometheus-logstash-exporter:0.7.0
+  #   container_name: logstash_exporter
+  #   restart: always
+  #   ports:
+  #     - "9304:9304"
+  #   command: ["-logstash.host", "${LOGSTASH_HOST}"]
+
+  # # Docker Logs Shipper ------------------------------
+  # filebeat:
+  #   image: elastic/filebeat:${ELK_VERSION}
+  #   build:
+  #     context: ./server/elk/filebeat
+  #   restart: always
+  #   # -e flag to log to stderr and disable syslog/file output
+  #   command: -e --strict.perms=false
+  #   user: root
+  #   environment:
+  #     ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+  #     ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+  #     KIBANA_HOST_PORT: ${KIBANA_HOST}:${KIBANA_PORT}
+  #     ELASTICSEARCH_HOST_PORT: https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+  #   volumes:
+  #     - ./filebeat/filebeat.docker.logs.yml:/usr/share/filebeat/filebeat.yml:ro
+  #     - /var/lib/docker/containers:/var/lib/docker/containers:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - filebeat-data:/var/lib/filebeat/data
+
+  # # # Cluster Logs Shipper ----
+  # filebeat-cluster-logs:
+  #   image: docker.elastic.co/beats/filebeat:8.3.2
+  #   build:
+  #     context: ./server/elk/filebeat
+  #   restart: always
+  #   # -e flag to log to stderr and disable syslog/file output
+  #   command: -e --strict.perms=false
+  #   user: root
+  #   environment:
+  #     ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+  #     ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+  #     KIBANA_HOST_PORT: ${KIBANA_HOST}:${KIBANA_PORT}
+  #     ELASTICSEARCH_HOST_PORT: https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+  #   volumes:
+  #     - Filebeat:/usr/share/filebeat
+  #     - /var/lib/docker/containers:/var/lib/docker/containers:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
 
 ############################################ Monitoring #######################################################
 ### v2.36.2
   prometheus:
     build: 
-      context: ./monitoring/prometheus
+      context: ./server/monitoring/prometheus
       dockerfile: Dockerfile
     container_name: prometheus
     expose:
@@ -65,8 +204,6 @@ services:
     volumes:
       - Prometheus:/etc/prometheus
       - PrometheusData:/prometheus
-      # - /etc/localtime:/etc/localtime:ro
-      # - /etc/timezone:/etc/timezone:ro
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -81,7 +218,7 @@ services:
 ### v0.24.0
   alertmanager:
     build: 
-      context: ./monitoring/alertmanager
+      context: ./server/monitoring/alertmanager
       dockerfile: Dockerfile
     container_name: alertmanager
     volumes:
@@ -109,9 +246,6 @@ services:
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker:/var/lib/docker:ro
-      # - /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
-      # - /etc/localtime:/etc/localtime:ro
-      # - /etc/timezone:/etc/timezone:ro
     restart: unless-stopped
     expose:
       - 8080
@@ -163,7 +297,7 @@ services:
       - 9113
     command: 
       - -nginx.scrape-uri
-      - http://nginx:8081/stub_status ### Docker 0 ip address, cmd: $ ip addr show docker0
+      - http://nginx:8081/stub_status
     restart: unless-stopped
     networks:
       - monitor-net
@@ -174,7 +308,7 @@ services:
 ### v2.5.0
   loki:
     build:
-      context: ./monitoring/loki
+      context: ./server/monitoring/loki
       dockerfile: Dockerfile
     container_name: loki
     privileged: true
@@ -194,7 +328,7 @@ services:
 ### v2.5.0
   promtail:
     build:
-      context: ./monitoring/promtail
+      context: ./server/monitoring/promtail
       dockerfile: Dockerfile
     user: root
     privileged: true
@@ -216,7 +350,7 @@ services:
 # v3.30.1
   syslog-ng:
     build: 
-      context: ./monitoring/syslog
+      context: ./server/monitoring/syslog
       dockerfile: Dockerfile
     container_name: syslog-ng
     user: root
@@ -241,7 +375,7 @@ services:
 ### v9.0.2
   grafana:
     build: 
-      context: ./monitoring/grafana
+      context: ./server/monitoring/grafana
       dockerfile: Dockerfile
     container_name: grafana
     volumes:
@@ -260,84 +394,60 @@ services:
       org.label-schema.group: "Visualization"
 
 ################################################# System ########################################################
-### v2.3.0
-  # caddy:
-  #   build:
-  #     context: ./system/caddy
-  #     dockerfile: Dockerfile
-  #   container_name: caddy
-  #   ports:
-  #     - "3000:3000"   ## Grafana
-  #     - "3100:3100"   ## Loki
-  #     - "5000:5000"   ## Api
-  #     - "9090:9090"
-  #     - "9093:9093"
-  #     - "9091:9091"
-  #   volumes:
-  #     - Caddy:/etc/caddy
-  #   environment:
-  #     - ADMIN_USER=${ADMIN_USER:-admin}
-  #     - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
-  #     - ADMIN_PASSWORD_HASH=${ADMIN_PASSWORD_HASH:-JDJhJDE0JE91S1FrN0Z0VEsyWmhrQVpON1VzdHVLSDkyWHdsN0xNbEZYdnNIZm1pb2d1blg4Y09mL0ZP}
-  #   restart: unless-stopped
-  #   networks:
-  #     - monitor-net
-  #   labels:
-  #     org.label-schema.group: "System"
+# ### v1.5.0
+#   vault:
+#     build: 
+#       context: ./server/secrets/vault
+#       dockerfile: Dockerfile
+#     container_name: vault
+#     ports:
+#       - 8200:8200
+#     volumes:
+#       - Vault:/vault
+#     environment:
+#       - VAULT_ADDR=http://127.0.0.1:8200
+#     command: server
+#     cap_add:
+#       - IPC_LOCK
+#     depends_on:
+#       - consul
+#     networks:
+#       - monitor-net
+#     labels:
+#       org.label-schema.group: "System"
 
-### v1.5.0
-  vault:
-    build: 
-      context: ./system/secrets/vault
-      dockerfile: Dockerfile
-    container_name: vault
-    ports:
-      - 8200:8200
-    volumes:
-      - Vault:/vault
-    environment:
-      - VAULT_ADDR=http://127.0.0.1:8200
-    command: server
-    cap_add:
-      - IPC_LOCK
-    depends_on:
-      - consul
-    networks:
-      - test
-    labels:
-      org.label-schema.group: "System"
-
-### v1.8.2
-  consul:
-    build: 
-      context: ./system/secrets/consul
-      dockerfile: Dockerfile
-    container_name: consul
-    ports:
-      - 8500:8500
-    environment:
-      - CONSUL_BIND_INTERFACE=eth0
-      - CONSUL_CLIENT_INTERFACE=eth0
-      - CONSUL_ALLOW_PRIVILEGED_PORTS=
-    command: agent -server -bootstrap-expect 1
-    volumes:
-      - ConsulConfig:/consul/config
-      - ConsulData:/consul/data
-    networks:
-      - test
-    labels:
-      org.label-schema.group: "System"
+# ### v1.8.2
+#   consul:
+#     build: 
+#       context: ./server/secrets/consul
+#       dockerfile: Dockerfile
+#     container_name: consul
+#     ports:
+#       - 8500:8500
+#     environment:
+#       - CONSUL_BIND_INTERFACE=eth0
+#       - CONSUL_CLIENT_INTERFACE=eth0
+#       - CONSUL_ALLOW_PRIVILEGED_PORTS=
+#     command: agent -server -bootstrap-expect 1
+#     volumes:
+#       - ConsulConfig:/consul/config
+#       - ConsulData:/consul/data
+#     networks:
+#       - monitor-net
+#     labels:
+#       org.label-schema.group: "System"
 
 ### v1.23.0-alpine
   nginx:
     build: 
-      context: ./system/nginx
+      context: ./server/nginx
       dockerfile: Dockerfile
     container_name: nginx
     ports:
-      - "5000:80"
+      - "4000:80"
       - "3000:3000"
       - "3100:3100"
+      - "5000:5000"
       - "8081:8081"
 
     volumes:

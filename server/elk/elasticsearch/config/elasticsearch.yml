@@ -1,0 +1,12 @@
+## Default Elasticsearch configuration from Elasticsearch base image.
+## https://github.com/elastic/elasticsearch/blob/master/distribution/docker/src/docker/config/elasticsearch.yml
+#
+cluster.name: titan
+network.host: 0.0.0.0
+
+
+## License
+xpack.license.self_generated.type: basic
+
+# Security
+xpack.security.enabled: false
