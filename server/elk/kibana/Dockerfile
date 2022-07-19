@@ -1,4 +1,6 @@
-FROM kibana:8.3.2
+ARG ELK_VERSION
+
+FROM kibana:${ELK_VERSION}
 
 WORKDIR /usr/share/kibana
 

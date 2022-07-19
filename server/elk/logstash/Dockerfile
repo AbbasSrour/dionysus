@@ -1,7 +1,8 @@
-FROM logstash:8.3.2
+ARG ELK_VERSION
+
+FROM logstash:${ELK_VERSION}
 
 WORKDIR /usr/share/logstash
 
-COPY conf/ ./config
-COPY pipeline/ ./pipeline
+COPY config pipeline ./
 

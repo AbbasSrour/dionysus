@@ -67,6 +67,20 @@ filebeat.autodiscover:
                 input:
                   type: container
                   paths: '/var/lib/docker/containers/${data.docker.container.id}/*.log'
+    # - type: docker
+    #   templates:
+    #     - condition:
+    #         and:
+    #          - not.contains:
+    #             docker.container.image: elasticsearch
+    #          - not.contains:
+    #             docker.container.image: logstash
+    #          - not.contains:
+    #             docker.container.image: kibana
+    #       config:
+    #         - type: container
+    #           paths:
+    #             - /var/lib/docker/containers/${data.docker.container.id}/*.log
 
 
 processors:
@@ -80,6 +94,9 @@ output.elasticsearch:
   ssl:
     verification_mode: "none"
 
+# Output to Logstash
+# output.logstash:
+#   hosts: ["logstash:5044"]
 
 #=================================== Kibana ==========================================
 # Enable setting up Kibana
@@ -101,12 +118,12 @@ setup:
 # see: https://github.com/elastic/beats/pull/13182
 xpack.monitoring:
   enabled: true
-#  elasticsearch:
-#    hosts: '${ELASTICSEARCH_HOST_PORT}'
-#    username: '${ELASTIC_USERNAME}'
-#    password: '${ELASTIC_PASSWORD}'
+  # elasticsearch:
+  #  hosts: '${ELASTICSEARCH_HOST_PORT}'
+  #  username: '${ELASTIC_USERNAME}'
+  #  password: '${ELASTIC_PASSWORD}'
 
-#monitoring:
+# monitoring:
 #  enabled: true
 #  elasticsearch:
 #    hosts: '${ELASTICSEARCH_HOST_PORT}'

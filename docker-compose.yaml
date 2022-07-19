@@ -18,20 +18,20 @@ volumes:
   Vault: {}
   Nginx: {}
   ElasticData: {}
+  ElasticData1: {}
+  ElasticData2: {}
   ElasticConfig: {}
   Kibana: {}
   Filebeat: {}
-  LogstashConfig: {}
-  LogstashPipes: {}
-  elasticsearch: {}
+  FilebeatData: {}
+  Logstash: {}
 
 networks:
-  elk:
   monitor-net:
     driver: bridge
 
 services:
-################################################ Api #######################################################
+  ################################################ Api #######################################################
   api:
     build:
       context: ./backend
@@ -57,143 +57,215 @@ services:
       monitor-net:
     labels:
       org.label-schema.group: "Api"
-############################################## Search Engine ########################################################
-########################## Base
-  elasticsearch:
+  ############################################## Search Engine ########################################################
+  elasticsearch_zues:
     build:
       context: ./server/elk/elasticsearch
       dockerfile: Dockerfile
-    container_name: elasticsearch
+      args:
+        ELK_VERSION: ${ELK_VERSION}
+    container_name: elasticsearch_zues
     restart: unless-stopped
     environment:
-      ELASTIC_USERNAME: elastic
-      ELASTIC_PASSWORD: changeme
-      ES_JAVA_OPTS: -Xms512m -Xmx512m
-      discovery.type: single-node
-      # bootstrap.memory_lock: "true"
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTIC_CLUSTER_NAME: ${ELASTIC_CLUSTER_NAME}
+      ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME}
+      ELASTIC_INIT_MASTER_NODE: ${ELASTIC_INIT_MASTER_NODE}
+      ELASTIC_DISCOVERY_SEEDS: ${ELASTIC_DISCOVERY_SEEDS}
+      ES_JAVA_OPTS: "-Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP} -Des.enforce.bootstrap.checks=true -Dlog4j2.formatMsgNoLookups=true"
+      bootstrap.memory_lock: "true"
     volumes:
       - ElasticData:/usr/share/elasticsearch/data
       - ElasticConfig:/usr/share/elasticsearch/config
     ports:
       - "9200:9200"
       - "9300:9300"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 200000
+        hard: 200000
     networks:
       - monitor-net
+    # healthcheck:
+    #   test: ["CMD", "sh", "-c", "curl -sf --insecure https://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@localhost:9200/_cat/health | grep -ioE 'green|yellow' || echo 'not green/yellow cluster status'"]
 
-  # logstash:
-  #   build:
-  #     context: ./server/elk/logstash
-  #   container_name: logstash
-  #   restart: unless-stopped
-  #   volumes:
-  #     - LogstashConfig:/usr/share/logstash/config
-  #     - LogstashPipes:/usr/share/logstash/pipeline
-  #   environment:
-  #     ELASTIC_USERNAME: ${ELASTIC_USERNAME}
-  #     ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-  #     ELASTICSEARCH_HOST_PORT: http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
-  #     LS_JAVA_OPTS: "-Xmx${LOGSTASH_HEAP} -Xms${LOGSTASH_HEAP} -Dlog4j2.formatMsgNoLookups=true"
-  #   ports:
-  #     - "5044:5044"
-  #     - "9600:9600"
+  elasticsearch_poseidon:
+    build:
+      context: ./server/elk/elasticsearch
+      dockerfile: Dockerfile
+      args:
+        ELK_VERSION: ${ELK_VERSION}
+    container_name: elasticsearch_poseidon
+    restart: unless-stopped
+    environment:
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTIC_CLUSTER_NAME: ${ELASTIC_CLUSTER_NAME}
+      ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME_1}
+      ELASTIC_INIT_MASTER_NODE: ${ELASTIC_INIT_MASTER_NODE}
+      ELASTIC_DISCOVERY_SEEDS: ${ELASTIC_DISCOVERY_SEEDS}
+      ES_JAVA_OPTS: "-Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP} -Des.enforce.bootstrap.checks=true -Dlog4j2.formatMsgNoLookups=true"
+      bootstrap.memory_lock: "true"
+    volumes:
+      - ElasticData1:/usr/share/elasticsearch/data
+      - ElasticConfig:/usr/share/elasticsearch/config
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 200000
+        hard: 200000
+    networks:
+      - monitor-net
+    # healthcheck:
+    #   test: ["CMD", "sh", "-c", "curl -sf --insecure https://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@localhost:9200/_cat/health | grep -ioE 'green|yellow' || echo 'not green/yellow cluster status'"]
 
+  elasticsearch_hades:
+    build:
+      context: ./server/elk/elasticsearch
+      dockerfile: Dockerfile
+      args:
+        ELK_VERSION: ${ELK_VERSION}
+    container_name: elasticsearch_hades
+    restart: unless-stopped
+    environment:
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTIC_CLUSTER_NAME: ${ELASTIC_CLUSTER_NAME}
+      ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME_1}
+      ELASTIC_INIT_MASTER_NODE: ${ELASTIC_INIT_MASTER_NODE}
+      ELASTIC_DISCOVERY_SEEDS: ${ELASTIC_DISCOVERY_SEEDS}
+      ES_JAVA_OPTS: "-Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP} -Des.enforce.bootstrap.checks=true -Dlog4j2.formatMsgNoLookups=true"
+      bootstrap.memory_lock: "true"
+    volumes:
+      - ElasticData2:/usr/share/elasticsearch/data
+      - ElasticConfig:/usr/share/elasticsearch/config
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 200000
+        hard: 200000
+    networks:
+      - monitor-net
+    # healthcheck:
+    #   test: ["CMD", "sh", "-c", "curl -sf --insecure https://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@localhost:9200/_cat/health | grep -ioE 'green|yellow' || echo 'not green/yellow cluster status'"]
+
+  logstash:
+    build:
+      context: ./server/elk/logstash
+      args:
+        ELK_VERSION: $ELK_VERSION
+    container_name: logstash
+    restart: unless-stopped
+    volumes:
+      - Logstash:/usr/share/logstash
+    environment:
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTICSEARCH_HOST_PORT: https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+      LS_JAVA_OPTS: "-Xmx${LOGSTASH_HEAP} -Xms${LOGSTASH_HEAP} -Dlog4j2.formatMsgNoLookups=true"
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    networks:
+      - monitor-net
+    # healthcheck:
+    #   test: ["CMD", "sh", "-c", "curl -sf --insecure https://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@localhost:9200/_cat/health | grep -ioE 'green|yellow' || echo 'not green/yellow cluster status'"]
 
   kibana:
     build:
       context: ./server/elk/kibana
+      args:
+        ELK_VERSION: $ELK_VERSION
     container_name: kibana
     restart: unless-stopped
     volumes:
       - Kibana:/usr/share/kibana
     environment:
-      ELASTIC_USERNAME: elastic
-      ELASTIC_PASSWORD: changeme
-      ELASTICSEARCH_HOST_PORT: http://elasticsearch:9200
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTICSEARCH_HOST_PORT: https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
     ports:
       - "5601:5601"
     networks:
       - monitor-net
 
-  # rubban:
-  #   image: sherifabdlnaby/rubban:latest
-  #   restart: unless-stopped
-  #   container_name: rubban
-  #   environment:
-  #     RUBBAN_KIBANA_HOST: "https://${KIBANA_HOST}:${KIBANA_PORT}"
-  #     RUBBAN_KIBANA_USER: ${ELASTIC_USERNAME}
-  #     RUBBAN_KIBANA_PASSWORD: ${ELASTIC_PASSWORD}
-  #     RUBBAN_REFRESHINDEXPATTERN_ENABLED: 'true'
-  #     RUBBAN_REFRESHINDEXPATTERN_SCHEDULE: '*/5 * * * *'
-  #     RUBBAN_REFRESHINDEXPATTERN_PATTERNS: '*'
-  #     RUBBAN_AUTOINDEXPATTERN_ENABLED: 'true'
-  #     RUBBAN_AUTOINDEXPATTERN_SCHEDULE: '*/5 * * * *'
-  #     RUBBAN_AUTOINDEXPATTERN_GENERALPATTERNS: '[{"pattern":"filebeat?","timeFieldName":"@timestamp"},{"pattern":"logstash?","timeFieldName":"@timestamp"}]'
+  filebeat:
+    build:
+      context: ./server/elk/filebeat
+      args:
+        ELK_VERSION: $ELK_VERSION
+    restart: always
+    command: -e --strict.perms=false
+    user: root
+    container_name: filebeat
+    environment:
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      KIBANA_HOST_PORT: ${KIBANA_HOST}:${KIBANA_PORT}
+      ELASTICSEARCH_HOST_PORT: https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+    expose:
+      - 5066
+    volumes:
+      - Filebeat:/usr/share/filebeat
+      - FilebeatData:/var/lib/filebeat/data
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro⏎
+    networks:
+      - monitor-net
 
-  # Prometheus Exporters ----
-  # elasticsearch-exporter:
-  #   container_name: elasticsearch_exporter
-  #   image: justwatch/elasticsearch_exporter:1.1.0
-  #   restart: always
-  #   command: ["--es.uri", "https://${ELASTIC_USERNAME}:${ELASTIC_PASSWORD}@${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}",
-  #             "--es.ssl-skip-verify",
-  #             "--es.all",
-  #             "--es.snapshots",
-  #             "--es.indices"]
-  #   ports:
-  #     - "9114:9114"
+  rubban:
+    image: sherifabdlnaby/rubban:latest
+    restart: unless-stopped
+    container_name: rubban
+    environment:
+      RUBBAN_KIBANA_HOST: "https://${KIBANA_HOST}:${KIBANA_PORT}"
+      RUBBAN_KIBANA_USER: ${ELASTIC_USERNAME}
+      RUBBAN_KIBANA_PASSWORD: ${ELASTIC_PASSWORD}
+      RUBBAN_REFRESHINDEXPATTERN_ENABLED: "true"
+      RUBBAN_REFRESHINDEXPATTERN_SCHEDULE: "*/5 * * * *"
+      RUBBAN_REFRESHINDEXPATTERN_PATTERNS: "*"
+      RUBBAN_AUTOINDEXPATTERN_ENABLED: "true"
+      RUBBAN_AUTOINDEXPATTERN_SCHEDULE: "*/5 * * * *"
+      RUBBAN_AUTOINDEXPATTERN_GENERALPATTERNS: '[{"pattern":"filebeat?","timeFieldName":"@timestamp"},{"pattern":"logstash?","timeFieldName":"@timestamp"}]'
 
-  # Logstash Exporters ----
-  # logstash-exporter:
-  #   image: alxrem/prometheus-logstash-exporter:0.7.0
-  #   container_name: logstash_exporter
-  #   restart: always
-  #   ports:
-  #     - "9304:9304"
-  #   command: ["-logstash.host", "${LOGSTASH_HOST}"]
+  elasticsearch-exporter:
+    container_name: elasticsearch_exporter
+    image: justwatch/elasticsearch_exporter:1.1.0
+    restart: always
+    command:
+      [
+        "--es.uri",
+        "https://${ELASTIC_USERNAME}:${ELASTIC_PASSWORD}@${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}",
+        "--es.ssl-skip-verify",
+        "--es.all",
+        "--es.snapshots",
+        "--es.indices",
+      ]
+    ports:
+      - "9114:9114"
 
-  # # Docker Logs Shipper ------------------------------
-  # filebeat:
-  #   image: elastic/filebeat:${ELK_VERSION}
-  #   build:
-  #     context: ./server/elk/filebeat
-  #   restart: always
-  #   # -e flag to log to stderr and disable syslog/file output
-  #   command: -e --strict.perms=false
-  #   user: root
-  #   environment:
-  #     ELASTIC_USERNAME: ${ELASTIC_USERNAME}
-  #     ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-  #     KIBANA_HOST_PORT: ${KIBANA_HOST}:${KIBANA_PORT}
-  #     ELASTICSEARCH_HOST_PORT: https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
-  #   volumes:
-  #     - ./filebeat/filebeat.docker.logs.yml:/usr/share/filebeat/filebeat.yml:ro
-  #     - /var/lib/docker/containers:/var/lib/docker/containers:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro
-  #     - filebeat-data:/var/lib/filebeat/data
+  logstash-exporter:
+    image: alxrem/prometheus-logstash-exporter:0.7.0
+    container_name: logstash_exporter
+    restart: always
+    ports:
+      - "9304:9304"
+    command: ["-logstash.host", "logstash"]
+    networks:
+      - monitor-net
 
-  # # # Cluster Logs Shipper ----
-  # filebeat-cluster-logs:
-  #   image: docker.elastic.co/beats/filebeat:8.3.2
-  #   build:
-  #     context: ./server/elk/filebeat
-  #   restart: always
-  #   # -e flag to log to stderr and disable syslog/file output
-  #   command: -e --strict.perms=false
-  #   user: root
-  #   environment:
-  #     ELASTIC_USERNAME: ${ELASTIC_USERNAME}
-  #     ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-  #     KIBANA_HOST_PORT: ${KIBANA_HOST}:${KIBANA_PORT}
-  #     ELASTICSEARCH_HOST_PORT: https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
-  #   volumes:
-  #     - Filebeat:/usr/share/filebeat
-  #     - /var/lib/docker/containers:/var/lib/docker/containers:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro
-
-############################################ Monitoring #######################################################
-### v2.36.2
+  ############################################ Monitoring #######################################################
+  ### v2.36.2
   prometheus:
-    build: 
+    build:
       context: ./server/monitoring/prometheus
       dockerfile: Dockerfile
     container_name: prometheus
@@ -205,27 +277,27 @@ services:
       - Prometheus:/etc/prometheus
       - PrometheusData:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
-      - '--web.enable-lifecycle'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=200h"
+      - "--web.enable-lifecycle"
     restart: unless-stopped
     labels:
       org.label-schema.group: "monitoring"
 
-### v0.24.0
+  ### v0.24.0
   alertmanager:
-    build: 
+    build:
       context: ./server/monitoring/alertmanager
       dockerfile: Dockerfile
     container_name: alertmanager
     volumes:
       - AlertManager:/etc/alertmanager
     command:
-      - '--config.file=/etc/alertmanager/config.yml'
-      - '--storage.path=/alertmanager'
+      - "--config.file=/etc/alertmanager/config.yml"
+      - "--storage.path=/alertmanager"
     restart: unless-stopped
     expose:
       - 9093
@@ -234,7 +306,7 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
-### v0.44.0
+  ### v0.44.0
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.44.0
     container_name: cadvisor
@@ -254,7 +326,7 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
-### v1.4.3
+  ### v1.4.3
   pushgateway:
     image: prom/pushgateway:v1.4.3
     container_name: pushgateway
@@ -266,7 +338,7 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
-### v1.3.1
+  ### v1.3.1
   nodeexporter:
     image: prom/node-exporter:v1.3.1
     container_name: nodeexporter
@@ -277,10 +349,10 @@ services:
       - /sys:/host/sys:ro
       - /:/rootfs:ro
     command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
     restart: unless-stopped
     expose:
       - 9100
@@ -289,13 +361,13 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
-### 0.10
+  ### 0.10
   nginxexporter:
     image: nginx/nginx-prometheus-exporter:0.10
     container_name: nginx-exporter
     expose:
       - 9113
-    command: 
+    command:
       - -nginx.scrape-uri
       - http://nginx:8081/stub_status
     restart: unless-stopped
@@ -304,8 +376,8 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
-################################################## Logging ######################################################
-### v2.5.0
+  ################################################## Logging ######################################################
+  ### v2.5.0
   loki:
     build:
       context: ./server/monitoring/loki
@@ -325,7 +397,7 @@ services:
     labels:
       org.label-schema.group: "logging"
 
-### v2.5.0
+  ### v2.5.0
   promtail:
     build:
       context: ./server/monitoring/promtail
@@ -346,10 +418,10 @@ services:
     restart: unless-stopped
     labels:
       org.label-schema.group: "logging"
-  
-# v3.30.1
+
+  # v3.30.1
   syslog-ng:
-    build: 
+    build:
       context: ./server/monitoring/syslog
       dockerfile: Dockerfile
     container_name: syslog-ng
@@ -371,10 +443,10 @@ services:
     labels:
       org.label-schema.group: "logging"
 
-############################################## Visualization ###################################################
-### v9.0.2
+  ############################################## Visualization ###################################################
+  ### v9.0.2
   grafana:
-    build: 
+    build:
       context: ./server/monitoring/grafana
       dockerfile: Dockerfile
     container_name: grafana
@@ -393,10 +465,30 @@ services:
     labels:
       org.label-schema.group: "Visualization"
 
-################################################# System ########################################################
+  ################################################# System ########################################################
+  ### v1.23.0-alpine
+  nginx:
+    build:
+      context: ./server/nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    ports:
+      - "4000:80"
+      - "3000:3000"
+      - "3100:3100"
+      - "5000:5000"
+      - "8081:8081"
+
+    volumes:
+      - Nginx:/etc/nginx
+    networks:
+      - monitor-net
+    restart: unless-stopped
+    labels:
+      org.label-schema.group: "System"
 # ### v1.5.0
 #   vault:
-#     build: 
+#     build:
 #       context: ./server/secrets/vault
 #       dockerfile: Dockerfile
 #     container_name: vault
@@ -418,7 +510,7 @@ services:
 
 # ### v1.8.2
 #   consul:
-#     build: 
+#     build:
 #       context: ./server/secrets/consul
 #       dockerfile: Dockerfile
 #     container_name: consul
@@ -437,24 +529,4 @@ services:
 #     labels:
 #       org.label-schema.group: "System"
 
-### v1.23.0-alpine
-  nginx:
-    build: 
-      context: ./server/nginx
-      dockerfile: Dockerfile
-    container_name: nginx
-    ports:
-      - "4000:80"
-      - "3000:3000"
-      - "3100:3100"
-      - "5000:5000"
-      - "8081:8081"
-
-    volumes:
-      - Nginx:/etc/nginx
-    networks:
-      - monitor-net
-    restart: unless-stopped
-    labels:
-      org.label-schema.group: "System"
 ################################################################################################################
