@@ -2,16 +2,20 @@ import cheerio from "cheerio";
 import crypto from "crypto";
 import got from "got";
 
-const aes_encrypt = (data: string, key: Buffer, iv: Buffer): string => {
-  const cipher = crypto.createCipheriv("AES-256-CBC", key, iv);
+const aes_encrypt = (data: string, key: String, iv: String): string => {
+  const keyBinary = Buffer.from(key);
+  const ivBinary = Buffer.from(iv);
+  const cipher = crypto.createCipheriv("AES-256-CBC", keyBinary, ivBinary);
   cipher.setAutoPadding(true);
   const encryptedData = Buffer.concat([cipher.update(data), cipher.final()]);
   return encryptedData.toString("base64");
 };
 
-const aes_decrypt = (encrypted: string, key: Buffer, iv: Buffer): string => {
+const aes_decrypt = (encrypted: string, key: String, iv: String): string => {
   const data = Buffer.from(encrypted, "base64");
-  const decipher = crypto.createDecipheriv("AES-256-CBC", key, iv);
+  const keyBinary = Buffer.from(key);
+  const ivBinary = Buffer.from(iv);
+  const decipher = crypto.createDecipheriv("AES-256-CBC", keyBinary, ivBinary);
   decipher.setAutoPadding(true);
   const decryptedData = Buffer.concat([
     decipher.update(data),
@@ -76,18 +80,16 @@ const content_id = async (show: any) => {
 const content = async (content_id: string) => {
   const ENCRYPT_AJAX_ENDPOINT = "https://membed.net/encrypt-ajax.php";
   const SECRET = "25742532592138496744665879883281";
-  const SECRETBINARY = Buffer.from(SECRET);
   const IV = "9225679083961858";
-  const IVBINARY = Buffer.from(IV);
 
   const res = await got(ENCRYPT_AJAX_ENDPOINT, {
     method: "GET",
     headers: { "x-requested-with": "XMLHttpRequest" },
     searchParams: {
-      id: aes_encrypt(content_id, SECRETBINARY, IVBINARY),
+      id: aes_encrypt(content_id, SECRET, IV),
     },
   });
   const resJson = JSON.parse(res.body)["data"];
-  const contentJson = JSON.parse(aes_decrypt(resJson, SECRETBINARY, IVBINARY));
+  const contentJson = JSON.parse(aes_decrypt(resJson, SECRET, IV));
   return contentJson;
 };

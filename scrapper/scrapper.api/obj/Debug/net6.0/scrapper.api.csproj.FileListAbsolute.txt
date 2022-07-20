@@ -34,3 +34,4 @@
 /home/ares/Projects/dionysus/scrapper/scrapper.api/obj/Debug/net6.0/scrapper.api.genruntimeconfig.cache
 /home/ares/Projects/dionysus/scrapper/scrapper.api/bin/Debug/net6.0/Humanizer.dll
 /home/ares/Projects/dionysus/scrapper/scrapper.api/bin/Debug/net6.0/Microsoft.EntityFrameworkCore.Design.dll
+/home/ares/Projects/dionysus/scrapper/scrapper.api/bin/Debug/net6.0/HtmlAgilityPack.NetCore.dll

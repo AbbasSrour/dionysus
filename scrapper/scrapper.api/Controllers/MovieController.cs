@@ -1,57 +1,42 @@
-using System.Security.Cryptography;
-using System.Text;
+using HtmlAgilityPack;
 using Microsoft.AspNetCore.Mvc;
-using scrapper.api.Context;
+using scrapper.api.Utils;
 
 namespace scrapper.api.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]/[action]")]
 public class MovieController : Controller {
-    private readonly DionysusDbContext db;
+    // private readonly DionysusDbContext db;
 
-    public MovieController(DionysusDbContext db) {
-        this.db = db;
+    // public MovieController(DionysusDbContext db) {
+    //     this.db = db;
+    // }
+
+    [HttpGet]
+    public async Task<HtmlNode> GetMovie() {
+        var scrapper = new Scrapper();
+        var content = await scrapper.CallImdb("https://www.imdb.com/find?q=uncharted&ref_=nv_sr_sm");
+        var shows = await scrapper.mapShows(content);
+        return shows;
     }
 
-    public string Encrypt(string data, string key, string iv) {
-        var keyBinary = Encoding.Default.GetBytes(key);
-        var ivBinary = Encoding.Default.GetBytes(iv);
-        var dataBinary = Encoding.Default.GetBytes(data);
-
-        using (var aes = Aes.Create()) {
-            aes.Mode = CipherMode.CBC;
-            aes.Key = keyBinary;
-            aes.BlockSize = 256;
-            aes.IV = ivBinary;
-            using (var ms = new MemoryStream()) {
-                using (var transform = aes.CreateEncryptor())
-                using (var cs = new CryptoStream(ms, transform, CryptoStreamMode.Write)) {
-                    cs.Write(dataBinary, 0, dataBinary.Length);
-                }
-
-                return BitConverter.ToString(ms.ToArray()).Replace("-", string.Empty);
-            }
-        }
+    [HttpGet("{searchString}")]
+    public string Encrypt(string searchString) {
+        if (searchString.Length == 0) return "Fuck You";
+        var SECRET = "25742532592138496744665879883281";
+        var IV = "9225679083961858";
+        var toEncrypt = new Crypto(searchString, SECRET, IV);
+        return toEncrypt.Encrypt(searchString);
     }
 
-    public string Decrypt(string encrypted, string key, string iv) {
-        var keyBinary = Encoding.Default.GetBytes(key);
-        var ivBinary = Encoding.Default.GetBytes(iv);
-        var dataBinary = Encoding.Default.GetBytes(encrypted);
-
-        using (var aes = Aes.Create()) {
-            aes.Mode = CipherMode.CBC;
-            aes.BlockSize = 256;
-            aes.IV = ivBinary;
-            using (var ms = new MemoryStream()) {
-                using (var transform = aes.CreateDecryptor())
-                using (var cs = new CryptoStream(ms, transform, CryptoStreamMode.Write)) {
-                    cs.Write(dataBinary, 0, dataBinary.Length);
-                }
-
-                return BitConverter.ToString(ms.ToArray()).Replace("-", string.Empty);
-            }
-        }
+    [HttpGet("{encrypted}")]
+    public string Decrypt(string encrypted) {
+        if (encrypted.Length == 0) return "Fuck You";
+        var SECRET = "25742532592138496744665879883281";
+        var IV = "9225679083961858";
+        Console.Write(encrypted);
+        var toDecrypt = new Crypto(encrypted, SECRET, IV);
+        return toDecrypt.Decrypt(encrypted);
     }
 }
