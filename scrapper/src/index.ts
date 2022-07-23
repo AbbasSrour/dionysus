@@ -1,18 +1,37 @@
-import express, {Application, json, Request, Response} from "express"
-import {AppDataSource} from "./utils/data-source.util";
 import dotenv from "dotenv";
-import ValidateEnv, {env} from "./utils/validate.util";
+dotenv.config();
+
+import express, {Application, json, Response, Request} from "express"
+import {AppDataSource} from "./utils/data-source.util";
+import ValidateEnv, {env} from "./utils/validate-env.util";
+import SearchRoute from "./routes/search.route"
+
+
 
 AppDataSource.initialize().then(
-    async () =>{
+    async () => {
+
+        //------------------------------------------ Setup ------------------------------------------------------//
         ValidateEnv();
-        const app:Application = express();
+        const app: Application = express();
 
-        app.use(json);
 
-        app.listen(env.PORT,()=>{
+        //------------------------------------------ Middleware ------------------------------------------------//
+        app.use(express.json());
+
+        //------------------------------------------ Routes ----------------------------------------------------//
+
+
+        app.use("/api/v1/search", SearchRoute);
+
+        // app.use("/api/v1",(req:Request, res:Response)=>{
+        //     res.send("helloworld");
+        // })
+
+        //------------------------------------------ Listen ----------------------------------------------------//
+        app.listen(env.PORT, () => {
             console.log("hello world");
         });
     }
 )
-.catch((error)=> console.log(error));
+    .catch((error) => console.log(error));

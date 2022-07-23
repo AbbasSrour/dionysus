@@ -19,6 +19,8 @@ import { MovieProductionCompany } from "./movie-production-company.entity";
 import { MovieRating } from "./movie-rating.entity";
 import { MovieServers } from "./movie-servers.entity";
 import { MovieWriters } from "./movie-writters.entity";
+import MovieLanguages from "./movie-languages.entity";
+import MovieImdb from "./movie-imdb.entity";
 
 @Entity("movie", { schema: "dionysus" })
 @Unique(["name", "releaseYear"])
@@ -41,11 +43,18 @@ export default class Movie extends BaseEntity {
   releaseYear: number | null;
 
   @Column("character varying", {
-    name: "wallpaper",
+    name: "poster",
     nullable: true,
     length: 480,
   })
-  wallpaper: string;
+  poster: string;
+
+  @Column("character varying", {
+    name: "cover",
+    nullable: true,
+    length: 480,
+  })
+  cover: string;
 
   @OneToOne(() => Imdb, {
     onDelete: "RESTRICT",
@@ -73,15 +82,8 @@ export default class Movie extends BaseEntity {
   @Column("integer", { name: "budget", nullable: true })
   budget: number | null;
 
-  @Column("bigint", { name: "revenue", nullable: true })
-  revenue: string | null;
-
-  @Column("character varying", {
-    name: "og_language",
-    nullable: true,
-    length: 20,
-  })
-  ogLanguage: string | null;
+  @Column("integer", { name: "revenue", nullable: true })
+  revenue: number | null;
 
   @CreateDateColumn()
   created_at: Date;
@@ -115,4 +117,10 @@ export default class Movie extends BaseEntity {
 
   @OneToMany(() => MovieWriters, (movieWriters) => movieWriters.movieId)
   movieWriters: MovieWriters[];
+
+  @OneToMany(() => MovieLanguages, (movieLanguages) => movieLanguages.movieId)
+  movieLanguages: MovieLanguages[];
+
+  @OneToMany(() => MovieImdb, (movieImdb) => movieImdb.movieId)
+  movieImdb: MovieImdb[];
 }

@@ -1,4 +1,4 @@
-import {cleanEnv, port, str, num} from "envalid";
+import {cleanEnv, port, str} from "envalid";
 
 export const env = cleanEnv(process.env, {
     NODE_ENV: str(),
@@ -8,7 +8,9 @@ export const env = cleanEnv(process.env, {
     PSQL_DB_USER_NAME: str(),
     PSQL_DB_PASSWORD: str(),
     PSQL_DB_PORT: port(),
+    API_KEY: str(),
     ORIGIN: str(),
+    ENC_KEY: str()
 });
 
 const ValidateEnv = () => {

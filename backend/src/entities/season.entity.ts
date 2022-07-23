@@ -33,11 +33,11 @@ export class Season extends BaseEntity {
   summery: string | null;
 
   @Column("character varying", {
-    name: "wallpaper",
+    name: "poster",
     nullable: true,
     length: 480,
   })
-  wallpaper: string | null;
+  poster: string | null;
 
   @Column("character varying", { name: "trailer", nullable: true, length: 480 })
   trailer: string | null;

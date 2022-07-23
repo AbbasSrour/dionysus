@@ -19,6 +19,8 @@ import { SeriesGenres } from "./series-genres.entity";
 import { SeriesProductionCompany } from "./series-production-company.entity";
 import { SeriesRating } from "./series-rating.entity";
 import { SeriesWriters } from "./series-writers.entity";
+import SeriesLanguages from "./series-languages.entity";
+import SeriesImdb from "./series-imdb.entity";
 
 @Entity("series", { schema: "dionysus" })
 @Unique(["imdbId"])
@@ -37,18 +39,18 @@ export class Series extends BaseEntity {
   releaseYear: number;
 
   @Column("character varying", {
-    name: "wallpaper",
+    name: "poster",
     nullable: true,
     length: 480,
   })
-  wallpaper: string | null;
+  poster: string | null;
 
-  @OneToOne(() => Imdb, {
-    onDelete: "RESTRICT",
-    onUpdate: "CASCADE",
+  @Column("character varying", {
+    name: "cover",
+    nullable: true,
+    length: 480,
   })
-  @JoinColumn([{ name: "imdb_id", referencedColumnName: "imdbId" }])
-  imdbId: Imdb;
+  cover: string;
 
   @Column("character varying", { name: "summery", nullable: true, length: 480 })
   summery: string | null;
@@ -62,13 +64,6 @@ export class Series extends BaseEntity {
     length: 20,
   })
   pgRating: string | null;
-
-  @Column("character varying", {
-    name: "og_language",
-    nullable: true,
-    length: 20,
-  })
-  ogLanguage: string | null;
 
   @CreateDateColumn()
   created_at: Date;
@@ -105,4 +100,13 @@ export class Series extends BaseEntity {
 
   @OneToMany(() => SeriesWriters, (seriesWriters) => seriesWriters.seriesId)
   seriesWriters: SeriesWriters[];
+
+  @OneToMany(
+    () => SeriesLanguages,
+    (seriesLanguages) => seriesLanguages.seriesId
+  )
+  seriesLanguages: SeriesLanguages[];
+
+  @OneToMany(() => SeriesImdb, (seriesImdb) => seriesImdb.seriesId)
+  seriesImdb: SeriesImdb[];
 }

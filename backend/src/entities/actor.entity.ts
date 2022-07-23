@@ -16,16 +16,10 @@ export default class Actor extends BaseEntity {
   actorId: number;
 
   @Column("character varying", {
-    name: "first_name",
+    name: "name",
     length: 100,
   })
-  firstName: string;
-
-  @Column("character varying", {
-    name: "last_name",
-    length: 100,
-  })
-  lastName: string;
+  name: string;
 
   @Column("character varying", {
     name: "image",

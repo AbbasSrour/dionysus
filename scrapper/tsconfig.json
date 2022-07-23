@@ -14,15 +14,28 @@
     "outDir": "./build",
     "rootDir": "."
   },
-  "exclude": ["tests", "./jest.config.ts", "src/migrations"],
-  "include": ["config", "src/"],
+  "exclude": [
+    "tests",
+    "./jest.config.ts",
+    "src/migrations"
+  ],
+  "include": [
+    "config",
+    "src/"
+  ],
   "ts-node": {
     "transpileOnly": true,
     "files": true,
     "compilerOptions": {
       "rootDir": "."
     },
-    "include": ["src/"],
-    "exclude": ["node_modules", "tests", "src/migrations"]
+    "include": [
+      "src/"
+    ],
+    "exclude": [
+      "node_modules",
+      "tests",
+      "src/migrations"
+    ]
   }
 }

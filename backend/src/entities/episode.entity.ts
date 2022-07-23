@@ -46,11 +46,11 @@ export class Episode extends BaseEntity {
   name: string | null;
 
   @Column("character varying", {
-    name: "wallpaper",
+    name: "poster",
     nullable: true,
     length: 480,
   })
-  wallpaper: string | null;
+  poster: string | null;
 
   @Column("character varying", {
     name: "summery",

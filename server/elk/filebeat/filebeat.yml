@@ -24,23 +24,23 @@ filebeat.autodiscover:
               server:
                 input:
                   type: container
-                  paths: '/var/lib/docker/containers/${data.docker.container.id}/*.log'
+                  paths: "/var/lib/docker/containers/${data.docker.container.id}/*.log"
               gc:
                 input:
                   type: container
-                  paths: '/var/lib/docker/containers/${data.docker.container.id}/*.log'
+                  paths: "/var/lib/docker/containers/${data.docker.container.id}/*.log"
               audit:
                 input:
                   type: container
-                  paths: '/var/lib/docker/containers/${data.docker.container.id}/*.log'
+                  paths: "/var/lib/docker/containers/${data.docker.container.id}/*.log"
               slowlog:
                 input:
                   type: container
-                  paths: '/var/lib/docker/containers/${data.docker.container.id}/*.log'
+                  paths: "/var/lib/docker/containers/${data.docker.container.id}/*.log"
               deprecation:
                 input:
                   type: container
-                  paths: '/var/lib/docker/containers/${data.docker.container.id}/*.log'
+                  paths: "/var/lib/docker/containers/${data.docker.container.id}/*.log"
     - type: docker
       templates:
         - condition:
@@ -51,7 +51,7 @@ filebeat.autodiscover:
               log:
                 input:
                   type: container
-                  paths: '/var/lib/docker/containers/${data.docker.container.id}/*.log'
+                  paths: "/var/lib/docker/containers/${data.docker.container.id}/*.log"
     - type: docker
       templates:
         - condition:
@@ -62,41 +62,40 @@ filebeat.autodiscover:
               log:
                 input:
                   type: container
-                  paths: '/var/lib/docker/containers/${data.docker.container.id}/*.log'
+                  paths: "/var/lib/docker/containers/${data.docker.container.id}/*.log"
               slowlog:
                 input:
                   type: container
-                  paths: '/var/lib/docker/containers/${data.docker.container.id}/*.log'
-    # - type: docker
-    #   templates:
-    #     - condition:
-    #         and:
-    #          - not.contains:
-    #             docker.container.image: elasticsearch
-    #          - not.contains:
-    #             docker.container.image: logstash
-    #          - not.contains:
-    #             docker.container.image: kibana
-    #       config:
-    #         - type: container
-    #           paths:
-    #             - /var/lib/docker/containers/${data.docker.container.id}/*.log
-
+                  paths: "/var/lib/docker/containers/${data.docker.container.id}/*.log"
+    - type: docker
+      templates:
+        - condition:
+            and:
+             - not.contains:
+                docker.container.image: elasticsearch
+             - not.contains:
+                docker.container.image: logstash
+             - not.contains:
+                docker.container.image: kibana
+          config:
+            - type: container
+              paths:
+                - /var/lib/docker/containers/${data.docker.container.id}/*.log
 
 processors:
   - add_cloud_metadata: ~
 
 # Output to ES directly.
-output.elasticsearch:
-  hosts: '${ELASTICSEARCH_HOST_PORT}'
-  username: '${ELASTIC_USERNAME}'
-  password: '${ELASTIC_PASSWORD}'
-  ssl:
-    verification_mode: "none"
+# output.elasticsearch:
+#   hosts: '${ELASTICSEARCH_HOST_PORT}'
+#   username: '${ELASTIC_USERNAME}'
+#   password: '${ELASTIC_PASSWORD}'
+#   ssl:
+#     verification_mode: "none"
 
 # Output to Logstash
-# output.logstash:
-#   hosts: ["logstash:5044"]
+output.logstash:
+  hosts: ["logstash:5044"]
 
 #=================================== Kibana ==========================================
 # Enable setting up Kibana
@@ -104,9 +103,9 @@ output.elasticsearch:
 # This requires a Kibana endpoint configuration.
 setup:
   kibana:
-    host: '${KIBANA_HOST_PORT}'
-    username: '${ELASTIC_USERNAME}'
-    password: '${ELASTIC_PASSWORD}'
+    host: "${KIBANA_HOST_PORT}"
+    username: "${ELASTIC_USERNAME}"
+    password: "${ELASTIC_PASSWORD}"
 
 #==================================== Monitoring =====================================
 # Enable Monitoring Beats

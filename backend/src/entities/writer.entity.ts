@@ -15,11 +15,8 @@ export class Writers extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "writer_id" })
   writerId: number;
 
-  @Column("character varying", { name: "first_name", length: 100 })
-  firstName: string;
-
-  @Column("character varying", { name: "last_name", length: 100 })
-  lastName: string;
+  @Column("character varying", { name: "name", length: 100 })
+  name: string;
 
   @Column("character varying", {
     name: "image",

@@ -5,7 +5,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   CreateDateColumn,
+  OneToMany,
 } from "typeorm";
+import MovieImdb from "./movie-imdb.entity";
+import SeriesImdb from "./series-imdb.entity";
 
 @Entity("imdb", { schema: "dionysus" })
 export default class Imdb extends BaseEntity {
@@ -16,7 +19,13 @@ export default class Imdb extends BaseEntity {
   rating: number | null;
 
   @Column("integer", { name: "vote", nullable: true })
-  vote: number | null;
+  voteCount: number | null;
+
+  @OneToMany(() => MovieImdb, (movieImdb) => movieImdb.imdbId)
+  movieImdb: MovieImdb[];
+
+  @OneToMany(() => SeriesImdb, (seriesImdb) => seriesImdb.imdbId)
+  seriesImdb: SeriesImdb[];
 
   @CreateDateColumn()
   created_at: Date;

@@ -1,9 +1,10 @@
-import dotenv from "dotenv"
+import dotenv from "dotenv";
+dotenv.config();
+
 import "reflect-metadata"
 import {DataSource} from "typeorm";
-import {env} from "./validate.util"
+import {env} from "./validate-env.util"
 
-dotenv.config();
 
 export const AppDataSource = new DataSource({
     host: env.PSQL_DB_URL,
