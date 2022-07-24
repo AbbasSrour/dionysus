@@ -10,13 +10,11 @@ WORKDIR /usr/share/app
 
 COPY ["package.json",  "tsconfig.json","./"]
 
-# Exec Form yields less processes, and better signal handling
 RUN ["pnpm", "install"]
 
 COPY ["src", "tsconfig.json","./"]
 COPY ["./src","./src"]
 
-# Exec Form yields less processes, and better signal handling
 RUN ["pnpm","build"]
 
 FROM node:alpine
@@ -29,9 +27,10 @@ RUN apk add --no-cache curl \
 
 WORKDIR /usr/app
 
-COPY ["package.json", "development.env", "staging.env", "./"]
+COPY ["package.json", "./"]
 
-# Exec Form yields less processes, and better signal handling
+COPY ["stage.env", "./.env"]
+
 #RUN ["pnpm", "install", "--only=production"]
 COPY --from=build /usr/share/app/node_modules ./node_modules
 
@@ -41,7 +40,6 @@ ENV NODE_ENV=staging
 
 EXPOSE 5000/tcp
 
-# Exec Form yields less processes, and better signal handling
 # Using pnpm to run server yiels: 3 processes, 5 with cross env
 #CMD ["pnpm", "stage"]
 # Running node without pnpm yields: 1 process
