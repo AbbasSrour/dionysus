@@ -5,12 +5,14 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from "typeorm";
 import MovieCast from "./movie-cast.entity";
 import { SeriesCast } from "./series-cast.entity";
 
 @Entity("actor", { schema: "dionysus" })
+@Unique("UNIQUE_ACTOR_NAME_IMAGE", ["name", "image"])
 export default class Actor extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "actor_id" })
   actorId: number;

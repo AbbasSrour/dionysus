@@ -14,7 +14,7 @@ import { Episode } from "./episode.entity";
 import { Series } from "./series.entity";
 
 @Entity("season", { schema: "dionysus" })
-@Unique(["seriesId", "number"])
+@Unique("UNIQUE_SEASON_NUMBER_SERIES_ID", ["seriesId", "number"])
 export class Season extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "season_id" })
   seasonId: number;
@@ -29,8 +29,8 @@ export class Season extends BaseEntity {
   @JoinColumn([{ name: "series_id", referencedColumnName: "seriesId" }])
   seriesId: Series;
 
-  @Column("character varying", { name: "summery", nullable: true, length: 480 })
-  summery: string | null;
+  @Column("character varying", { name: "summary", nullable: true, length: 480 })
+  summary: string | null;
 
   @Column("character varying", {
     name: "poster",

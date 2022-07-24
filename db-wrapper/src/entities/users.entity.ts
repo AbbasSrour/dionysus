@@ -7,6 +7,7 @@ import {
   Index,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from "typeorm";
 import { GenreRating } from "./genre-rating.entity";
@@ -16,8 +17,8 @@ import { SeriesHistory } from "./series-history.entity";
 import { SeriesRating } from "./series-rating.entity";
 
 import {
-  EncryptPassword,
   DecryptPassword,
+  EncryptPassword,
   HashPassword,
   VerifyPassword,
 } from "../utils/cryptography.util";
@@ -26,20 +27,20 @@ import crypto from "crypto";
 import { env } from "../utils/validate-env.util";
 
 @Entity("users", { schema: "dionysus" })
+@Unique("UNIQUE_USER_NAME", ["userName"])
+@Unique("UNIQUE_USER_EMAIL", ["email"])
 export class Users extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "user_id" })
   userId: number;
 
   @Column("character varying", {
     name: "user_name",
-    unique: true,
     length: 100,
   })
   userName: string;
 
   @Column("character varying", {
     name: "email",
-    unique: true,
     length: 480,
   })
   email: string;
@@ -78,10 +79,10 @@ export class Users extends BaseEntity {
   })
   verified: boolean;
 
-  @Index('verificationCode_index')
+  @Index("verificationCode_index")
   @Column({
     name: "verification_code",
-    type: 'text',
+    type: "text",
     nullable: true,
   })
   verificationCode!: string | null;
@@ -107,18 +108,6 @@ export class Users extends BaseEntity {
   @OneToMany(() => SeriesRating, (seriesRating) => seriesRating.userId)
   seriesRatings: SeriesRating[];
 
-  @BeforeInsert()
-  async securePassword(): Promise<string | null> {
-    if (this.password) {
-      const hashedPassword: string = await HashPassword(this.password);
-      this.password = await EncryptPassword(
-        hashedPassword,
-        env.ENC_KEY
-      );
-    }
-    return this.password;
-  }
-
   //  Validate password
   static async comparePasswords(
     candidatePassword: string,
@@ -139,5 +128,14 @@ export class Users extends BaseEntity {
       .update(verificationCode)
       .digest("hex");
     return { verificationCode, hashedVerificationCode };
+  }
+
+  @BeforeInsert()
+  async securePassword(): Promise<string | null> {
+    if (this.password) {
+      const hashedPassword: string = await HashPassword(this.password);
+      this.password = await EncryptPassword(hashedPassword, env.ENC_KEY);
+    }
+    return this.password;
   }
 }

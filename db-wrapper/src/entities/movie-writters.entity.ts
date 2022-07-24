@@ -12,7 +12,7 @@ import Movie from "./movie.entity";
 import { Writers } from "./writer.entity";
 
 @Entity("movie_writers", { schema: "dionysus" })
-@Unique(["movieId", "writerId"])
+@Unique("UNIQUE_MOVIE_ID_WRITER_ID", ["movieId", "writerId"])
 export class MovieWriters extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "movie_writer_id" })
   movieWriterId: number;

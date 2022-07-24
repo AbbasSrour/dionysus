@@ -12,7 +12,7 @@ import { Series } from "./series.entity";
 import Language from "./language.entity";
 
 @Entity("series_languages", { schema: "dionysus" })
-@Unique(["languageId", "seriesId"])
+@Unique("UNIQUE_LANGUAGE_ID_SERIES_ID", ["languageId", "seriesId"])
 export default class SeriesLanguages extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "series_languages_id" })
   seriesLanguagesId: number;

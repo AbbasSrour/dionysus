@@ -12,7 +12,7 @@ import { Series } from "./series.entity";
 import Imdb from "./imdb.entity";
 
 @Entity("series_imdb", { schema: "dionysus" })
-@Unique(["imdbId", "seriesId"])
+@Unique("UNIQUE_IMDB_ID_SERIES_ID", ["imdbId", "seriesId"])
 export default class SeriesImdb extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "series_imdb_id" })
   seriesImdbId: number;

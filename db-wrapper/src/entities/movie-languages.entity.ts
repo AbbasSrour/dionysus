@@ -12,7 +12,7 @@ import Movie from "./movie.entity";
 import Language from "./language.entity";
 
 @Entity("movie_languages", { schema: "dionysus" })
-@Unique(["languageId", "movieId"])
+@Unique("UNIQUE_LANGUAGE_ID_MOVIE_ID", ["languageId", "movieId"])
 export default class MovieLanguages extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "movie_language_id" })
   movieLanguagesId: number;

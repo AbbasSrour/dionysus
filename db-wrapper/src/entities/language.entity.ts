@@ -5,12 +5,14 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from "typeorm";
 import MovieLanguages from "./movie-languages.entity";
 import SeriesLanguages from "./series-languages.entity";
 
 @Entity("language", { schema: "dionysus" })
+@Unique("UNIQUE_LANGUAGE_NAME", ["name"])
 export default class Language extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "language_id" })
   languageId: number;

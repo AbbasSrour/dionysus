@@ -1,16 +1,13 @@
 import {
-  JoinColumn,
-  OneToMany,
-  Column,
-  Entity,
-  OneToOne,
   BaseEntity,
-  PrimaryGeneratedColumn,
+  Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
   Unique,
+  UpdateDateColumn,
 } from "typeorm";
-import Imdb from "./imdb.entity";
 import MovieCast from "./movie-cast.entity";
 import MovieDirectors from "./movie-directors.entity";
 import { MovieGenres } from "./movie-genres.entity";
@@ -23,8 +20,7 @@ import MovieLanguages from "./movie-languages.entity";
 import MovieImdb from "./movie-imdb.entity";
 
 @Entity("movie", { schema: "dionysus" })
-@Unique(["name", "releaseYear"])
-@Unique(["imdbId"])
+@Unique("UNIQUE_MOVIE_NAME_RELEASE_YEAR", ["name", "releaseYear"])
 export default class Movie extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "movie_id" })
   movieId: number;
@@ -38,7 +34,6 @@ export default class Movie extends BaseEntity {
   @Column("integer", {
     name: "release_year",
     nullable: true,
-    unique: true,
   })
   releaseYear: number | null;
 
@@ -56,15 +51,8 @@ export default class Movie extends BaseEntity {
   })
   cover: string;
 
-  @OneToOne(() => Imdb, {
-    onDelete: "RESTRICT",
-    onUpdate: "CASCADE",
-  })
-  @JoinColumn([{ name: "imdb_id", referencedColumnName: "imdbId" }])
-  imdbId: Imdb;
-
-  @Column("character varying", { name: "summery", nullable: true, length: 480 })
-  summery: string | null;
+  @Column("character varying", { name: "summary", nullable: true, length: 480 })
+  summary: string | null;
 
   @Column("character varying", { name: "trailer", nullable: true, length: 480 })
   trailer: string | null;

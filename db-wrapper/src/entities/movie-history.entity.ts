@@ -1,8 +1,8 @@
 import {
-  JoinColumn,
   BaseEntity,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
@@ -11,7 +11,7 @@ import Movie from "./movie.entity";
 import { Users } from "./users.entity";
 
 @Entity("movie_history", { schema: "dionysus" })
-@Unique(["movieId", "userId"])
+@Unique("UNIQUE_MOVIE_ID_USER_ID", ["movieId", "userId"])
 export class MovieHistory extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "movie_history_id" })
   movieHistoryId: number;

@@ -12,13 +12,14 @@ import { MovieServers } from "./movie-servers.entity";
 import { SeriesServers } from "./series-servers.entity";
 
 @Entity("servers", { schema: "dionysus" })
+@Unique("UNIQUE_SERVER_NAME", ["name"])
+@Unique("UNIQUE_SERVER_URL", ["url"])
 export class Servers extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "servers_id" })
   serverId: number;
 
   @Column("character varying", {
     name: "name",
-    unique: true,
     length: 100,
   })
   name: string;

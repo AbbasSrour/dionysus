@@ -11,7 +11,7 @@ import Movie from "./movie.entity";
 import Imdb from "./imdb.entity";
 
 @Entity("movie_imdb", { schema: "dionysus" })
-@Unique(["imdbId", "movieId"])
+@Unique("UNIQUE_MOVIE_ID_IMDB_ID", ["imdbId", "movieId"])
 export default class MovieImdb {
   @PrimaryGeneratedColumn({ name: "movie_imdb_id" })
   movieImdbId: number;

@@ -11,7 +11,7 @@ import { Episode } from "./episode.entity";
 import { Users } from "./users.entity";
 
 @Entity("series_history", { schema: "dionysus" })
-@Unique(["episodeId", "userId"])
+@Unique("UNIQUE_EPISODE_ID_USER_ID", ["episodeId", "userId"])
 export class SeriesHistory extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "series_history_id" })
   seriesHistoryId: number;

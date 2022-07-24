@@ -12,7 +12,7 @@ import Genre from "./genre.entity";
 import { Series } from "./series.entity";
 
 @Entity("series_genres", { schema: "dionysus" })
-@Unique(["genreId", "seriesId"])
+@Unique("UNIQUE_GENRE_ID_SERIES_ID", ["genreId", "seriesId"])
 export class SeriesGenres extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "series_genres" })
   seriesGenreId: number;

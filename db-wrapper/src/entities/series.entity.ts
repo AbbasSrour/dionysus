@@ -3,15 +3,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from "typeorm";
 import { Episode } from "./episode.entity";
-import Imdb from "./imdb.entity";
 import { Season } from "./season.entity";
 import { SeriesCast } from "./series-cast.entity";
 import { SeriesDirectors } from "./series-directors.entity";
@@ -23,8 +20,7 @@ import SeriesLanguages from "./series-languages.entity";
 import SeriesImdb from "./series-imdb.entity";
 
 @Entity("series", { schema: "dionysus" })
-@Unique(["imdbId"])
-@Unique(["name", "releaseYear"])
+@Unique("UNIQUE_SERIES_NAME_RELEASE_YEAR", ["name", "releaseYear"])
 export class Series extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "series_id" })
   seriesId: number;
@@ -52,8 +48,8 @@ export class Series extends BaseEntity {
   })
   cover: string;
 
-  @Column("character varying", { name: "summery", nullable: true, length: 480 })
-  summery: string | null;
+  @Column("character varying", { name: "summary", nullable: true, length: 480 })
+  summary: string | null;
 
   @Column("character varying", { name: "trailer", nullable: true, length: 480 })
   trailer: string | null;

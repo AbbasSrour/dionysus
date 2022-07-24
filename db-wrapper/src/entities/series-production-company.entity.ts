@@ -12,7 +12,10 @@ import { ProductionCompany } from "./production-company.entity";
 import { Series } from "./series.entity";
 
 @Entity("series_production_company", { schema: "dionysus" })
-@Unique(["seriesId", "productionCompanyId"])
+@Unique("UNIQUE_SERIES_ID_PRODUCTION_COMPANY_ID", [
+  "seriesId",
+  "productionCompanyId",
+])
 export class SeriesProductionCompany extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "series_production_company_id" })
   SeriesProductionCompanyId: number;

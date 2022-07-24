@@ -1,19 +1,19 @@
 import {
-  Entity,
-  Column,
   BaseEntity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  Column,
   CreateDateColumn,
+  Entity,
   OneToMany,
+  PrimaryColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import MovieImdb from "./movie-imdb.entity";
 import SeriesImdb from "./series-imdb.entity";
 
 @Entity("imdb", { schema: "dionysus" })
 export default class Imdb extends BaseEntity {
-  @PrimaryGeneratedColumn({ name: "imdb_id" })
-  imdbId: number;
+  @PrimaryColumn("uuid", { name: "imdb_id" })
+  imdbId: string;
 
   @Column("real", { name: "rating", nullable: true })
   rating: number | null;

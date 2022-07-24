@@ -16,7 +16,11 @@ import { SeriesServers } from "./series-servers.entity";
 import { Series } from "./series.entity";
 
 @Entity("episode", { schema: "dionysus" })
-@Unique(["number", "seasonId", "seriesId"])
+@Unique("UNIQUE_EPISODE_NUMBER_SEASON_SERIES", [
+  "number",
+  "seasonId",
+  "seriesId",
+])
 export class Episode extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "episode_id" })
   episodeId: number;
@@ -53,11 +57,11 @@ export class Episode extends BaseEntity {
   poster: string | null;
 
   @Column("character varying", {
-    name: "summery",
+    name: "summary",
     nullable: true,
     length: 480,
   })
-  summery: string | null;
+  summary: string | null;
 
   @Column("integer", { name: "release_date", nullable: true })
   releaseDate: number | null;

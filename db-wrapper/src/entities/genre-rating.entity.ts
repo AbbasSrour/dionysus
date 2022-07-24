@@ -13,7 +13,7 @@ import Genre from "./genre.entity";
 import { Users } from "./users.entity";
 
 @Entity("genre_rating", { schema: "dionysus" })
-@Unique(["userId", "genreId"])
+@Unique("UNIQUE_USER_ID_GENRE_ID", ["userId", "genreId"])
 export class GenreRating extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "genre_rating" })
   genreRatingId: number;

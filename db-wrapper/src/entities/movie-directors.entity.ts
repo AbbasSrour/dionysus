@@ -11,7 +11,7 @@ import Director from "./director.entity";
 import Movie from "./movie.entity";
 
 @Entity("movie_directors", { schema: "dionysus" })
-@Unique(["directorId", "movieId"])
+@Unique("UNIQUE_DIRECTOR_ID_MOVIE_ID", ["directorId", "movieId"])
 export default class MovieDirectors {
   @PrimaryGeneratedColumn()
   movieDirectorId: number;

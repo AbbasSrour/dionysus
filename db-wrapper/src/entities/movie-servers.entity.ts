@@ -13,7 +13,7 @@ import Movie from "./movie.entity";
 import { Servers } from "./server.entity";
 
 @Entity("movie_servers", { schema: "dionysus" })
-@Unique(["movieId", "serverId"])
+@Unique("UNIQUE_MOVIE_ID_SERVER_ID", ["movieId", "serverId"])
 export class MovieServers extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "movie_servers_id" })
   MovieServersId: number;

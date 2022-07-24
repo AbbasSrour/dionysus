@@ -5,6 +5,7 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from "typeorm";
 import { GenreRating } from "./genre-rating.entity";
@@ -12,16 +13,16 @@ import { MovieGenres } from "./movie-genres.entity";
 import { SeriesGenres } from "./series-genres.entity";
 
 @Entity("genre", { schema: "dionysus" })
+@Unique("UNIQUE_GENRE_NAME", ["name"])
 export default class Genre extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "genre_id" })
   genreId: number;
 
   @Column("character varying", {
-    name: "genre_name",
-    unique: true,
+    name: "name",
     length: 100,
   })
-  genreName: string;
+  name: string;
 
   @CreateDateColumn()
   created_at: Date;

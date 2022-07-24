@@ -12,7 +12,7 @@ import Director from "./director.entity";
 import { Series } from "./series.entity";
 
 @Entity("series_directors", { schema: "dionysus" })
-@Unique(["seriesId", "directorId"])
+@Unique("UNIQUE_SERIES_ID_DIRECTOR_ID", ["seriesId", "directorId"])
 export class SeriesDirectors extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "series_director_id" })
   seriesDirectorId: number;
