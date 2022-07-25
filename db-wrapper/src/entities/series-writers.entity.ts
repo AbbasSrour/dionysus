@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Series } from "./series.entity";
-import { Writers } from "./writer.entity";
+import { Writer } from "./writer.entity";
 
 @Entity("series_writers", { schema: "dionysus" })
 @Unique("UNIQUE_SERIES_ID_WRITER_ID", ["seriesId", "writerId"])
@@ -17,12 +17,12 @@ export class SeriesWriters extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "series_writers_id" })
   seriesWritersId: number;
 
-  @ManyToOne(() => Writers, (writers) => writers.seriesWriters, {
+  @ManyToOne(() => Writer, (writers) => writers.seriesWriters, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "writer_id", referencedColumnName: "writerId" }])
-  writerId: Writers;
+  writerId: Writer;
 
   @ManyToOne(() => Series, (series) => series.seriesWriters, {
     onDelete: "CASCADE",

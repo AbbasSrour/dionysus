@@ -10,7 +10,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import Movie from "./movie.entity";
-import { Servers } from "./server.entity";
+import { Server } from "./server.entity";
 
 @Entity("movie_servers", { schema: "dionysus" })
 @Unique("UNIQUE_MOVIE_ID_SERVER_ID", ["movieId", "serverId"])
@@ -25,12 +25,12 @@ export class MovieServers extends BaseEntity {
   @JoinColumn([{ name: "movie_id", referencedColumnName: "movieId" }])
   movieId: Movie;
 
-  @ManyToOne(() => Servers, (servers) => servers.movieServers, {
+  @ManyToOne(() => Server, (servers) => servers.movieServers, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "server_id", referencedColumnName: "serverId" }])
-  serverId: Servers;
+  serverId: Server;
 
   @Column("character varying", { name: "url", length: 480 })
   url: string;

@@ -11,9 +11,9 @@ import {
 import { MovieWriters } from "./movie-writters.entity";
 import { SeriesWriters } from "./series-writers.entity";
 
-@Entity("writers", { schema: "dionysus" })
+@Entity("writer", { schema: "dionysus" })
 @Unique("UNIQUE_WRITER_NAME_IMAGE", ["name", "image"])
-export class Writers extends BaseEntity {
+export class Writer extends BaseEntity {
   @PrimaryGeneratedColumn({ name: "writer_id" })
   writerId: number;
 
