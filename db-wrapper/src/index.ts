@@ -16,14 +16,29 @@ import cors from "cors";
 import morganMiddleware from "./middleware/morgan.middleware";
 
 // Documentation
-import swaggerUI from "swagger-ui-express";
-import swaggerDocs from "./docs/swagger.doc";
-
+// import swaggerUI from "swagger-ui-express";
+// import swaggerDocs from "./docs/swagger.doc";
 // Routes
+import MovieRoute from "./routes/movie.route";
+import ActorRoute from "./routes/actor.route";
+import ImdbRoute from "./routes/imdb.route";
+import DirectorRoute from "./routes/director.route";
+import WriterRoute from "./routes/writer.route";
+import GenreRoute from "./routes/genre.route";
+import LanguageRoute from "./routes/language.route";
+import ProductionCompanyRoute from "./routes/production-company.route";
+import ServerRoute from "./routes/server.route";
+import MovieCastRoute from "./routes/movie-cast.route";
+import MovieGenreRoute from "./routes/movie-genre.route";
+import MovieImdbRoute from "./routes/movie-imdb.route";
+import MovieLanguageRoute from "./routes/movie-language.route";
+import MovieProductionCompanyRoute from "./routes/movie-production-company.route";
+import MovieServerRoute from "./routes/movie-server.route";
+import MovieWriterRoute from "./routes/movie-writer.route";
 
 // Environment
-ValidateEnv();
 dotenv.config();
+ValidateEnv();
 
 AppDataSource.initialize()
   .then(() => {
@@ -71,11 +86,30 @@ AppDataSource.initialize()
     });
 
     // Documentation
-    app.use(
-      "/docs",
-      swaggerUI.serve,
-      swaggerUI.setup(swaggerDocs, swaggerOpts)
-    );
+    // app.use(
+    //   "/docs",
+    //   swaggerUI.serve,
+    //   swaggerUI.setup(swaggerOpts)
+    // );
+
+    // Route
+    app.use("/api/v1/actors", ActorRoute);
+    app.use("/api/v1/directors", DirectorRoute);
+    app.use("/api/v1/genres", GenreRoute);
+    app.use("/api/v1/imdb", ImdbRoute);
+    app.use("/api/v1/languages", LanguageRoute);
+    app.use("/api/v1/movies", MovieRoute);
+    app.use("/api/v1/movie-cast", MovieCastRoute);
+    app.use("/api/v1/movie-directors", DirectorRoute);
+    app.use("/api/v1/movie-genres", MovieGenreRoute);
+    app.use("/api/v1/movie-imdb", MovieImdbRoute);
+    app.use("/api/v1/movie-language", MovieLanguageRoute);
+    app.use("/api/v1/movie-production-company", MovieProductionCompanyRoute);
+    app.use("/api/v1/movie-server", MovieServerRoute);
+    app.use("/api/v1/movie-writer", MovieWriterRoute);
+    app.use("/api/v1/production-companies", ProductionCompanyRoute);
+    app.use("/api/v1/server", ServerRoute);
+    app.use("/api/v1/writers", WriterRoute);
 
     // UNHANDLED ROUTE
     app.all("*", (req: Request, res: Response, next: NextFunction) => {
@@ -97,7 +131,9 @@ AppDataSource.initialize()
 
     //------------------------------------------ Listen ----------------------------------------------------//
     app.listen(env.PORT, () => {
-      log.info(`⚡️[engine]: Engine running at https://localhost:${env.PORT}`);
+      log.info(
+        `⚡️[db-wrapper]: Db-Wrapper running at https://localhost:${env.PORT}`
+      );
     });
   })
   .catch((error) => {
