@@ -11,6 +11,7 @@ export const createMovieGenreHandler = async (
   try {
     const { movie, genre } = req.body;
     const movieGenre = await createMovieGenreService({ movie, genre });
+    res.status(201).json({ status: "Success movie genre created", movieGenre });
   } catch (error) {
     log.error(error);
     next(error);

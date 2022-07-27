@@ -10,7 +10,7 @@ export const createMovieDirectorHandler = async (
 ) => {
   try {
     const { movie, director } = req.body;
-    const movieDirector = createMovieDirectorService({ movie, director });
+    const movieDirector = await createMovieDirectorService({ movie, director });
     res
       .status(201)
       .json({ status: "Success movie director created", movieDirector });

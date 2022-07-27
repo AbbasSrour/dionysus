@@ -12,7 +12,7 @@ import SeriesImdb from "./series-imdb.entity";
 
 @Entity("imdb", { schema: "dionysus" })
 export default class Imdb extends BaseEntity {
-  @PrimaryColumn("uuid", { name: "imdb_id" })
+  @PrimaryColumn("character varying", { name: "imdb_id" })
   imdbId: string;
 
   @Column("real", { name: "rating", nullable: true })

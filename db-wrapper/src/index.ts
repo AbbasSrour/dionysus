@@ -35,6 +35,7 @@ import MovieLanguageRoute from "./routes/movie-language.route";
 import MovieProductionCompanyRoute from "./routes/movie-production-company.route";
 import MovieServerRoute from "./routes/movie-server.route";
 import MovieWriterRoute from "./routes/movie-writer.route";
+import MovieDirectorRoute from "./routes/movie-director.route";
 
 // Environment
 dotenv.config();
@@ -63,9 +64,9 @@ AppDataSource.initialize()
       );
 
     // Swagger Api Documentation
-    const swaggerOpts = {
-      explorer: true,
-    };
+    // const swaggerOpts = {
+    //   explorer: true,
+    // };
 
     //------------------------------------------ Routes ----------------------------------------------------//
     // Default Route
@@ -98,18 +99,18 @@ AppDataSource.initialize()
     app.use("/api/v1/genres", GenreRoute);
     app.use("/api/v1/imdb", ImdbRoute);
     app.use("/api/v1/languages", LanguageRoute);
+    app.use("/api/v1/production-companies", ProductionCompanyRoute);
+    app.use("/api/v1/servers", ServerRoute);
+    app.use("/api/v1/writers", WriterRoute);
     app.use("/api/v1/movies", MovieRoute);
     app.use("/api/v1/movie-cast", MovieCastRoute);
-    app.use("/api/v1/movie-directors", DirectorRoute);
+    app.use("/api/v1/movie-directors", MovieDirectorRoute);
     app.use("/api/v1/movie-genres", MovieGenreRoute);
     app.use("/api/v1/movie-imdb", MovieImdbRoute);
-    app.use("/api/v1/movie-language", MovieLanguageRoute);
+    app.use("/api/v1/movie-languages", MovieLanguageRoute);
     app.use("/api/v1/movie-production-company", MovieProductionCompanyRoute);
-    app.use("/api/v1/movie-server", MovieServerRoute);
-    app.use("/api/v1/movie-writer", MovieWriterRoute);
-    app.use("/api/v1/production-companies", ProductionCompanyRoute);
-    app.use("/api/v1/server", ServerRoute);
-    app.use("/api/v1/writers", WriterRoute);
+    app.use("/api/v1/movie-servers", MovieServerRoute);
+    app.use("/api/v1/movie-writers", MovieWriterRoute);
 
     // UNHANDLED ROUTE
     app.all("*", (req: Request, res: Response, next: NextFunction) => {
@@ -117,6 +118,7 @@ AppDataSource.initialize()
     });
 
     // GLOBAL ERROR HANDLER
+    // noinspection JSUnusedLocalSymbols
     app.use(
       (error: AppError, req: Request, res: Response, next: NextFunction) => {
         error.status = error.status || "error";

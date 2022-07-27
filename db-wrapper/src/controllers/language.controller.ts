@@ -10,7 +10,7 @@ export const createLanguageHandler = async (
 ) => {
   try {
     const { name } = req.body;
-    const language = createLanguageService({ name });
+    const language = await createLanguageService({ name });
     res
       .status(201)
       .json({ status: "Success, the language was created", language });

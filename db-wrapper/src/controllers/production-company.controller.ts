@@ -10,7 +10,10 @@ export const createProductionCompanyHandler = async (
 ) => {
   try {
     const { name, image } = req.body;
-    const productionCompany = createProductionCompanyService({ name, image });
+    const productionCompany = await createProductionCompanyService({
+      name,
+      image,
+    });
     res.status(201).json({
       status: "Success, production company created",
       productionCompany,

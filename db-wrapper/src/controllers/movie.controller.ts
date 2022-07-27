@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { MovieInput } from "../schemas/movie.schema";
-import { createMovieService } from "../services/movies.service";
-import log from "../utils/logger.util";
+import { createMovieService } from "../services/movie.service";
 
 export const createMovieHandler = async (
   req: Request<{}, {}, MovieInput>,
@@ -19,6 +18,7 @@ export const createMovieHandler = async (
       budget,
       revenue,
       trailer,
+      movieLength,
     } = req.body;
     const movie = await createMovieService({
       name,
@@ -30,10 +30,10 @@ export const createMovieHandler = async (
       budget,
       revenue,
       trailer,
+      movieLength,
     });
     res.status(201).json({ status: "Success, the movie was created", movie });
   } catch (error) {
-    log.error(error);
     next(error);
   }
 };

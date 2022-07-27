@@ -14,7 +14,6 @@ export const createMovieCastService = async (
     actorId: AppDataSource.manager.create(Actor, input.actor),
     role: input.role,
   };
-  console.log(input.movie, input.actor);
   const movieCast = AppDataSource.manager.create(MovieCast, myInput);
   return (await movieCastRepo.save(movieCast)) as MovieCast;
 };

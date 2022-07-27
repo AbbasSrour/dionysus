@@ -1,21 +1,15 @@
-import { NextFunction, Request, Response } from "express";
-import { MovieDirectorInput } from "../schemas/movie-director.schema";
-import { createMovieDirectorService } from "../services/movie-director.service";
-import log from "../utils/logger.util";
+import express from "express";
+import { ApiCheck } from "../middleware/api.middleware";
+import { Validate } from "../middleware/validate.middleware";
+import { MovieDirectorSchema } from "../schemas/movie-director.schema";
+import { createMovieDirectorHandler } from "../controllers/movie-director.controller";
 
-export const createMovieDirectorHandler = async (
-  req: Request<{}, {}, MovieDirectorInput>,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { director, movie } = req.body;
-    const movieDirector = await createMovieDirectorService({ director, movie });
-    res
-      .status(201)
-      .json({ status: "Success movie director created", movieDirector });
-  } catch (error) {
-    log.error(error);
-    next(error);
-  }
-};
+const Router = express.Router();
+
+Router.route("/").post(
+  ApiCheck,
+  Validate(MovieDirectorSchema),
+  createMovieDirectorHandler
+);
+
+export default Router;

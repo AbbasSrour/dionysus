@@ -10,7 +10,7 @@ export const createServerHandler = async (
 ) => {
   try {
     const { name, url } = req.body;
-    const server = createServerService({ name, url });
+    const server = await createServerService({ name, url });
     res.status(201).json({ status: "Success the server was created", server });
   } catch (error) {
     log.error(error);

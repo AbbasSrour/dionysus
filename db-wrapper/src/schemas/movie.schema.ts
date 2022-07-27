@@ -9,6 +9,7 @@ export const MovieSchema = object({
       required_error: "The year the movie was released in is required",
     }),
     poster: string(),
+    movieLength: number(),
     cover: string(),
     summary: string(),
     pgRating: string(),
