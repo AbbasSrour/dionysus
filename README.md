@@ -1,51 +1,36 @@
-# Dionysus: Backend
+# Dionysus:
 
-## Description:
+![stack]("./assets/Dionysus.drawio.png")
+Dionysus is a Movie and TV-Serieses streaming website, with all the features expected from modren streaming services
+mainly user accounts that hold user watch history, recommendation system based on this history, slick UI, and fast search using
+elastic search. This repository holds all the different microservices that constitute the website.
 
-Dionysus is a free Movie and TV-Serieses streaming website, with all the features expected from modren streaming services
-mainly user accounts that hold user watch history, recommendation system based on this history and a slick UI.
+## Structure
 
-This repository holds the backend side of the website powered by NodeJS, Express and PostgreSQL.
+### Frontend
 
-## Todo:
+The frontend is CSR React application to be used as a UI for the user to interact with the application. The user experience starts with creating
+an account and registering, verfing his email and then logging in.
 
-### Database
+### Backend:
 
-- [x] ER Diagram
-- [x] Relation Data Model
-- [x] Normalization
-- [ ] Database Processes For Checks:
-  - [ ] Process To Check The Email
-  - [ ] Process to Check The Username
-  - [ ] Process To Check The Password
-- [ ] Database Triggers For Data Integrity:
-  - [x] Make emails Lower Case
-  - [ ] Correct Email Fortmat
-  - [ ] Unify Lower Case Email And Email Format Trigger
-  - [ ] An episode can have the season id of a different series
-  - [ ] Episode Default Wallpaper: If Episode Wallpaper is null it takes season wallpaper if it exists if not takes series wallpaper
-  - [ ] Season Takes The Default Wallpaper Of Series If Null
-- [ ] User Intrests
-- [ ] User Recomendation System
-- [ ] Since History is unique, you need to update the watch time and date when a user rewatches the same thing
+Express + Typescript rest api that handles incoming requests from the frontend clients, using jwts and sessions for frontend user athentication stored in
+a redis cache database(more on the security aspect later). Requests on the `/search` route trigger the client to send a request to
+the scrapper microservice, saves the search term in the elastic search database, and then saves the response data also in the elastic search
+database. The backend also handles the management, insertion, deletion, and querying of a remote postgresql database
+that functions as a datastore for user data, and a backup for movie and series data incase some data gets lost.
 
-### Backend
+### Scrapper:
 
-- [x] TypeScript
-- [x] TypeOrm
-- [x] Redis
-- [x] Jwt And User Auth
-- [x] Email Verification
-- [ ] Routes
-  - [x] Auth Route
-  - [x] User Route
-  - [ ] Movie Route
-  - [ ] Searies Route
-  - [ ] Search Route
-- [ ] Crawler That Automatically Adds Data From Searches
-- [ ] logger
+The scrapper an Express + Typescript rest api which is responsible for searching imdb using the search term recieved from the backend,
+checking if the specfied movie or series exists on the servers (currently one but more are to be added), then scrape imdb for all the movie data.
+The scrape is thorough, and includes mostly everything that exists and related to specfied movie or sitcom from release data and pg rating
+to the production company. The scrapper then will forward the scrapped data, each entity on its own on its specfied api route in the backend
+through post http requests to be inserted to database. And finally a response containing all the data in a json will be sent to be saved in
+the elastic search database.
 
-### Documentation
+### Engine
 
-- [ ] Authentication Documentation
-- [ ] Swagger
+The recommendation engine is responsible for crunching the data in the elasticsearch database and recommending movies using content based
+filtering, collaborative filtering, and demographic filtering. In a nutshell the enginge will recommend the best genres to be showen on the
+the user's homepage based on his intrests with the movies in each genre sorted from worst to best based on the user intrests.
