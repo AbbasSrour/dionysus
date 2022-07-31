@@ -1,6 +1,6 @@
 # Dionysus:
 
-![stack]("https://github.com/AbbasSrour/dionysus/blob/a26f69576393a1403ac44d5e05db6b9f9fe44094/assets/Dionysus.drawio.png")
+![stack](https://github.com/AbbasSrour/dionysus/blob/a26f69576393a1403ac44d5e05db6b9f9fe44094/assets/Dionysus.drawio.png)
 Dionysus is a Movie and TV-Serieses streaming website, with all the features expected from modren streaming services
 mainly user accounts that hold user watch history, recommendation system based on this history, slick UI, and fast search using
 elastic search. This repository holds all the different microservices that constitute the website.
