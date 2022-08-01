@@ -1,0 +1,51 @@
+version: "3.8"
+
+volumes:
+  ConsulConfig: {}
+  ConsulData: {}
+  Vault: {}
+
+services:
+ ### v1.5.0
+   vault:
+     build:
+       context: ./server/secrets/vault
+       dockerfile: Dockerfile
+     container_name: vault
+     ports:
+       - 8200:8200
+     volumes:
+       - Vault:/vault
+     environment:
+       - VAULT_ADDR=http://127.0.0.1:8200
+     command: server
+     cap_add:
+       - IPC_LOCK
+     depends_on:
+       - consul
+     networks:
+       - monitor-net
+     labels:
+       org.label-schema.group: "System"
+
+ ### v1.8.2
+   consul:
+     build:
+       context: ./server/secrets/consul
+       dockerfile: Dockerfile
+     container_name: consul
+     ports:
+       - 8500:8500
+     environment:
+       - CONSUL_BIND_INTERFACE=eth0
+       - CONSUL_CLIENT_INTERFACE=eth0
+       - CONSUL_ALLOW_PRIVILEGED_PORTS=
+     command: agent -server -bootstrap-expect 1
+     volumes:
+       - ConsulConfig:/consul/config
+       - ConsulData:/consul/data
+     networks:
+       - monitor-net
+     labels:
+       org.label-schema.group: "System"
+
