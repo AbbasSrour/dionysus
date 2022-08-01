@@ -1,6 +1,6 @@
 # Dionysus:
 
-![stack]()
+![stack](https://github.com/AbbasSrour/dionysus/blob/main/assets/Dionysus.Stack.png)
 
 Dionysus is a Movie and TV-Serieses streaming website, with all the features expected from modren streaming services
 mainly user accounts that hold user watch history, recommendation system based on this history, slick UI, and fast search using
@@ -37,11 +37,11 @@ filtering, collaborative filtering, and demographic filtering. In a nutshell the
 the user's homepage with the movies in each genre sorted from worst to best based on the user intrests.
 
 ### Database
-![ER Model]()
-![RM]()
+![ER Model](https://github.com/AbbasSrour/dionysus/blob/main/assets/Dionysus.ERM.png)
+![RM](https://github.com/AbbasSrour/dionysus/tree/main/assets)
 
 Postgres database that at is designed from the get go to have every possible feature that I intend to implement in the project, with extra
 future proofing to make sure that the database will not need any drastic changes in the future. The picture above reflects the OG ERM, after 
 much much much reconsideration, updates, 1NF, 2NF, and 3NF the database became too complex for the ERM to convey any meaning without much 
-redesigning, which I leave it to a later time, for now the Relational model and the [Db Markdown Table]() will have to do.
+redesigning, which I leave it to a later time, for now the Relational model and the [Db Markdown Table](https://github.com/AbbasSrour/dionysus/blob/main/Database/Dionysus-RM.md) will have to do.
 
