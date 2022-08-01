@@ -1,7 +1,16 @@
-import cheerio from "cheerio";
 import crypto from "crypto";
 import got from "got";
-import { MovieSchemaInput } from "../schemas/movie.schema";
+import { MovieInput } from "../schemas/movie.schema";
+import log from "./logger.util";
+import { DirectorInput } from "../schemas/director.schema";
+import { ActorInput } from "../schemas/actor.schema";
+import { ProductionCompanyInput } from "../schemas/production-company.schema";
+import { WriterInput } from "../schemas/writer.schema";
+import { ImdbInput } from "../schemas/imdb.schema";
+import { LanguageInput } from "../schemas/language.schema";
+import { GenreInput } from "../schemas/genre.schema";
+
+const cheerio = require("cheerio");
 
 const aes_encrypt = (data: string, key: String, iv: String): string => {
   const keyBinary = Buffer.from(key);
@@ -37,7 +46,7 @@ export const map_shows = async (query: string): Promise<Array<string>> => {
   });
   const $ = cheerio.load(res.body);
   const td: any = [];
-  $(".result_text").each(function (i, elem) {
+  $(".result_text").each(function (i: number, elem: Element) {
     td[i] = $(elem).html();
   });
   const regex =
@@ -94,11 +103,16 @@ export const content = async (content_id: string) => {
     },
   });
   const resJson = JSON.parse(res.body)["data"];
-  return await JSON.parse(aes_decrypt(resJson, SECRET, IV));
+  return {
+    name: "membed",
+    url: ENCRYPT_AJAX_ENDPOINT,
+    movieUrl: await JSON.parse(aes_decrypt(resJson, SECRET, IV)).linkiframe,
+  };
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const ratingCount = (ratingString: string): number => {
-  let rating: number = 0;
+  let rating = 0;
   let aux = 1;
   let multiplier = "t";
   let float = false;
@@ -125,7 +139,38 @@ const ratingCount = (ratingString: string): number => {
   return rating;
 };
 
-export const ImdbMovieData = async (imdbId: string) => {
+const convertTimeInt = (timeString: string): number => {
+  let len = 0;
+  let m = false;
+  let h = false;
+  let minMulti = 1;
+  let hourMulti = 60;
+  for (let i = 0; i < timeString.length; i++) {
+    let x = timeString.charAt(timeString.length - i - 1);
+    if (x === " ") continue;
+    if (x === "m") {
+      m = true;
+      h = false;
+      continue;
+    }
+    if (x === "h") {
+      m = false;
+      h = true;
+      continue;
+    }
+    if (m) {
+      len += parseInt(x) * minMulti;
+      minMulti *= 10;
+    } else if (h) {
+      len += parseInt(x) * hourMulti;
+      hourMulti *= 10;
+    }
+  }
+  return len;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+export const getImdbPage = async (imdbId: string): Promise<cheerio.Root> => {
   const IMDB_LINK = "https://www.imdb.com/title/" + imdbId;
   const response = await got.get(IMDB_LINK, {
     followRedirect: true,
@@ -134,82 +179,153 @@ export const ImdbMovieData = async (imdbId: string) => {
         "Mozilla/5.0 (X11; Linux x86_64; rv:100.0) Gecko/20100101 Firefox/100.0",
     },
   });
-  const $ = await cheerio.load(response.body);
+  return cheerio.load(response.body);
+};
 
-  const directors = new Array<string | undefined>();
-  $('li[data-testid="title-pc-principal-credit"]')
+export const getMovieData = async ($: cheerio.Root) => {
+  const hero = await $('ul[data-testid="hero-title-block__metadata"]');
+
+  const name = await $('h1[data-testid="hero-title-block__title"]').text();
+  const releaseYear = parseInt(await hero.find("li:first-child > a").text());
+  const pgRating = await hero.find("li:nth-child(2) > a").text();
+  const movieLength = convertTimeInt(await hero.find("li:nth-child(3)").text());
+  const summary = await $('[data-testid="plot"]').find(":nth-child(3)").text();
+  let poster: string;
+  try {
+    // @ts-ignore
+    poster = await $('div[data-testid="hero-media__poster"] > div')
+      .find("img")
+      .attr("srcset")
+      .split("w,")[2]
+      .replace(/\s\d{3}[w]/g, "")
+      .replace(/^\s/, "");
+  } catch (e) {
+    log.error(e);
+    poster = "";
+  }
+  const budget =
+    parseInt(
+      $('li[data-testid="title-boxoffice-budget"] > div > ul > li > span')
+        .text()
+        .replace("$", "")
+        .replace(/,/g, "")
+    ) | 0;
+  const revenue =
+    parseInt(
+      $(
+        'li[data-testid="title-boxoffice-cumulativeworldwidegross"] > div > ul > li > span '
+      )
+        .text()
+        .replace("$", "")
+        .replace(/,/g, "")
+    ) | 0;
+  const trailer = "none";
+  const cover = "none";
+
+  let data: MovieInput = {
+    name,
+    releaseYear,
+    poster,
+    cover,
+    summary,
+    trailer,
+    pgRating,
+    movieLength,
+    budget,
+    revenue,
+  };
+  return data;
+};
+
+export const getDirectors = async (
+  $: cheerio.Root
+): Promise<Array<DirectorInput>> => {
+  const directors = new Array<DirectorInput>();
+  // await $('li[data-testid="title-pc-principal-credit"]')
+  //   .first()
+  //   .find("div > ul > li ")
+  //   .each((i, elem) => {
+  //     directors[i] = $(elem).find("a").attr("href");
+  //   });
+  await $('li[data-testid="title-pc-principal-credit"]')
     .first()
     .find("div > ul > li ")
     .each((i, elem) => {
-      directors[i] = $(elem).find("a").attr("href");
+      directors[i] = { name: $(elem).find("a").text(), image: "" };
     });
+  return directors;
+};
 
-  const writers = new Array<string | undefined>();
-  $('li[data-testid="title-pc-principal-credit"]:nth-of-type(1)')
-    .find("div > ul > li")
-    .each((i, elem) => {
-      writers[i] = $(elem).find("a").attr("href");
-    });
-
-  type actorSchema = {
-    role?: string;
-    image?: string;
-    name?: string;
-  };
-  const actors = new Array<Object>();
+export const getActors = async ($: cheerio.Root) => {
+  const actors = new Array<ActorInput>();
   $(
     'div[data-testid="shoveler"] > div[data-testid="shoveler-items-container"] > div[data-testid="title-cast-item"]'
   ).each((i, elem) => {
-    let actor: actorSchema = {};
+    let image: string;
     try {
       // @ts-ignore
-      actor.image = $(elem)
+      image = $(elem)
         .find("div > div > div > img ")
         .attr("srcset")
         .split("w,")[2]
         .replace(/\s\d{3}[w]/g, "")
         .replace(/^\s/, "");
     } catch (e) {
-      actor.image = "";
+      image = "";
     }
-    actor.name = $(elem).find("div > a").text();
-    actor.role = $(elem)
+    const name = $(elem).find("div > a").text();
+    const role = $(elem)
       .find('div > ul > li > a[data-testid="cast-item-characters-link"] > span')
       .text();
+    let actor: ActorInput = { name, image, role };
     actors.push(actor);
   });
+  return actors;
+};
 
-  type ProductionCompanySchema = {
-    name?: string;
-    image?: string;
-  };
-  const ProductionCompaniesArray = new Array<object>();
+export const getProductionCompanies = async ($: cheerio.Root) => {
+  const ProductionCompaniesArray = new Array<ProductionCompanyInput>();
+  let name: string;
+  let image = "";
   $('li[data-testid="title-details-companies"] > div > ul > li').each(
     (i, elem) => {
-      let productionCompany: ProductionCompanySchema = {};
       try {
-        productionCompany.name = $(elem).find("a").text();
+        name = $(elem).find("a").text();
       } catch (e) {
-        console.error(e);
-        productionCompany.name = "";
+        name = "";
       }
+      let productionCompany: ProductionCompanyInput = { name, image };
       ProductionCompaniesArray.push(productionCompany);
     }
   );
+  return ProductionCompaniesArray;
+};
 
-  type imdbRatingSchema = {
-    rating?: number;
-    count?: number;
-  };
-  const imdbRating: imdbRatingSchema = {};
-  imdbRating.rating = parseFloat(
+export const getWriters = async ($: cheerio.Root) => {
+  const writers = new Array<WriterInput>();
+  // $('li[data-testid="title-pc-principal-credit"]:nth-of-type(1)')
+  //   .find("div > ul > li")
+  //   .each((i, elem) => {
+  //     writers[i] = $(elem).find("a").attr("href");
+  //   });
+  $('li[data-testid="title-pc-principal-credit"]:nth-of-type(2)')
+    .first()
+    .find("div > ul > li > a")
+    .each((i, elem) => {
+      writers[i] = { name: $(elem).text(), image: "" };
+    });
+  return writers;
+};
+
+export const getImdbData = async ($: cheerio.Root, imdbId: string) => {
+  const rating = parseFloat(
     $(
       "div[data-testid='hero-rating-bar__aggregate-rating__score'] > span:first"
     ).text()
   );
 
   // @ts-ignore
-  imdbRating.count = ratingCount(
+  const voteCount = ratingCount(
     // @ts-ignore
     $(
       'div[data-testid="hero-rating-bar__aggregate-rating"] > a > div > div > div'
@@ -217,58 +333,32 @@ export const ImdbMovieData = async (imdbId: string) => {
       .find("div:nth-child(3)")
       .html()
   );
+  const imdbRating: ImdbInput = { imdbId, rating, voteCount };
+  return imdbRating;
+};
 
-  console.log(imdbRating);
+export const getLanguages = async ($: cheerio.Root) => {
+  const languages = new Array<LanguageInput>();
+  $('li[data-testid="title-details-languages"] > div > ul')
+    .find("li")
+    .each((i, elem) => {
+      let language: LanguageInput = {
+        name: $(elem).find("a").text(),
+      };
+      languages.push(language);
+    });
+  return languages;
+};
 
-  const name = $('h1[data-testid="hero-title-block__title"]').text();
-  const releaseYear = parseInt(
-    $('ul[data-testid="hero-title-block__metadata"]')
-      .find("li:first-child > a")
-      .text()
-  );
-  const pgRating = $('ul[data-testid="hero-title-block__metadata"]')
-    .find("li:nth-child(2) > a")
-    .text();
-  const movieLength = $('ul[data-testid="hero-title-block__metadata"]')
-    .find("li:nth-child(3)")
-    .text();
-  const summary = $('[data-testid="plot"]').find(":nth-child(3)").text();
-  const ogLanguage = $('li[data-testid="title-details-languages"] > div > ul')
-    .find(":nth-child(1) > a")
-    .text();
-  let wallpaper: string;
-  try {
-    // @ts-ignore
-    wallpaper = $('div[data-testid="hero-media__poster"] > div')
-      .find("img")
-      .attr("srcset")
-      .split("w,")[2]
-      .replace(/\s\d{3}[w]/g, "")
-      .replace(/^\s/, "");
-  } catch (e) {
-    wallpaper = "";
-  }
-  const budget = $(
-    'li[data-testid="title-boxoffice-budget"] > div > ul > li > span'
-  ).text();
-  const revenue = $(
-    'li[data-testid="title-boxoffice-cumulativeworldwidegross"] > div > ul > li > span '
-  ).text();
-  const trailer = "none";
-
-  let data: MovieSchemaInput = {
-    name: name,
-    imdbId: imdbId,
-    releaseYear: releaseYear,
-    pgRating: pgRating,
-    movieLength: movieLength,
-    summary: summary,
-    ogLanguage: ogLanguage,
-    wallpaper: wallpaper,
-    budget: budget,
-    revenue: revenue,
-    trailer: trailer,
-  };
-
-  return data;
+export const getGenres = async ($: cheerio.Root) => {
+  const genres = new Array<GenreInput>();
+  $('div[data-testid="genres"]:nth-child(1) > div')
+    .find("a")
+    .each((i, elem) => {
+      let genre: GenreInput = {
+        name: $(elem).text(),
+      };
+      genres.push(genre);
+    });
+  return genres;
 };

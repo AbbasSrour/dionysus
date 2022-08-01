@@ -9,7 +9,7 @@ const developmentLoggerConfig = {
     winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
     winston.format.errors({ stack: true }),
     winston.format.printf(({ level, message, timestamp, stack }) => {
-      return `${timestamp} ${level}: ${message} => ${stack} `;
+      return `${timestamp} ${level}: ${message || stack}`;
     })
   ),
   transports: [new winston.transports.Console()],

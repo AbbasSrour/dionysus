@@ -15,8 +15,8 @@ import cors from "cors";
 import morganMiddleware from "./middleware/morgan.middleware";
 
 // Documentation
-import swaggerUI from "swagger-ui-express";
-import swaggerDocs from "./docs/swagger.doc";
+// import swaggerUI from "swagger-ui-express";
+// import swaggerDocs from "./docs/swagger.doc";
 
 // Routes
 import SearchRoute from "./routes/search.route";
@@ -46,9 +46,9 @@ if (env.NODE_ENV === "development")
   );
 
 // Swagger Api Documentation
-const swaggerOpts = {
-  explorer: true,
-};
+// const swaggerOpts = {
+//   explorer: true,
+// };
 
 //------------------------------------------ Routes -------------------------------------------------------//
 // Default Route
@@ -69,7 +69,7 @@ app.get("/health", async (req: Request, res: Response) => {
 });
 
 // Documentation
-app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs, swaggerOpts));
+// app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs, swaggerOpts));
 
 // Search Route
 app.use("/api/v1/search", SearchRoute);
