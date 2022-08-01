@@ -1,6 +1,7 @@
 # Dionysus:
 
-![stack]("./assets/Dionysus.drawio.png")
+![stack]()
+
 Dionysus is a Movie and TV-Serieses streaming website, with all the features expected from modren streaming services
 mainly user accounts that hold user watch history, recommendation system based on this history, slick UI, and fast search using
 elastic search. This repository holds all the different microservices that constitute the website.
@@ -33,4 +34,14 @@ the elastic search database.
 
 The recommendation engine is responsible for crunching the data in the elasticsearch database and recommending movies using content based
 filtering, collaborative filtering, and demographic filtering. In a nutshell the enginge will recommend the best genres to be showen on the
-the user's homepage based on his intrests with the movies in each genre sorted from worst to best based on the user intrests.
+the user's homepage with the movies in each genre sorted from worst to best based on the user intrests.
+
+### Database
+![ER Model]()
+![RM]()
+
+Postgres database that at is designed from the get go to have every possible feature that I intend to implement in the project, with extra
+future proofing to make sure that the database will not need any drastic changes in the future. The picture above reflects the OG ERM, after 
+much much much reconsideration, updates, 1NF, 2NF, and 3NF the database became too complex for the ERM to convey any meaning without much 
+redesigning, which I leave it to a later time, for now the Relational model and the [Db Markdown Table]() will have to do.
+
