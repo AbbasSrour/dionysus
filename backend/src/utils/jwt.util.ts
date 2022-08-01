@@ -8,7 +8,7 @@ export const signJwt = async (
   keyName: "accessTokenPrivateKey" | "refreshTokenPrivateKey",
   options: SignOptions
 ) => {
-  var privateKey: string;
+  let privateKey: string;
   if (keyName == "accessTokenPrivateKey")
     privateKey = Buffer.from(env.JWT_ACCESS_TOKEN_PRIVATE_KEY, "hex").toString(
       "ascii"
@@ -29,7 +29,7 @@ export const verifyJwt = <T>(
   keyName: "accessTokenPublicKey" | "refreshTokenPublicKey"
 ): T | null => {
   try {
-    var publicKey: string;
+    let publicKey: string;
     if (keyName === "accessTokenPublicKey")
       publicKey = Buffer.from(env.JWT_ACCESS_TOKEN_PUBLIC_KEY, "hex").toString(
         "ascii"

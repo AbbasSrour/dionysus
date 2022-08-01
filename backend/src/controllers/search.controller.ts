@@ -1,46 +1,42 @@
-// import { Request, Response, NextFunction } from "express";
-// import { RedisClient } from "../utils/redis.util";
-// import Movie from "../entities/movie.entity";
-// import { Series } from "../entities/series.entity";
-// import { searchSeries } from "../services/series.service";
-// import { searchMovies } from "../services/movies.service";
-//
-// export const searchHandler = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { searchTerm } = req.body;
-//     const cachedSearch: null | string = await RedisClient.get(
-//       `search: ${searchTerm}`
-//     );
-//
-//     if (cachedSearch) return res.status(201).json(cachedSearch);
-//     else {
-//       const movies: Array<Movie> | null = await searchMovies(searchTerm);
-//       const series: Array<Series> | null = await searchSeries(searchTerm);
-//       const searchResults = {
-//         ...movies,
-//         ...series,
-//       };
-//
-//       // Send request to crawler
-//       // const crawlerRequest = got.post("");
-//       const crawlerRequest = "helloworld";
-//
-//       // TODO: More thought should go into this especially the expiration
-//       if (crawlerRequest != null)
-//         RedisClient.set(
-//           `search: ${searchTerm}`,
-//           JSON.stringify(searchResults),
-//           { EX: 5 }
-//         );
-//
-//       res.status(201).json({
-//         status: "success",
-//         data: searchResults,
-//       });
-//     }
-//   } catch (error) {}
-// };
+import { NextFunction, Request, Response } from "express";
+// import { ElasticClient } from "../utils/elastic.util";
+import got from "got";
+import { env } from "../utils/validate-env.util";
+
+export const SearchHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { searchTerm } = req.body;
+  // const check = await ElasticClient.search({
+  //   index: "SearchTerms",
+  //   query: {
+  //     match: { searchTerm: searchTerm },
+  //   },
+  // });
+
+  // if (check) {
+  // Search elastic search for the movie and return it
+  // } else {
+  // await ElasticClient.index({
+  //   index: "SearchTerms",
+  //   document: {
+  //     searchTerm: searchTerm,
+  //   },
+  // });
+
+  try {
+    const scrape = await got.put(`http://localhost:4000/search`, {
+      json: {
+        apikey: `${env.API_KEY}`,
+        searchTerm: `${searchTerm}`,
+      },
+    });
+
+    res.status(200).json({});
+  } catch (error: any) {
+    next(error);
+  }
+  // }
+};

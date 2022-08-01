@@ -38,7 +38,7 @@ COPY --from=build /usr/share/app/build ./build
 
 ENV NODE_ENV=staging
 
-EXPOSE 5000/tcp
+EXPOSE 4000/tcp
 
 # Using pnpm to run server yiels: 3 processes, 5 with cross env
 #CMD ["pnpm", "stage"]
