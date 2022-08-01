@@ -38,7 +38,7 @@ the user's homepage with the movies in each genre sorted from worst to best base
 
 ### Database
 ![ER Model](https://github.com/AbbasSrour/dionysus/blob/main/assets/Dionysus.ERM.png)
-![RM](https://github.com/AbbasSrour/dionysus/tree/main/assets)
+![RM](https://github.com/AbbasSrour/dionysus/blob/main/assets/Dionysus.RM.png)
 
 Postgres database that at is designed from the get go to have every possible feature that I intend to implement in the project, with extra
 future proofing to make sure that the database will not need any drastic changes in the future. The picture above reflects the OG ERM, after 
