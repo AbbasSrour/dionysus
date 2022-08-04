@@ -14,7 +14,7 @@ const ShowBox: React.FC<Props> = ({ width, show }) => {
       className="show-box"
       style={{ width: width }}
       onMouseEnter={() => {
-        setTimeout(() => setIsHovered(true), 1000);
+        setTimeout(() => setIsHovered(true), 500);
       }}
       // onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
