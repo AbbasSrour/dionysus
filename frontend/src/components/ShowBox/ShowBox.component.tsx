@@ -3,7 +3,7 @@ import "./ShowBox.scss";
 import ShowSchema from "../../schemas/movie.schema";
 
 type Props = {
-  width: number;
+  width: string;
   show: ShowSchema;
 };
 
@@ -12,7 +12,7 @@ const ShowBox: React.FC<Props> = ({ width, show }) => {
   return (
     <div
       className="show-box"
-      style={{ width: `${width}%` }}
+      style={{ width: width }}
       onMouseEnter={() => {
         setTimeout(() => setIsHovered(true), 1000);
       }}

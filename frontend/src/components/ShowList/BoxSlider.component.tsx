@@ -1,4 +1,4 @@
-import "./ShowList.scss";
+import "./BoxSlider.scss";
 import React, { useEffect, useState } from "react";
 import {
   ArrowBackIosOutlined,
@@ -11,7 +11,7 @@ interface Props {
   shows: Array<ShowSchema>;
 }
 
-export const ShowList: React.FC<Props> = ({ shows }) => {
+export const BoxSlider: React.FC<Props> = ({ shows }) => {
   const [sliderHasMoved, setSliderHasMoved] = useState(false); // boolean to display prev arrow
   const [sliderMoving, setSliderMoving] = useState(false); // boolean for slider animation
   const [movePercentage, setMovePercentage] = useState(0); // move percentage to shift slider during animation
@@ -96,7 +96,7 @@ export const ShowList: React.FC<Props> = ({ shows }) => {
           show={shows[index]}
           // key={`${shows[index].id}-${index}`}
           key={`${index + Math.random() * 1000}`}
-          width={100 / itemsInRow}
+          width={`${100 / itemsInRow}%`}
         />
       );
     }
@@ -204,20 +204,20 @@ export const ShowList: React.FC<Props> = ({ shows }) => {
   }
 
   return (
-    <div className="show-list">
+    <div className="box-slider">
       {sliderHasMoved && (
-        <div className="show-list__arrow left">
+        <div className="box-slider__arrow left">
           <ArrowBackIosOutlined onClick={() => handlePrev()} />
         </div>
       )}
-      <div className="show-list__content" style={style}>
+      <div className="box-slider__content" style={style}>
         {renderSliderContent()}
       </div>
-      <div className="show-list__arrow right">
+      <div className="box-slider__arrow right">
         <ArrowForwardIosOutlined onClick={() => handleNext()} />
       </div>
     </div>
   );
 };
 
-export default ShowList;
+export default BoxSlider;

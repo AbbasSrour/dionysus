@@ -1,4 +1,4 @@
-.show-list {
+.box-slider {
   padding: 0 4%;
   position: relative;
   margin-bottom: 40px;
@@ -56,7 +56,7 @@
 
   &:hover,
   &:active {
-    .show-list__arrow {
+    .box-slider__arrow {
       display: flex;
     }
   }
