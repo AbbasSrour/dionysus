@@ -1,4 +1,4 @@
-type MovieSchema = {
+type SeriesSchema = {
   title: string;
   overview: string;
   poster: string;
@@ -11,4 +11,4 @@ type MovieSchema = {
   cover: string;
 };
 
-export default MovieSchema;
+export default SeriesSchema;
