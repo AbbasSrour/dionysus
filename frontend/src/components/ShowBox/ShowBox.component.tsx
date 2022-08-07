@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import "./ShowBox.scss";
-import ShowSchema from "../../schemas/movie.schema";
+import MovieSchema from "../../schemas/movie.schema";
 
 type Props = {
   width: string;
-  show: ShowSchema;
+  show: MovieSchema;
 };
 
 const ShowBox: React.FC<Props> = ({ width, show }) => {

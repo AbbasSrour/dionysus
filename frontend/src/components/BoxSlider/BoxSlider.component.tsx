@@ -1,4 +1,4 @@
-import "./Slider.scss";
+import "./BoxSlider.scss";
 import React, { useEffect, useState } from "react";
 import {
   ArrowBackIosOutlined,
@@ -11,7 +11,7 @@ interface Props {
   shows: Array<MovieSchema>;
 }
 
-export const Slider: React.FC<Props> = ({ shows }) => {
+export const BoxSlider: React.FC<Props> = ({ shows }) => {
   const [sliderHasMoved, setSliderHasMoved] = useState(false); // boolean to display prev arrow
   const [sliderMoving, setSliderMoving] = useState(false); // boolean for slider animation
   const [movePercentage, setMovePercentage] = useState(0); // move percentage to shift slider during animation
@@ -20,24 +20,15 @@ export const Slider: React.FC<Props> = ({ shows }) => {
   ); // direction of movement of animation
   const [lowestVisibleIndex, setLowestVisibleIndex] = useState(0); // lowest visible index of slider content
   const [itemsInRow, setItemsInRow] = useState(5); // number of items in the slider content changed dynamically on window size
-  const [slider, setSlider] = useState(true);
-
-  let totalItems = shows.length;
-  if (totalItems < itemsInRow) {
-    setItemsInRow(totalItems);
-    setSlider(false);
-  }
 
   // handle window resize and sets items in row
   const handleWindowResize = () => {
-    if (window.innerWidth > 1440 && totalItems > 6) {
+    if (window.innerWidth > 1440) {
       setItemsInRow(6);
-    } else if (window.innerWidth >= 1000 && totalItems > 5) {
+    } else if (window.innerWidth >= 1000) {
       setItemsInRow(5);
-    } else if (window.innerWidth < 1000 && totalItems > 4) {
+    } else if (window.innerWidth < 1000) {
       setItemsInRow(4);
-    } else {
-      setItemsInRow(totalItems);
     }
   };
   useEffect(() => {
@@ -48,6 +39,8 @@ export const Slider: React.FC<Props> = ({ shows }) => {
       window.removeEventListener("resize", handleWindowResize);
     };
   });
+
+  let totalItems = shows.length;
 
   const renderSliderContent = () => {
     // gets the indexes to be displayed
@@ -73,35 +66,28 @@ export const Slider: React.FC<Props> = ({ shows }) => {
       }
 
       // right
-      if (slider) {
-        if (i + lowestVisibleIndex + itemsInRow >= totalItems) {
-          right.push(i + lowestVisibleIndex + itemsInRow - totalItems);
-        } else {
-          right.push(i + lowestVisibleIndex + itemsInRow);
-        }
+      if (i + lowestVisibleIndex + itemsInRow >= totalItems) {
+        right.push(i + lowestVisibleIndex + itemsInRow - totalItems);
+      } else {
+        right.push(i + lowestVisibleIndex + itemsInRow);
       }
     }
 
     // combine indexes
     const indexToDisplay = [...left, ...mid, ...right];
-    console.log(indexToDisplay);
 
     // add on leading and trailing indexes for peek image when sliding
-    if (slider) {
-      if (sliderHasMoved) {
-        const trailingIndex =
-          indexToDisplay[indexToDisplay.length - 1] === totalItems - 1
-            ? 0
-            : indexToDisplay[indexToDisplay.length - 1] + 1;
-        indexToDisplay.push(trailingIndex);
-      }
+    if (sliderHasMoved) {
+      const trailingIndex =
+        indexToDisplay[indexToDisplay.length - 1] === totalItems - 1
+          ? 0
+          : indexToDisplay[indexToDisplay.length - 1] + 1;
+      indexToDisplay.push(trailingIndex);
     }
 
-    if (slider) {
-      const leadingIndex =
-        indexToDisplay[0] === 0 ? totalItems - 1 : indexToDisplay[0] - 1;
-      indexToDisplay.unshift(leadingIndex);
-    }
+    const leadingIndex =
+      indexToDisplay[0] === 0 ? totalItems - 1 : indexToDisplay[0] - 1;
+    indexToDisplay.unshift(leadingIndex);
 
     const sliderContents = [];
     for (let index of indexToDisplay) {
@@ -110,23 +96,21 @@ export const Slider: React.FC<Props> = ({ shows }) => {
           show={shows[index]}
           // key={`${shows[index].id}-${index}`}
           key={`${index + Math.random() * 1000}`}
-          width={slider ? `${100 / itemsInRow}%` : `15vw`}
+          width={`${100 / itemsInRow}%`}
         />
       );
     }
 
     // adds empty divs to take up appropriate spacing when slider at initial position
-    if (slider) {
-      if (!sliderHasMoved) {
-        for (let i = 0; i < itemsInRow; i++) {
-          sliderContents.unshift(
-            <div
-              className="show-box"
-              style={{ width: `${100 / itemsInRow}%` }}
-              key={i}
-            />
-          );
-        }
+    if (!sliderHasMoved) {
+      for (let i = 0; i < itemsInRow; i++) {
+        sliderContents.unshift(
+          <div
+            className="show-box"
+            style={{ width: `${100 / itemsInRow}%` }}
+            key={i}
+          />
+        );
       }
     }
     return sliderContents;
@@ -199,14 +183,7 @@ export const Slider: React.FC<Props> = ({ shows }) => {
   };
 
   let style = {};
-  if (!slider) {
-    style = {
-      whiteSpace: "normal",
-      display: "flex",
-      width: "fit-content",
-      // width: "30vw",
-    };
-  } else if (sliderMoving) {
+  if (sliderMoving) {
     let translate = "";
     if (sliderMoveDirection === "right") {
       translate = `translateX(-${100 + movePercentage + 100 / itemsInRow}%)`;
@@ -227,22 +204,20 @@ export const Slider: React.FC<Props> = ({ shows }) => {
   }
 
   return (
-    <div className="show-list">
-      {sliderHasMoved && slider && (
-        <div className="show-list__arrow left">
+    <div className="box-slider">
+      {sliderHasMoved && (
+        <div className="box-slider__arrow left">
           <ArrowBackIosOutlined onClick={() => handlePrev()} />
         </div>
       )}
-      <div className="show-list__content" style={style}>
+      <div className="box-slider__content" style={style}>
         {renderSliderContent()}
       </div>
-      {slider && (
-        <div className="show-list__arrow right">
-          <ArrowForwardIosOutlined onClick={() => handleNext()} />
-        </div>
-      )}
+      <div className="box-slider__arrow right">
+        <ArrowForwardIosOutlined onClick={() => handleNext()} />
+      </div>
     </div>
   );
 };
 
-export default Slider;
+export default BoxSlider;

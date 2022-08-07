@@ -1,0 +1,72 @@
+.Login {
+  width: 27.5%;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 1;
+
+  background: rgba(000, 000, 000, 0.75);
+
+  &__links {
+    display: flex;
+    align-self: center;
+    align-items: center;
+    margin: 3rem 0;
+
+    .separator {
+      height: 2rem;
+      border-left: 0.1rem grey solid;
+
+    }
+
+    button {
+      font-size: 2rem;
+      font-weight: bold;
+      color: grey;
+      margin: 0 1rem;
+      cursor: pointer;
+      background: none;
+      border: 0;
+    }
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+
+    fieldset {
+      margin: 1rem 2rem;
+    }
+
+    a {
+      color: grey;
+      font-size: 1.4rem;
+      align-self: flex-end;
+      text-decoration: none;
+      cursor: pointer;
+      margin: 0 2.4rem 1rem 0;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .checkbox {
+      margin: 0.2rem 0 0.2rem 2.2rem;
+    }
+
+  }
+
+  &__button {
+    height: 3rem;
+    border-radius: 0.5rem;
+    border: none;
+    outline: none;
+    background-color: red;
+    color: white;
+    font-size: 1.2rem;
+    margin: 1rem 2rem 3rem 2rem;
+  }
+}
+
