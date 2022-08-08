@@ -1,7 +1,6 @@
 import { RedisClient } from "../utils/redis.util";
 
 import { CookieOptions, NextFunction, Request, Response } from "express";
-import { Users } from "../entities/users.entity";
 import AppError from "../errors/app.error";
 import {
   LoginUserInput,
@@ -9,12 +8,16 @@ import {
   VerifyEmailInput,
 } from "../schemas/users.schema";
 import {
+  comparePasswords,
   createUser,
+  createVerificationCode,
   findUser,
   findUserByEmail,
   findUserById,
   signTokens,
-} from "../services/users.service";
+  updateVerificationCode,
+  updateVerified,
+} from "../services/user.service";
 import { signJwt, verifyJwt } from "../utils/jwt.util";
 import { Email } from "../utils/email.util";
 import crypto from "crypto";
@@ -47,6 +50,7 @@ export const registerUserHandler = async (
   next: NextFunction
 ) => {
   try {
+    // Create User
     const { email, password, userName, age, firstName, lastName } = req.body;
     const user = await createUser({
       email: email.toLowerCase(),
@@ -59,9 +63,8 @@ export const registerUserHandler = async (
 
     // email verification process
     const { hashedVerificationCode, verificationCode } =
-      Users.createVerificationCode();
-    user.verificationCode = hashedVerificationCode;
-    await user.save();
+      await createVerificationCode();
+    await updateVerificationCode(user, hashedVerificationCode);
     const redirectUrl = `${env.ORIGIN}/verifyemail/${verificationCode}`;
     try {
       await new Email(user, redirectUrl).sendVerificationCode();
@@ -70,9 +73,8 @@ export const registerUserHandler = async (
         message: "Success a verification link was sent to your email address",
       });
     } catch (error) {
-      user.verificationCode = null;
-      console.log(error);
-      await user.save();
+      const verificationCode = null;
+      await updateVerificationCode(user, verificationCode);
 
       return res.status(500).json({
         status: "error",
@@ -80,7 +82,7 @@ export const registerUserHandler = async (
       });
     }
   } catch (error: any) {
-    if (error.code === "23505") {
+    if (error.code === "P2002") {
       return res.status(409).json({
         status: "fail",
         message: "User with that email already exist",
@@ -104,7 +106,7 @@ export const loginUserHandler = async (
       return next(new AppError(400, "Invalid email or password"));
     }
 
-    if (!user || !(await Users.comparePasswords(password, user.password))) {
+    if (!user || !(await comparePasswords(password, user.password))) {
       return next(new AppError(400, "Invalid email or password"));
     }
 
@@ -211,9 +213,8 @@ export const verifyEmailHandler = async (
       return next(new AppError(401, "Could not verify email"));
     }
 
-    user.verified = true;
-    user.verificationCode = null;
-    await user.save();
+    await updateVerificationCode(user, null);
+    await updateVerified(user, true);
 
     res.status(200).json({
       status: "success",

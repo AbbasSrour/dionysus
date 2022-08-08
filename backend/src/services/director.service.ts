@@ -1,10 +1,22 @@
-import { AppDataSource } from "../utils/data-source.util";
-import Director from "../entities/director.entity";
-import { DirectorInput } from "../schemas/director.schema";
+import { DirectorInput, MovieDirectorInput } from "../schemas/director.schema";
+import client from "../utils/prisma.util";
+import { Director, MovieDirector } from "../../prisma/client";
 
-const directorRepo = AppDataSource.getRepository(Director);
+export const createDirectorService = async (
+  input: DirectorInput
+): Promise<Director> => {
+  return await client.director.create({ data: { ...input } });
+};
 
-export const createDirectorService = async (input: DirectorInput) => {
-  const director = AppDataSource.manager.create(Director, input);
-  return (await AppDataSource.manager.save(director)) as Director;
+export const getDirectorByIdService = async (
+  id: number
+): Promise<Director | null> => {
+  return await client.director.findUnique({ where: { directorId: id } });
+};
+
+export const createMovieDirectorService = async (
+  input: MovieDirectorInput
+): Promise<MovieDirector> => {
+  const { movie, director } = input;
+  return await client.movieDirector.create({ data: input });
 };

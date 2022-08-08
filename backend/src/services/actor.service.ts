@@ -1,10 +1,30 @@
-import { AppDataSource } from "../utils/data-source.util";
-import Actor from "../entities/actor.entity";
-import { ActorInput } from "../schemas/actor.schema";
-
-const actorRepo = AppDataSource.getRepository(Actor);
+import { ActorInput, MovieCastInput } from "../schemas/actor.schema";
+import client from "../utils/prisma.util";
+import { Actor, MovieCast } from "../../prisma/client";
 
 export const createActorService = async (input: ActorInput): Promise<Actor> => {
-  const actor = AppDataSource.manager.create(Actor, input);
-  return (await AppDataSource.manager.save(actor)) as Actor;
+  return client.actor.create({
+    data: { ...input },
+  });
+};
+
+export const getActorByIdService = async (
+  id: number
+): Promise<Actor | null> => {
+  return client.actor.findUnique({
+    where: {
+      actorId: id,
+    },
+  });
+};
+
+export const createMovieCastService = async (
+  input: MovieCastInput
+): Promise<MovieCast> => {
+  const { actor, role, movie } = input;
+  return client.movieCast.create({
+    data: {
+      ...input,
+    },
+  });
 };

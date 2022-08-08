@@ -1,18 +1,19 @@
-import Movie from "../entities/movie.entity";
-import { AppDataSource } from "../utils/data-source.util";
+import { Movie } from "../../prisma/client";
 import { MovieInput } from "../schemas/movie.schema";
-
-const MovieRepo = AppDataSource.getRepository(Movie);
+import client from "../utils/prisma.util";
 
 export const createMovieService = async (input: MovieInput): Promise<Movie> => {
-  const movie = AppDataSource.manager.create(Movie, input);
-  return (await AppDataSource.manager.save(movie)) as Movie;
+  return client.movie.create({ data: input });
 };
 
-export const searchMovies = async (
+export const getMoviesByName = async (
   name: string
 ): Promise<Array<Movie> | null> => {
-  return await MovieRepo.createQueryBuilder("movie")
-    .where("movie.name like :name", { name: `%${name}%` })
-    .getMany();
+  return client.movie.findMany({
+    where: {
+      name: {
+        contains: name,
+      },
+    },
+  });
 };

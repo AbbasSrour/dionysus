@@ -1,10 +1,26 @@
-import { AppDataSource } from "../utils/data-source.util";
-import { Writer } from "../entities/writer.entity";
-import { WriterInput } from "../schemas/writer.schema";
+import { MovieWriterInput, WriterInput } from "../schemas/writer.schema";
+import { MovieWriter, Writer } from "../../prisma/client";
+import client from "../utils/prisma.util";
 
-const writerRepo = AppDataSource.getRepository(Writer);
+export const createWriterService = async (
+  input: WriterInput
+): Promise<Writer> => {
+  return client.writer.create({ data: input });
+};
 
-export const createWriterService = async (input: WriterInput) => {
-  const writer = AppDataSource.manager.create(Writer, input);
-  return (await AppDataSource.manager.save(writer)) as Writer;
+export const getWriterByIdService = async (
+  writerId: number
+): Promise<Writer | null> => {
+  return client.writer.findUnique({
+    where: {
+      writerId,
+    },
+  });
+};
+
+export const createMovieWriterService = async (
+  input: MovieWriterInput
+): Promise<MovieWriter> => {
+  const { movie, writer } = input;
+  return client.movieWriter.create({ data: input });
 };

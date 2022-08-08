@@ -1,4 +1,5 @@
 import { object, string, TypeOf } from "zod";
+import { MovieSchema } from "./movie.schema";
 
 export const ServerSchema = object({
   body: object({
@@ -13,3 +14,12 @@ export const ServerSchema = object({
 });
 
 export type ServerInput = TypeOf<typeof ServerSchema>["body"];
+
+export const MovieServerSchema = object({
+  body: object({
+    movie: MovieSchema.shape.body,
+    server: ServerSchema.shape.body,
+    url: string({ required_error: "Movie Url is required" }),
+  }),
+});
+export type MovieServerInput = TypeOf<typeof MovieServerSchema>["body"];

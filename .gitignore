@@ -5,3 +5,5 @@ pnpm-lock.yaml
 tests/coverage
 .idea
 migrations/
+prisma/client
+prisma/migrations

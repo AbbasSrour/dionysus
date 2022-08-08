@@ -1,8 +1,8 @@
-import { Users } from "../entities/users.entity";
 import nodemailer from "nodemailer";
 import { convert } from "html-to-text";
 import pug from "pug";
 import { env } from "./validate-env.util";
+import { User } from "../../prisma/client";
 
 const smtp = {
   host: env.EMAIL_HOST,
@@ -12,15 +12,26 @@ const smtp = {
 };
 
 export class Email {
-  firstName: string;
+  userName: string;
   to: string;
   from: string;
 
-  constructor(public user: Users, public url: string) {
-    this.firstName = user.firstName;
+  constructor(public user: User, public url: string) {
+    this.userName = user.userName;
     this.to = user.email;
     // BUG: Email from not defined
     // this.from = `Dionysus Streaming ${}`;
+  }
+
+  async sendVerificationCode() {
+    await this.send("verificationCode", "Your account verification code");
+  }
+
+  async sendPasswordResetToken() {
+    await this.send(
+      "resetPassword",
+      "Your password reset token (valid for only 10 minutes)"
+    );
   }
 
   private newTransport() {
@@ -36,7 +47,7 @@ export class Email {
 
   private async send(template: string, subject: string) {
     const html = pug.renderFile(`${__dirname}/../views/${template}.pug`, {
-      firstName: this.firstName,
+      userName: this.userName,
       subject,
       url: this.url,
     });
@@ -52,16 +63,5 @@ export class Email {
     // Send email
     const info = await this.newTransport().sendMail(mailOptions);
     console.log(nodemailer.getTestMessageUrl(info));
-  }
-
-  async sendVerificationCode() {
-    await this.send("verificationCode", "Your account verification code");
-  }
-
-  async sendPasswordResetToken() {
-    await this.send(
-      "resetPassword",
-      "Your password reset token (valid for only 10 minutes)"
-    );
   }
 }

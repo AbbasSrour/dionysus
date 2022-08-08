@@ -8,6 +8,7 @@ export const MovieSchema = object({
     releaseYear: number({
       required_error: "The year the movie was released in is required",
     }),
+    imdbId: string(),
     poster: string(),
     movieLength: number(),
     cover: string(),
@@ -18,5 +19,4 @@ export const MovieSchema = object({
     trailer: string(),
   }),
 });
-
 export type MovieInput = TypeOf<typeof MovieSchema>["body"];

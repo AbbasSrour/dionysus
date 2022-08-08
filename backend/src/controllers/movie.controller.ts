@@ -7,39 +7,14 @@ export const createMovieHandler = async (
   res: Response,
   next: NextFunction
 ) => {
-  const {
-    name,
-    releaseYear,
-    poster,
-    movieLength,
-    cover,
-    summary,
-    pgRating,
-    budget,
-    revenue,
-    trailer,
-  } = req.body;
   try {
-    const movie = await createMovieService({
-      name,
-      releaseYear,
-      poster,
-      movieLength,
-      cover,
-      summary,
-      pgRating,
-      budget,
-      revenue,
-      trailer,
-    });
-    res
-      .status(201)
-      .json({ status: "Success, the movie was created", data: { movie } });
+    const movie = await createMovieService(req.body);
+    res.status(201).json({ status: "Success", data: { movie } });
   } catch (error: any) {
-    if (error.code === "23505")
+    if (error.code === "P2002")
       return res.status(409).json({
         status: "fail",
-        message: `Movie of name ${name} and release ${releaseYear} exists in the database`,
+        message: `Movie of name ${req.body.name} and release ${req.body.releaseYear} exists in the database`,
       });
     next(error);
   }

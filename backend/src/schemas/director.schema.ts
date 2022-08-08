@@ -1,4 +1,5 @@
 import { object, string, TypeOf } from "zod";
+import { MovieSchema } from "./movie.schema";
 
 export const DirectorSchema = object({
   body: object({
@@ -10,3 +11,11 @@ export const DirectorSchema = object({
 });
 
 export type DirectorInput = TypeOf<typeof DirectorSchema>["body"];
+
+export const MovieDirectorSchema = object({
+  body: object({
+    movie: MovieSchema.shape.body,
+    director: DirectorSchema.shape.body,
+  }),
+});
+export type MovieDirectorInput = TypeOf<typeof MovieDirectorSchema>["body"];

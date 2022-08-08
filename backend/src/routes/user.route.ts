@@ -5,7 +5,6 @@ import { requireUser } from "../middleware/require-user.middleware";
 
 const Router = express.Router();
 
-// Get currently logged-in user
 Router.get("/me", deserializeUser, requireUser, getMeHandler);
 
 export default Router;

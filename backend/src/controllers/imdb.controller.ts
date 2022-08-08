@@ -17,7 +17,7 @@ export const createImdbHandler = async (
   } catch (error: any) {
     log.error(error);
 
-    if (error.code === "23505")
+    if (error.code === "P2002")
       return res.status(409).json({
         status: "fail",
         message: `Imdb entry of id ${imdbId} already exists in the database`,
