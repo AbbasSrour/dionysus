@@ -8,15 +8,17 @@ import {
 import {
   createDirectorHandler,
   createMovieDirectorHandler,
+  getDirectorByIdHandler,
+  getDirectorHandler,
 } from "../controllers/director.controller";
 
 const Router = express.Router();
 
-Router.route("/").post(
-  ApiCheck,
-  Validate(DirectorSchema),
-  createDirectorHandler
-);
+Router.route("/")
+  .get(getDirectorHandler)
+  .post(ApiCheck, Validate(DirectorSchema), createDirectorHandler);
+
+Router.route("/:id").get(getDirectorByIdHandler);
 
 Router.route("/movie").post(
   ApiCheck,

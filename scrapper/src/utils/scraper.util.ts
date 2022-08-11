@@ -4,7 +4,7 @@ import { MovieInput } from "../schemas/movie.schema";
 import log from "./logger.util";
 import { DirectorInput } from "../schemas/director.schema";
 import { ActorInput } from "../schemas/actor.schema";
-import { ProductionCompanyInput } from "../schemas/production-company.schema";
+import { StudioInput } from "../schemas/studio.schema";
 import { WriterInput } from "../schemas/writer.schema";
 import { ImdbInput } from "../schemas/imdb.schema";
 import { LanguageInput } from "../schemas/language.schema";
@@ -182,7 +182,7 @@ export const getImdbPage = async (imdbId: string): Promise<cheerio.Root> => {
   return cheerio.load(response.body);
 };
 
-export const getMovieData = async ($: cheerio.Root) => {
+export const getMovieData = async ($: cheerio.Root, imdbId: string) => {
   const hero = await $('ul[data-testid="hero-title-block__metadata"]');
 
   const name = await $('h1[data-testid="hero-title-block__title"]').text();
@@ -223,6 +223,7 @@ export const getMovieData = async ($: cheerio.Root) => {
   const cover = "none";
 
   let data: MovieInput = {
+    imdbId,
     name,
     releaseYear,
     poster,
@@ -251,7 +252,7 @@ export const getDirectors = async (
     .first()
     .find("div > ul > li ")
     .each((i, elem) => {
-      directors[i] = { name: $(elem).find("a").text(), image: "" };
+      directors[i] = { name: $(elem).find("a").text(), image: "default.png" };
     });
   return directors;
 };
@@ -283,8 +284,8 @@ export const getActors = async ($: cheerio.Root) => {
   return actors;
 };
 
-export const getProductionCompanies = async ($: cheerio.Root) => {
-  const ProductionCompaniesArray = new Array<ProductionCompanyInput>();
+export const getStudios = async ($: cheerio.Root) => {
+  const ProductionCompaniesArray = new Array<StudioInput>();
   let name: string;
   let image = "";
   $('li[data-testid="title-details-companies"] > div > ul > li').each(
@@ -294,7 +295,7 @@ export const getProductionCompanies = async ($: cheerio.Root) => {
       } catch (e) {
         name = "";
       }
-      let productionCompany: ProductionCompanyInput = { name, image };
+      let productionCompany: StudioInput = { name, image };
       ProductionCompaniesArray.push(productionCompany);
     }
   );
@@ -312,7 +313,7 @@ export const getWriters = async ($: cheerio.Root) => {
     .first()
     .find("div > ul > li > a")
     .each((i, elem) => {
-      writers[i] = { name: $(elem).text(), image: "" };
+      writers[i] = { name: $(elem).text(), image: "default.png" };
     });
   return writers;
 };

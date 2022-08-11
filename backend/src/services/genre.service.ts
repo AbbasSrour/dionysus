@@ -3,18 +3,24 @@ import { Genre, MovieGenre } from "../../prisma/client";
 import client from "../utils/prisma.util";
 
 export const createGenreService = async (input: GenreInput): Promise<Genre> => {
-  return await client.genre.create({ data: input });
+  return client.genre.create({ data: input });
 };
 
 export const getGenreByIdService = async (
   genreId: number
 ): Promise<Genre | null> => {
-  return await client.genre.findUnique({ where: { genreId } });
+  return client.genre.findUniqueOrThrow({ where: { genreId } });
+};
+
+export const getGenreByNameService = async (
+  genreName: string
+): Promise<Genre | null> => {
+  return client.genre.findUniqueOrThrow({ where: { name: genreName } });
 };
 
 export const createMovieGenreService = async (
   input: MovieGenreInput
 ): Promise<MovieGenre> => {
-  const { movie, genre } = input;
-  return await client.movieGenre.create({ data: input });
+  const { movieId, genreId } = input;
+  return client.movieGenre.create({ data: input });
 };

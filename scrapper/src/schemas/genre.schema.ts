@@ -1,4 +1,4 @@
-import { object, TypeOf, string } from "zod";
+import { number, object, string, TypeOf } from "zod";
 
 export const GenreSchema = object({
   body: object({
@@ -9,3 +9,11 @@ export const GenreSchema = object({
 });
 
 export type GenreInput = TypeOf<typeof GenreSchema>["body"];
+
+export const MovieGenreSchema = object({
+  body: object({
+    movieId: number(),
+    genreId: number(),
+  }),
+});
+export type MovieGenreInput = TypeOf<typeof MovieGenreSchema>["body"];

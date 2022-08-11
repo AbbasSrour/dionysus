@@ -11,20 +11,31 @@ export const createActorService = async (input: ActorInput): Promise<Actor> => {
 export const getActorByIdService = async (
   id: number
 ): Promise<Actor | null> => {
-  return client.actor.findUnique({
+  return client.actor.findUniqueOrThrow({
     where: {
       actorId: id,
     },
   });
 };
 
+export const getActorByNameAndImageService = async (
+  name: string,
+  image: string
+): Promise<Actor | any> => {
+  return client.actor.findUniqueOrThrow({
+    where: { name_image: { name, image } },
+  });
+};
+
 export const createMovieCastService = async (
   input: MovieCastInput
 ): Promise<MovieCast> => {
-  const { actor, role, movie } = input;
+  const { actorId, role, movieId } = input;
   return client.movieCast.create({
     data: {
-      ...input,
+      actorId,
+      movieId,
+      role,
     },
   });
 };

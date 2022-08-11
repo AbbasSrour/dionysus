@@ -5,11 +5,17 @@ import { ActorSchema, MovieCastSchema } from "../schemas/actor.schema";
 import {
   createActorHandler,
   createMovieCastHandler,
+  getActorByIdHandler,
+  getActorHandler,
 } from "../controllers/actor.controller";
 
 const Router = express.Router();
 
-Router.route("/").post(ApiCheck, Validate(ActorSchema), createActorHandler);
+Router.route("/")
+  .get(getActorHandler)
+  .post(ApiCheck, Validate(ActorSchema), createActorHandler);
+
+Router.route("/:id").get(getActorByIdHandler);
 
 Router.route("/movie").post(
   ApiCheck,

@@ -9,5 +9,12 @@ export const createImdbService = async (input: ImdbInput) => {
       ...input,
     },
   });
-  return JSON.parse(response.body).data.imdb;
+  return await JSON.parse(response.body).data.imdb;
+};
+
+export const getImdbService = async (id: string) => {
+  const response = await got.get(`${env.DB_WRAPPER}/api/v1/imdb`, {
+    searchParams: { id },
+  });
+  return await JSON.parse(response.body).data.imdb;
 };

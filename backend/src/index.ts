@@ -104,7 +104,7 @@ app.use("/api/v1/auth", AuthRoute);
 // User Route
 app.use("/api/v1/users", UserRoute);
 
-// // Search Route
+// Search Route
 app.use("/api/v1/search", SearchRoute);
 
 app.use("/api/v1/actors", ActorRoute);
@@ -123,11 +123,10 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 });
 
 // GLOBAL ERROR HANDLER
-// noinspection JSUnusedLocalSymbols
 app.use((error: AppError, req: Request, res: Response, next: NextFunction) => {
   error.status = error.status || "error";
   error.statusCode = error.statusCode || 500;
-  log.error(error);
+  // log.error(error);
 
   res.status(error.statusCode).json({
     status: error.status,

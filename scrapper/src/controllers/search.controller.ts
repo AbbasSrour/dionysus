@@ -9,28 +9,25 @@ import {
   getImdbPage,
   getLanguages,
   getMovieData,
-  getProductionCompanies,
+  getStudios,
   getWriters,
   map_shows,
 } from "../utils/scraper.util";
 import {createMovieService} from "../services/movie.service";
-import {createDirectorService} from "../services/director.service";
-import {createActorService} from "../services/actor.service";
-import {createProductionCompanyService} from "../services/production-company.service";
 import AppError from "../errors/app.error";
-import {createWriterService} from "../services/writer.service";
-import {createImdbService} from "../services/imdb.service";
-import {createLanguageSerivce} from "../services/language.service";
-import {createServerService} from "../services/server.service";
-import {createMovieProductionCompanyService} from "../services/movie-production-company.service";
-import {createMovieCastService} from "../services/movie-cast.service";
-import {createMovieDirectors} from "../services/movie-driector.service";
-import {createMovieWriterService} from "../services/movie-writer.service";
-import {createMovieLanguageService} from "../services/movie-language.service";
-import {createGenreService} from "../services/genre.service";
-import {createMovieGenreService} from "../services/movie-genre.service";
-import {ActorInput} from "../schemas/actor.schema";
-import {DirectorInput} from "../schemas/director.schema";
+import {createImdbService, getImdbService} from "../services/imdb.service";
+import log from "../utils/logger.util";
+import {createDirectorService, createMovieDirector, getDirectorService,} from "../services/director.service";
+import {createActorService, createMovieCastService, getActorService,} from "../services/actor.service";
+import {
+  createLanguageService,
+  createMovieLanguageService,
+  getLanguageByNameService,
+} from "../services/language.service";
+import {createMovieServerService, createServerService, getServerService,} from "../services/server.service";
+import {createGenreService, createMovieGenreService, getGenreService,} from "../services/genre.service";
+import {createMovieStudioService, createStudioService, getSudioService,} from "../services/studio.service";
+import {createMovieWriterService, createWriterService, getWriterService,} from "../services/writer.service";
 
 // TODO: Needs a lot of rethinking for async error handling
 // TODO: Refactor some more because this is fucking blocking everything with one hundred awaits use promise.all
@@ -40,6 +37,7 @@ export const SearchHandler = async (
   next: NextFunction
 ) => {
   const { searchTerm } = req.body;
+  let movies = [];
   try {
     //////////////////////////////////////////Sync 1////////////////////////////////////////////////////
     const showList = await map_shows(searchTerm);
@@ -51,6 +49,7 @@ export const SearchHandler = async (
         i--;
         continue;
       }
+
       const imdbId = showList[i];
       const imdbPage = await getImdbPage(imdbId).catch((error) => {
         throw new AppError(
@@ -58,148 +57,181 @@ export const SearchHandler = async (
           `Couldn't load imdb page for movie ${movieData.name} with ${imdbId} imdb id`
         );
       });
+      const imdbData = await createImdbService(
+        await getImdbData(imdbPage, imdbId)
+      ).catch((error) => getImdbService(imdbId));
+      if (!imdbData) continue;
 
-      const movieData = await getMovieData(imdbPage).catch((error) => {
+      const movieData = await getMovieData(imdbPage, imdbId).catch((error) => {
         throw new AppError(
           500,
           `Couldn't get movie ${movieData.name} with ${imdbId} imdb id data`
         );
       });
       const movie = await createMovieService(movieData).catch((error) => {
-        console.log(error);
+        log.error(error);
         return null;
       });
       if (!movie) continue;
-      //////////////////////////////////////////Sync 1////////////////////////////////////////////////////
 
-      const serverData = await content(serverId);
-      const server = await createServerService({
-        name: serverData.name,
-        url: serverData.url,
-      }).catch((error) => {
-        console.log(error);
-      });
-
-      const imdbData = await createImdbService(
-        await getImdbData(imdbPage, imdbId)
-      );
-
-      const directorData: Array<DirectorInput> = await getDirectors(imdbPage);
-      const directors = [];
-      for (let i = 0; i < directorData.length; i++) {
-        directors.push(await createDirectorService(directorData[i]));
-      }
-
-      const movieDirectors = [];
-      for (let i = 0; i < directors.length; i++) {
-        movieDirectors.push(
-          await createMovieDirectors({ movie, director: directors[i] })
-        );
-      }
-
-      const actorData: Array<ActorInput> = await getActors(imdbPage);
-      const actors = [];
-      for (let i = 0; i < actorData.length; i++) {
-        actors.push(await createActorService(actorData[i]));
-      }
-
-      const movieCast = [];
-      for (let i = 0; i < actors.length; i++) {
-        movieCast.push(
-          await createMovieCastService({
-            movie,
-            actor: actors[i],
-            role: actorData[i].role,
-          }).catch((error) => console.log(error))
-        );
-      }
-
-      const productionCompanyData = await getProductionCompanies(imdbPage);
-      const productionCompanies = [];
-      for (let i = 0; i < productionCompanyData.length; i++) {
-        productionCompanies.push(
-          await createProductionCompanyService(productionCompanyData[i])
-        );
-      }
-
-      const movieProductionCompanies = [];
-      for (let i = 0; i < productionCompanies.length; i++) {
-        movieProductionCompanies.push(
-          await createMovieProductionCompanyService({
-            movie,
-            productionCompany: productionCompanies[i],
-          })
-        );
-      }
-
-      const writerData = await getWriters(imdbPage);
-      const writers = [];
-      for (let i = 0; i < writerData.length; i++) {
-        writers.push(await createWriterService(writerData[i]));
-      }
-
-      const movieWriters = [];
-      for (let i = 0; i < writers.length; i++) {
-        movieWriters.push(
-          await createMovieWriterService({ movie, writer: writers[i] }).catch(
-            (error) => console.log(error)
-          )
-        );
-      }
-
-      const languageData = await getLanguages(imdbPage);
-      const languages: any[] = [];
-      const movieLanguages: any[] = [];
-      for (let i = 0; i < languageData.length; i++) {
-        createLanguageSerivce(languageData[i])
-          .then((language) => {
-            languages.push(language);
-            return language;
-          })
-          .then((language) =>
-            createMovieLanguageService({ movie, language }).then(
-              (movieLanguage) => movieLanguages.push(movieLanguage)
+      //////////////////////////////////////////Sync 2////////////////////////////////////////////////////
+      const server = content(serverId)
+        .then((serverInfo) =>
+          getServerService(serverInfo.name)
+            .catch((error) =>
+              createServerService({
+                name: serverInfo.name,
+                url: serverInfo.url,
+              })
             )
+            .then((server) => {
+              createMovieServerService({
+                serverId: server.serverId,
+                movieId: movie.movieId,
+                url: serverInfo.movieUrl,
+              });
+              return { ...server, movieUrl: serverInfo.movieUrl };
+            })
+        )
+        .catch((error) => log.error(error));
+
+      const languages: any[] = [];
+      getLanguages(imdbPage)
+        .then((data) =>
+          data.forEach((language) =>
+            getLanguageByNameService(language.name)
+              .catch((error) => createLanguageService(language))
+              .then((language) => {
+                languages.push(language);
+                createMovieLanguageService({
+                  languageId: language.languageId,
+                  movieId: movie.movieId,
+                });
+              })
+              .catch((error) => log.error(error))
           )
-          .catch((error) => {
-            console.log(error);
-          });
-      }
+        )
+        .catch((err) => log.error(err));
 
-      // const movieLanguages = [];
-      // for (let i = 0; i < languages.length; i++) {
-      //   movieLanguages.push(
-      //       await createMovieLanguageService({movie, language: languages[i]})
-      //   );
-      // }
+      const actors = [];
+      getActors(imdbPage)
+        .then((data) =>
+          data.forEach((data) => {
+            getActorService({ name: data.name, image: data.image })
+              .catch(() => createActorService(data))
+              .then((actor) => {
+                actors.push({ ...actor, role: data.role });
+                createMovieCastService({
+                  movieId: movie.movieId,
+                  actorId: actor.actorId,
+                  role: data.role,
+                });
+              })
+              .catch((err) => log.error(err));
+          })
+        )
+        .catch((err) => log.error(err));
 
-      console.log(languages, movieLanguages);
+      const directors = [];
+      getDirectors(imdbPage)
+        .then((data) =>
+          data.forEach((director) => {
+            getDirectorService(director)
+              .catch((error) => createDirectorService(director))
+              .then((director) => {
+                directors.push(director);
+                createMovieDirector({
+                  directorId: director.directorId,
+                  movieId: movie.movieId,
+                });
+              })
+              .catch((error) => log.error(error));
+          })
+        )
+        .catch((error) => {
+          log.error(error);
+        });
 
-      const genreData = await getGenres(imdbPage);
       const genres = [];
-      for (let i = 0; i < genreData.length; i++) {
-        genres.push(
-          await createGenreService(genreData[i]).catch((error) =>
-            console.log(error)
+      getGenres(imdbPage)
+        .then((data) =>
+          data.forEach((genre) =>
+            getGenreService(genre)
+              .catch((error) => createGenreService(genre))
+              .then((genre) => {
+                genres.push(genre);
+                createMovieGenreService({
+                  genreId: genre.genreId,
+                  movieId: movie.movieId,
+                });
+              })
+              .catch((error) => log.error(error))
           )
-        );
-      }
+        )
+        .catch((error) => log.error(error));
 
-      const movieGenres = [];
-      for (let i = 0; i < genres.length; i++) {
-        movieGenres.push(
-          await createMovieGenreService({ movie, genre: genres[i] }).catch(
-            (error) => console.log(error)
+      const studios = [];
+      getStudios(imdbPage)
+        .then((data) =>
+          data.forEach((studio) =>
+            getSudioService(studio)
+              .catch((error) => createStudioService(studio))
+              .then((studio) => {
+                studios.push(studio);
+                createMovieStudioService({
+                  studioId: studio.studioId,
+                  movieId: movie.movieId,
+                }).catch((error) => log.error(error));
+              })
           )
-        );
-      }
+        )
+        .catch((error) => log.error(error));
+
+      const writers = [];
+      const writerData = await getWriters(imdbPage)
+        .then((data) =>
+          data.forEach((writer) =>
+            getWriterService(writer)
+              .catch((error) => createWriterService(writer))
+              .then((writer) => {
+                writers.push(writer);
+                createMovieWriterService({
+                  movieId: movie.movieId,
+                  writerId: writer.writerId,
+                }).catch((error) => log.error(error.stack));
+              })
+          )
+        )
+        .catch((error) => log.error(error));
+
+      const d = Promise.all([
+        server,
+        languages,
+        genres,
+        directors,
+        actors,
+        writers,
+        studios,
+      ]);
+      const responseData = {
+        movie: await movie,
+        server: await server,
+        genres: await genres,
+        actors: await actors,
+        directors: await directors,
+        writers: await writers,
+        studios: await studios,
+      };
+      movies.push(responseData);
     }
     res.status(200).json({
       status: "success",
-      data: { message: "The movie was inserted successfully" },
+      data: {
+        message: "The movie was inserted successfully",
+        movies,
+      },
     });
   } catch (error: any) {
-    console.log(error);
     next(error);
   }
 };

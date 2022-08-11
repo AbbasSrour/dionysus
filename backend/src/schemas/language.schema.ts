@@ -1,5 +1,4 @@
-import { object, string, TypeOf } from "zod";
-import { MovieSchema } from "./movie.schema";
+import { number, object, string, TypeOf } from "zod";
 
 export const LanguageSchema = object({
   body: object({
@@ -13,8 +12,8 @@ export type LanguageInput = TypeOf<typeof LanguageSchema>["body"];
 
 export const MovieLanguageSchema = object({
   body: object({
-    movie: MovieSchema.shape.body,
-    language: LanguageSchema.shape.body,
+    movieId: number(),
+    languageId: number(),
   }),
 });
 export type MovieLanguagesInput = TypeOf<typeof MovieLanguageSchema>["body"];

@@ -8,7 +8,32 @@ export const createMovieHandler = async (
   next: NextFunction
 ) => {
   try {
-    const movie = await createMovieService(req.body);
+    const {
+      name,
+      releaseYear,
+      imdbId,
+      trailer,
+      revenue,
+      budget,
+      movieLength,
+      summary,
+      poster,
+      cover,
+      pgRating,
+    } = req.body;
+    const movie = await createMovieService({
+      name,
+      revenue,
+      budget,
+      movieLength,
+      pgRating,
+      cover,
+      imdbId,
+      trailer,
+      poster,
+      summary,
+      releaseYear,
+    });
     res.status(201).json({ status: "Success", data: { movie } });
   } catch (error: any) {
     if (error.code === "P2002")

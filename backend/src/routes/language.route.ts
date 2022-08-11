@@ -8,15 +8,17 @@ import {
 import {
   createLanguageHandler,
   createMovieLanguageHandler,
+  getLanguageByIdHandler,
+  getLanguageHandler,
 } from "../controllers/language.controller";
 
 const Router = express.Router();
 
-Router.route("/").post(
-  ApiCheck,
-  Validate(LanguageSchema),
-  createLanguageHandler
-);
+Router.route("/")
+  .get(getLanguageHandler)
+  .post(ApiCheck, Validate(LanguageSchema), createLanguageHandler);
+
+Router.route("/:id").get(getLanguageByIdHandler);
 
 Router.route("/movie").post(
   ApiCheck,

@@ -3,11 +3,11 @@ import client from "../utils/prisma.util";
 import { Imdb } from "../../prisma/client";
 
 export const createImdbService = async (input: ImdbInput): Promise<Imdb> => {
-  return await client.imdb.create({ data: input });
+  return client.imdb.create({ data: input });
 };
 
 export const getImdbByIdService = async (
   imdbId: string
 ): Promise<Imdb | null> => {
-  return await client.imdb.findUnique({ where: { imdbId } });
+  return client.imdb.findUniqueOrThrow({ where: { imdbId } });
 };

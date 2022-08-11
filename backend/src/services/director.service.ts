@@ -5,18 +5,27 @@ import { Director, MovieDirector } from "../../prisma/client";
 export const createDirectorService = async (
   input: DirectorInput
 ): Promise<Director> => {
-  return await client.director.create({ data: { ...input } });
+  return client.director.create({ data: { ...input } });
 };
 
 export const getDirectorByIdService = async (
   id: number
 ): Promise<Director | null> => {
-  return await client.director.findUnique({ where: { directorId: id } });
+  return client.director.findUniqueOrThrow({ where: { directorId: id } });
+};
+
+export const getDirectorByNameAndImageService = async (
+  name: string,
+  image: string
+) => {
+  return client.director.findUniqueOrThrow({
+    where: { name_image: { name, image } },
+  });
 };
 
 export const createMovieDirectorService = async (
   input: MovieDirectorInput
 ): Promise<MovieDirector> => {
-  const { movie, director } = input;
-  return await client.movieDirector.create({ data: input });
+  const { movieId, directorId } = input;
+  return client.movieDirector.create({ data: input });
 };

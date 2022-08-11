@@ -1,4 +1,4 @@
-import { object, string, TypeOf } from "zod";
+import { number, object, string, TypeOf } from "zod";
 
 export const DirectorSchema = object({
   body: object({
@@ -10,3 +10,11 @@ export const DirectorSchema = object({
 });
 
 export type DirectorInput = TypeOf<typeof DirectorSchema>["body"];
+
+export const MovieDirectorSchema = object({
+  body: object({
+    movieId: number(),
+    directorId: number(),
+  }),
+});
+export type MovieDirectorInput = TypeOf<typeof MovieDirectorSchema>["body"];

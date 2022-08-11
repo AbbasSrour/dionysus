@@ -1,10 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { LanguageInput, MovieLanguagesInput } from "../schemas/language.schema";
-import log from "../utils/logger.util";
 import {
   createLanguageService,
   createMovieLanguageService,
+  getLanguageByIdService,
+  getLanguageByNameService,
 } from "../services/language.service";
+import AppError from "../errors/app.error";
+import { Prisma } from "../../prisma/client";
 
 export const createLanguageHandler = async (
   req: Request<{}, {}, LanguageInput>,
@@ -19,13 +22,51 @@ export const createLanguageHandler = async (
       data: { language },
     });
   } catch (error: any) {
-    log.error(error);
     if (error.code === "P2002")
       return res.status(409).json({
         status: "fail",
         message: `Language of ${name} already exists in the database`,
       });
-    next(error);
+    else next(error);
+  }
+};
+
+export const getLanguageHandler = async (
+  req: Request<{}, {}, {}, { name?: string; id?: number }>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { name, id } = req.query;
+  try {
+    let language;
+    if (id) language = await getLanguageByIdService(id);
+    else if (name) language = await getLanguageByNameService(name);
+    else throw new AppError(400, "No server id or name provided");
+    res.status(200).json({ status: "Success", data: { language } });
+  } catch (error) {
+    if (error instanceof Prisma.NotFoundError)
+      res
+        .status(404)
+        .json({ status: "fail", message: "Requested language not found" });
+    else next(error);
+  }
+};
+
+export const getLanguageByIdHandler = async (
+  req: Request<{ id: number }, {}, {}, {}>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = req.params;
+  try {
+    const language = await getLanguageByIdService(id);
+    res.status(200).json({ status: "Success", data: { language } });
+  } catch (error) {
+    if (error instanceof Prisma.NotFoundError)
+      res
+        .status(404)
+        .json({ status: "fail", message: "Requested language not found" });
+    else next(error);
   }
 };
 
@@ -34,20 +75,22 @@ export const createMovieLanguageHandler = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { movie, language } = req.body;
+  const { movieId, languageId } = req.body;
   try {
-    const movieLanguage = await createMovieLanguageService({ movie, language });
+    const movieLanguage = await createMovieLanguageService({
+      movieId,
+      languageId,
+    });
     res.status(201).json({
       status: "Success movie language create",
       data: { movieLanguage },
     });
   } catch (error: any) {
-    log.error(error);
     if (error.code === "P2002")
       return res.status(409).json({
         status: "fail",
-        message: `Relation between language ${language} and movie ${movie} already exists in the database`,
+        message: `Relation between language ${languageId} and movie ${movieId} already exists in the database`,
       });
-    next(error);
+    else next(error);
   }
 };

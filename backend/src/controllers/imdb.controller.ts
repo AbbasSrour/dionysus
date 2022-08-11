@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { ImdbInput } from "../schemas/imdb.schema";
-import log from "../utils/logger.util";
-import { createImdbService } from "../services/imdb.service";
+import {
+  createImdbService,
+  getImdbByIdService,
+} from "../services/imdb.service";
+import { Prisma } from "../../prisma/client";
 
 export const createImdbHandler = async (
   req: Request<{}, {}, ImdbInput>,
@@ -15,13 +18,47 @@ export const createImdbHandler = async (
       .status(201)
       .json({ status: "Success imdb new entry created", data: { imdb } });
   } catch (error: any) {
-    log.error(error);
-
     if (error.code === "P2002")
       return res.status(409).json({
         status: "fail",
         message: `Imdb entry of id ${imdbId} already exists in the database`,
       });
-    next(error);
+    else next(error);
+  }
+};
+
+export const getImdbHandler = async (
+  req: Request<{}, {}, {}, { id: string }>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = req.query;
+  try {
+    const imdb = await getImdbByIdService(id);
+    res.status(200).json({ status: "success", data: { imdb } });
+  } catch (error) {
+    if (error instanceof Prisma.NotFoundError)
+      res
+        .status(404)
+        .json({ status: "fail", message: "Requested Imbd not found" });
+    else next(error);
+  }
+};
+
+export const getImdbByIdHandler = async (
+  req: Request<{ id: string }, {}, {}, {}>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = req.params;
+  try {
+    const imdb = await getImdbByIdService(id);
+    res.status(200).json({ status: "Success", data: { imdb } });
+  } catch (error) {
+    if (error instanceof Prisma.NotFoundError)
+      res
+        .status(404)
+        .json({ status: "fail", message: "Requested Imbd not found" });
+    else next(error);
   }
 };

@@ -19,8 +19,7 @@ export class Email {
   constructor(public user: User, public url: string) {
     this.userName = user.userName;
     this.to = user.email;
-    // BUG: Email from not defined
-    // this.from = `Dionysus Streaming ${}`;
+    this.from = `Dionysus Streaming ${this.user}`;
   }
 
   async sendVerificationCode() {

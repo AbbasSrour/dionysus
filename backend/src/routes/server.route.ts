@@ -5,11 +5,17 @@ import { MovieServerSchema, ServerSchema } from "../schemas/server.schema";
 import {
   createMovieServerHandler,
   createServerHandler,
+  getServerByIdHandler,
+  getServerHandler,
 } from "../controllers/server.controller";
 
 const Router = express.Router();
 
-Router.route("/").post(ApiCheck, Validate(ServerSchema), createServerHandler);
+Router.route("/")
+  .get(getServerHandler)
+  .post(ApiCheck, Validate(ServerSchema), createServerHandler);
+
+Router.route("/:id").get(getServerByIdHandler);
 
 Router.route("/movie").post(
   ApiCheck,

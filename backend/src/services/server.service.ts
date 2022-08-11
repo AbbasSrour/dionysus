@@ -5,22 +5,28 @@ import client from "../utils/prisma.util";
 export const createServerService = async (
   input: ServerInput
 ): Promise<Server> => {
-  return await client.server.create({ data: input });
+  return client.server.create({ data: input });
 };
 
 export const getServerByIdService = async (
   serverId: number
 ): Promise<Server | null> => {
-  return client.server.findUnique({
+  return client.server.findUniqueOrThrow({
     where: {
       serverId,
     },
   });
 };
 
+export const getServerByNameService = async (
+  serverName: string
+): Promise<Server | null> => {
+  return client.server.findUniqueOrThrow({ where: { name: serverName } });
+};
+
 export const createMovieServerService = async (
   input: MovieServerInput
 ): Promise<MovieServer> => {
-  const { movie, server, url } = input;
-  return await client.movieServer.create({ data: input });
+  const { movieId, serverId, url } = input;
+  return client.movieServer.create({ data: input });
 };

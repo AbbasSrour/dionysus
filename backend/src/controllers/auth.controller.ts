@@ -22,6 +22,7 @@ import { signJwt, verifyJwt } from "../utils/jwt.util";
 import { Email } from "../utils/email.util";
 import crypto from "crypto";
 import { env } from "../utils/validate-env.util";
+import log from "../utils/logger.util";
 
 // Setting Up Cookie Options
 const cookieOptions: CookieOptions = {
@@ -51,14 +52,13 @@ export const registerUserHandler = async (
 ) => {
   try {
     // Create User
-    const { email, password, userName, age, firstName, lastName } = req.body;
+    const { email, password, userName, age, name } = req.body;
     const user = await createUser({
       email: email.toLowerCase(),
       password: password,
       userName: userName,
       age: age,
-      firstName: firstName,
-      lastName: lastName,
+      name: name,
     });
 
     // email verification process

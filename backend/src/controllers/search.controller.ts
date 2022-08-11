@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 // import { ElasticClient } from "../utils/elastic.util";
 import got from "got";
 import { env } from "../utils/validate-env.util";
+import log from "../utils/logger.util";
 
 export const SearchHandler = async (
   req: Request,
@@ -27,16 +28,16 @@ export const SearchHandler = async (
   // });
 
   try {
-    const scrape = await got.put(`http://localhost:4000/search`, {
+    const scrape = await got.post(`http://localhost:4001/api/v1/search`, {
       json: {
         apikey: `${env.API_KEY}`,
         searchTerm: `${searchTerm}`,
       },
     });
-
-    res.status(200).json({});
+    const response = await JSON.parse(scrape.body);
+    res.status(200).json({ response });
   } catch (error: any) {
+    log.error(error);
     next(error);
   }
-  // }
 };

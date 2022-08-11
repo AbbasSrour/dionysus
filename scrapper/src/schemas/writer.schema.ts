@@ -1,4 +1,4 @@
-import { object, string, TypeOf } from "zod";
+import { number, object, string, TypeOf } from "zod";
 
 export const WriterSchema = object({
   body: object({
@@ -8,5 +8,12 @@ export const WriterSchema = object({
     image: string(),
   }),
 });
-
 export type WriterInput = TypeOf<typeof WriterSchema>["body"];
+
+export const MovieWriterSchema = object({
+  body: object({
+    movieId: number(),
+    writerId: number(),
+  }),
+});
+export type MovieWriterInput = TypeOf<typeof MovieWriterSchema>["body"];

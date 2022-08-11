@@ -37,14 +37,14 @@ export const updateVerificationCode = async (
   code: string | null
 ) => {
   return client.user.update({
-    where: { ...user },
+    where: { userId: user.userId },
     data: { verificationCode: code },
   });
 };
 
 export const updateVerified = async (user: User, verified: boolean) => {
   return client.user.update({
-    where: { ...user },
+    where: { userId: user.userId },
     data: { verified },
   });
 };

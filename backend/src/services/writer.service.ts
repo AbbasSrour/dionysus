@@ -11,16 +11,25 @@ export const createWriterService = async (
 export const getWriterByIdService = async (
   writerId: number
 ): Promise<Writer | null> => {
-  return client.writer.findUnique({
+  return client.writer.findUniqueOrThrow({
     where: {
       writerId,
     },
   });
 };
 
+export const getWriterByNameAndImageService = async (
+  name: string,
+  image: string
+): Promise<Writer | null> => {
+  return client.writer.findUniqueOrThrow({
+    where: { name_image: { name, image } },
+  });
+};
+
 export const createMovieWriterService = async (
   input: MovieWriterInput
 ): Promise<MovieWriter> => {
-  const { movie, writer } = input;
+  const { movieId, writerId } = input;
   return client.movieWriter.create({ data: input });
 };
