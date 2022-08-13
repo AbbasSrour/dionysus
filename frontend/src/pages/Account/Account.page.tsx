@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Login from "../../components/Login/Login.component";
+import Form from "../../components/Form/Form.component";
 import "./Account.scss";
 
 let background: string =
@@ -9,7 +9,7 @@ const AccountPage = () => {
   const [register, setRegister] = useState(false);
   return (
     <div className="AccountPage">
-      <Login />
+      <Form />
     </div>
   );
 };

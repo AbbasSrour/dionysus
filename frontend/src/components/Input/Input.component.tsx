@@ -1,80 +1,70 @@
-import React, { useState } from "react";
+import React, { ChangeEventHandler, FocusEventHandler } from "react";
 import "./Input.module.scss";
 import { motion } from "framer-motion";
+
+const variants = {
+  valid: {
+    x: "0%",
+  },
+  invalid: {
+    borderTop: "none",
+    borderLeft: "none",
+    borderRight: "none",
+    borderBottom: "0.2rem red solid",
+    x: ["3%", "-3%", "3%", "-3%", "3%", "-3%", "0%"],
+  },
+};
+const bounceTransition = {
+  x: {
+    duration: 0.5,
+    type: "easeInOut",
+  },
+};
 
 interface Props {
   type: string;
   nameID: string;
   label: string;
-  pattern?: string;
-  OnChange?: Function;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+  value: string;
+  onBlur: FocusEventHandler<HTMLInputElement>;
+  valid: boolean;
+  error: string | null;
 }
 
 export const Input: React.FC<Props> = ({
   type,
   nameID,
   label,
-  pattern,
-  OnChange,
+  value,
+  valid,
+  onChange,
+  onBlur,
+  error,
 }) => {
-  const [isValid, setIsValid] = useState<boolean>(true);
-
-  const variants = {
-    valid: {
-      borderTop: "none",
-      borderLeft: "none",
-      borderRight: "none",
-      borderBottom: "none",
-      // borderBottom: "0.2rem green solid",
-      x: "0%",
-    },
-    invalid: {
-      borderTop: "none",
-      borderLeft: "none",
-      borderRight: "none",
-      borderBottom: "0.2rem red solid",
-      x: ["3%", "-3%", "3%", "-3%", "3%", "-3%", "0%"],
-    },
-  };
-  const bounceTransition = {
-    x: {
-      duration: 0.5,
-      type: "easeInOut",
-    },
-  };
-
-  const onChangeHandler = (value: React.ChangeEvent) => {
-    let check: any;
-    // @ts-ignore
-    check = OnChange(value);
-    if (check) {
-      setIsValid(true);
-    }
-    setIsValid(false);
-  };
-
   return (
     <motion.fieldset
-      animate={isValid ? "valid" : "invalid"}
+      animate={valid ? "valid" : "invalid"}
       transition={bounceTransition}
       variants={variants}
+      style={{
+        borderTop: "none",
+        borderLeft: "none",
+        borderRight: "none",
+        borderBottom: "none",
+      }}
     >
       <input
         name={nameID}
         type={type}
         id={nameID}
-        pattern={pattern}
         placeholder={" "}
-        onChange={onChangeHandler}
-        onInvalid={() => {
-          setIsValid(false);
-        }}
+        onChange={onChange}
+        value={value}
+        onBlur={onBlur}
       />
       <label htmlFor={nameID}>{label}</label>
-      {/*<a onClick={() => setIsValid(!isValid)}>*/}
-      {/*  {" "}*/}
-      {/*  {isValid ? "valid" : "invalid"}*/}
-      {/*</a>*/}
+      <p>{error}</p>
     </motion.fieldset>
   );
 };
