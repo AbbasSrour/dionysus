@@ -6,12 +6,18 @@ import {
 } from "@material-ui/icons";
 import ShowBox from "../ShowBox/ShowBox.component";
 import MovieSchema from "../../schemas/movie.schema";
+import { ActorSchema } from "../../schemas/actor.schema";
+import ActorCard from "../ActorCard/ActorCard.component";
 
 interface Props {
-  shows: Array<MovieSchema>;
+  data: Array<MovieSchema | ActorSchema>;
+  type: string;
+  padding: string;
 }
 
-export const Slider: React.FC<Props> = ({ shows }) => {
+export const Slider: React.FC<Props> = ({ data, type, padding }) => {
+  let totalItems = data.length;
+
   const [sliderHasMoved, setSliderHasMoved] = useState(false); // boolean to display prev arrow
   const [sliderMoving, setSliderMoving] = useState(false); // boolean for slider animation
   const [movePercentage, setMovePercentage] = useState(0); // move percentage to shift slider during animation
@@ -19,30 +25,37 @@ export const Slider: React.FC<Props> = ({ shows }) => {
     null
   ); // direction of movement of animation
   const [lowestVisibleIndex, setLowestVisibleIndex] = useState(0); // lowest visible index of slider content
-  const [itemsInRow, setItemsInRow] = useState(5); // number of items in the slider content changed dynamically on window size
+  const [itemsInRow, setItemsInRow] = useState(totalItems); // number of items in the slider content changed dynamically on window size
   const [slider, setSlider] = useState(true);
-
-  let totalItems = shows.length;
-  if (totalItems < itemsInRow) {
-    setItemsInRow(totalItems);
-    setSlider(false);
-  }
 
   // handle window resize and sets items in row
   const handleWindowResize = () => {
-    if (window.innerWidth > 1440 && totalItems > 6) {
-      setItemsInRow(6);
-    } else if (window.innerWidth >= 1000 && totalItems > 5) {
-      setItemsInRow(5);
-    } else if (window.innerWidth < 1000 && totalItems > 4) {
-      setItemsInRow(4);
-    } else {
-      setItemsInRow(totalItems);
+    if (type === "show-box") {
+      if (window.innerWidth > 1440 && totalItems > 6) {
+        setItemsInRow(6);
+      } else if (window.innerWidth >= 1000 && totalItems > 5) {
+        setItemsInRow(5);
+      } else if (window.innerWidth < 1000 && totalItems > 4) {
+        setItemsInRow(4);
+      } else {
+        setSlider(false);
+      }
+    } else if (type === "actor-card") {
+      if (window.innerWidth > 1440 && totalItems > 10) {
+        setItemsInRow(10);
+      } else if (window.innerWidth >= 1000 && totalItems > 9) {
+        setItemsInRow(9);
+      } else if (window.innerWidth < 1000 && totalItems > 7) {
+        setItemsInRow(7);
+      } else {
+        setSlider(false);
+      }
     }
   };
   useEffect(() => {
     handleWindowResize();
     window.addEventListener("resize", handleWindowResize);
+    console.log(itemsInRow);
 
     return () => {
       window.removeEventListener("resize", handleWindowResize);
@@ -84,17 +97,15 @@ export const Slider: React.FC<Props> = ({ shows }) => {
 
     // combine indexes
     const indexToDisplay = [...left, ...mid, ...right];
-    console.log(indexToDisplay);
+    console.log({ indexToDisplay });
 
     // add on leading and trailing indexes for peek image when sliding
-    if (slider) {
-      if (sliderHasMoved) {
-        const trailingIndex =
-          indexToDisplay[indexToDisplay.length - 1] === totalItems - 1
-            ? 0
-            : indexToDisplay[indexToDisplay.length - 1] + 1;
-        indexToDisplay.push(trailingIndex);
-      }
+    if (sliderHasMoved && slider) {
+      const trailingIndex =
+        indexToDisplay[indexToDisplay.length - 1] === totalItems - 1
+          ? 0
+          : indexToDisplay[indexToDisplay.length - 1] + 1;
+      indexToDisplay.push(trailingIndex);
     }
 
     if (slider) {
@@ -105,20 +116,33 @@ export const Slider: React.FC<Props> = ({ shows }) => {
 
     const sliderContents = [];
     for (let index of indexToDisplay) {
-      sliderContents.push(
-        <ShowBox
-          show={shows[index]}
-          // key={`${shows[index].id}-${index}`}
-          key={`${index + Math.random() * 1000}`}
-          width={slider ? `${100 / itemsInRow}%` : `15vw`}
-        />
-      );
+      if (type === "show-box") {
+        sliderContents.push(
+          <ShowBox
+            // TODO FIX THIS
+            // @ts-ignore
+            show={data[index]}
+            key={`${index + Math.random() * 1000}`}
+            width={slider ? `${100 / itemsInRow}%` : `18%`}
+          />
+        );
+      } else if (type === "actor-card")
+        sliderContents.push(
+          <ActorCard
+            // TODO FIX THIS
+            // @ts-ignore
+            actor={data[index]}
+            key={`${index + Math.random() * 1000}`}
+            width={slider ? `${100 / itemsInRow - 0.5}%` : `15%`}
+            margin={"0.5%"}
+          />
+        );
     }
 
     // adds empty divs to take up appropriate spacing when slider at initial position
-    if (slider) {
-      if (!sliderHasMoved) {
-        for (let i = 0; i < itemsInRow; i++) {
+    if (!sliderHasMoved && slider) {
+      for (let i = 0; i < itemsInRow; i++) {
+        if (type === "show-box")
           sliderContents.unshift(
             <div
               className="show-box"
@@ -126,7 +150,14 @@ export const Slider: React.FC<Props> = ({ shows }) => {
               key={i}
             />
           );
-        }
+        else if (type === "actor-card")
+          sliderContents.unshift(
+            <div
+              className="actor-card"
+              style={{ width: `${100 / itemsInRow}%` }}
+              key={i}
+            />
+          );
       }
     }
     return sliderContents;
@@ -204,7 +235,6 @@ export const Slider: React.FC<Props> = ({ shows }) => {
       whiteSpace: "normal",
       display: "flex",
       width: "fit-content",
-      // width: "30vw",
     };
   } else if (sliderMoving) {
     let translate = "";
@@ -233,7 +263,10 @@ export const Slider: React.FC<Props> = ({ shows }) => {
           <ArrowBackIosOutlined onClick={() => handlePrev()} />
         </div>
       )}
-      <div className="show-list__content" style={style}>
+      <div
+        className="show-list__content"
+        style={{ ...style, padding: `${padding}` }}
+      >
         {renderSliderContent()}
       </div>
       {slider && (

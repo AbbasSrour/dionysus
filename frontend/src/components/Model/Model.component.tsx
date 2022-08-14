@@ -3,6 +3,8 @@ import MovieSchema from "../../schemas/movie.schema";
 import "./Model.scss";
 import GenreSlider from "../GenreSlider/GenreSlider.component";
 import SeriesSchema from "../../schemas/SeriesSchema.schema";
+import Slider from "../Slider/Slider.component";
+import { dummyActors, dummyGenres, dummyShows } from "../../assets/duumyData";
 
 interface Props {
   movie?: MovieSchema;
@@ -15,18 +17,6 @@ const Model: React.FC<Props> = ({ movie, series }) => {
   else if (series) show = series;
   //TODO else do some shit
 
-  const genres = [
-    "action",
-    "comedy",
-    "thriller",
-    "horror",
-    "adventure",
-    "sitcom",
-    "movie",
-    "series",
-    "bullshit",
-    "trailer",
-  ];
   return (
     <div className={"model"}>
       <div
@@ -40,8 +30,9 @@ const Model: React.FC<Props> = ({ movie, series }) => {
         />
         <div className="model__content__info">
           <h1 className="title">{show?.title}</h1>
-          <GenreSlider genres={genres} />
+          <GenreSlider genres={dummyGenres.slice(0, 4)} />
           <p className="overview">{movie?.overview}</p>
+          <Slider type={"actor-card"} data={dummyActors} padding={"0"} />
         </div>
       </div>
     </div>
