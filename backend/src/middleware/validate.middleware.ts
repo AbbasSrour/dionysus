@@ -4,6 +4,8 @@ import { NextFunction, Request, Response } from "express";
 export const Validate =
   (schema: AnyZodObject) =>
   (req: Request, res: Response, next: NextFunction) => {
+    // if (req.body.constructor === Object && Object.keys(req.body).length === 0)
+    //   throw new LocalError(444, "Empty body");
     try {
       schema.parse({
         params: req.params,
@@ -11,13 +13,18 @@ export const Validate =
         body: req.body,
       });
       next();
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof ZodError) {
         return res.status(400).json({
           status: "fail",
           error: error.errors,
         });
-      }
-      next(error);
+        // } else if (error.statusCode === 444) {
+        //   return res.status(400).json({
+        //     status: "fail",
+        //     error: error.errors,
+        //     message: "Empty body",
+        //   });
+      } else next(error);
     }
   };

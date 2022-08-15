@@ -22,7 +22,6 @@ import { signJwt, verifyJwt } from "../utils/jwt.util";
 import { Email } from "../utils/email.util";
 import crypto from "crypto";
 import { env } from "../utils/validate-env.util";
-import log from "../utils/logger.util";
 
 // Setting Up Cookie Options
 const cookieOptions: CookieOptions = {
@@ -127,6 +126,7 @@ export const loginUserHandler = async (
       accessToken,
     });
   } catch (error: any) {
+    console.log(error);
     next(error);
   }
 };

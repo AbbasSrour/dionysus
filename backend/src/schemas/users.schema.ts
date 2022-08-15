@@ -37,7 +37,7 @@ export type RegisterUserInput = Omit<
   "passwordConfirm"
 >;
 
-export const LoginUserSchema = Object({
+export const LoginUserSchema = object({
   body: object({
     email: string({
       required_error: "Email address is required",
