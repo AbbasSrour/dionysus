@@ -1,15 +1,104 @@
 //--------------------------------------------------------- --Setup --------------------------------------------------------------------//
 generator client {
   provider = "prisma-client-js"
-  output = "./client"
+  output   = "./client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://ares:7142@localhost:5432/test"
+  url      = "postgresql://ares:7142@localhost:5432/optimized"
 }
 
 //--------------------------------------------------------- Base Tables ------------------------------------------------------------//
+model Show {
+  showId      Int      @id @default(autoincrement()) @map("show_id")
+  name        String   @db.VarChar(100)
+  releaseYear Int
+  poster      String?  @db.VarChar(480)
+  cover       String?  @db.VarChar(480)
+  summary     String?  @db.VarChar(480)
+  trailer     String?  @db.VarChar(480)
+  pgRating    String?  @map("pg_rating") @db.VarChar(50)
+  budget      Int?
+  revenue     Int?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  Imdb         Imdb?
+  Movie        Movie?
+  Episode      Episode?
+  ShowCast     ShowCast[]
+  ShowDirector ShowDirector[]
+  ShowGenre    ShowGenre[]
+  ShowLanguage ShowLanguage[]
+  ShowStudio   ShowStudio[]
+  ShowWriter   ShowWriter[]
+  ShowRating   ShowRating[]
+
+  @@unique([name, releaseYear])
+  @@map("show")
+}
+
+model Imdb {
+  imdbId    String   @id @map("imdb_id")
+  show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId    Int      @unique @map("show_id")
+  rating    Float?
+  voteCount Int?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("imdb")
+}
+
+model Movie {
+  movieId   Int      @id @default(autoincrement()) @map("movie_id")
+  show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId    Int      @unique @map("show_id")
+  length    Int?     @map("movie_length")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  MovieServer  MovieServer[]
+  MovieHistory MovieHistory[]
+
+  @@map("movie")
+}
+
+model Episode {
+  episodeId   Int      @id @default(autoincrement()) @map("episode_id")
+  show        Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId      Int      @unique @map("show_id")
+  season      Int      @map("season")
+  number      Int
+  name        String?  @db.VarChar(100)
+  poster      String?  @db.VarChar(480)
+  summary     String?  @db.VarChar(480)
+  releaseYear Int?     @map("release_year")
+  length      Int?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt
+
+  SeriesServer  SeriesServer[]
+  SeriesHistory SeriesHistory[]
+
+  @@unique([number, season])
+  @@map("episode")
+}
+
+model Server {
+  serverId  Int      @id @default(autoincrement()) @map("server_id")
+  name      String   @unique @db.VarChar(100)
+  url       String   @unique @db.VarChar(480)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  MovieServer  MovieServer[]
+  SeriesServer SeriesServer[]
+
+  @@map("server")
+}
+
 model Actor {
   actorId   Int      @id @default(autoincrement()) @map("actor_id")
   name      String   @db.VarChar(100)
@@ -17,8 +106,7 @@ model Actor {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt
 
-  MovieCast MovieCast[]
-  SeriesCast SeriesCast[]
+  MovieCast ShowCast[]
 
   @@unique([name, image])
   @@map("actor")
@@ -31,32 +119,10 @@ model Director {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt
 
-  MovieDirector MovieDirector[]
-  SeriesDirector  SeriesDirector[]
+  ShowDirector ShowDirector[]
 
   @@unique([name, image])
   @@map("director")
-}
-
-model Episode {
-  episodeId   Int      @id @default(autoincrement()) @map("episode_id")
-  series      Series   @relation(fields: [seriesId], references: [seriesId], onDelete: Cascade, onUpdate: Cascade)
-  seriesId    Int      @map("series_id")
-  season      Season   @relation(fields: [seasonId], references: [seasonId], onDelete: Cascade, onUpdate: Cascade)
-  seasonId    Int      @map("season_id")
-  number      Int
-  name        String?  @db.VarChar(100)
-  poster      String?  @db.VarChar(480)
-  summary     String?  @db.VarChar(480)
-  releaseYear Int?     @map("release_year")
-  length      Int?
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt
-
-  SeriesHistory SeriesHistory[]
-
-  @@unique([number, seriesId, seasonId])
-  @@map("episode")
 }
 
 model Genre {
@@ -66,21 +132,9 @@ model Genre {
   updatedAt DateTime @updatedAt
 
   GenreRating GenreRating[]
-  MovieGenre  MovieGenre[]
-  SeriesGenre SeriesGenre[]
+  ShowGenre   ShowGenre[]
 
   @@map("genre")
-}
-
-model Imdb {
-  imdbId    String @id @map("imdb_id")
-  rating    Float?
-  voteCount Int?
-
-  series Series[]
-  movie  Movie[]
-
-  @@map("imdb")
 }
 
 model Language {
@@ -89,41 +143,9 @@ model Language {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  MovieLanguage MovieLanguage[]
-  SeriesLanguage SeriesLanguage[]
+  ShowLanguage ShowLanguage[]
 
   @@map("language")
-}
-
-model Movie {
-  movieId     Int      @id @default(autoincrement()) @map("movie_id")
-  name        String   @db.VarChar(100)
-  releaseYear Int
-  imdb        Imdb     @relation(fields: [imdbId], references: [imdbId], onDelete: Cascade, onUpdate: Cascade)
-  imdbId      String   @map("imdb_id")
-  poster      String?  @db.VarChar(480)
-  cover       String?  @db.VarChar(480)
-  summary     String?  @db.VarChar(480)
-  trailer     String?  @db.VarChar(480)
-  pgRating    String?  @map("pg_rating") @db.VarChar(50)
-  movieLength Int?     @map("movie_length")
-  budget      Int?
-  revenue     Int?
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  MovieCast     MovieCast[]
-  MovieDirector MovieDirector[]
-  MovieGenre    MovieGenre[]
-  MovieHistory  MovieHistory[]
-  MovieLanguage MovieLanguage[]
-  MovieStudio   MovieStudio[]
-  MovieRating   MovieRating[]
-  MovieServer   MovieServer[]
-  MovieWriter   MovieWriter[]
-
-  @@unique([name, releaseYear])
-  @@map("movie")
 }
 
 model Studio {
@@ -133,92 +155,9 @@ model Studio {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  MovieStudio MovieStudio[]
-  SeriesStudio SeriesStudio[]
+  ShowStudio ShowStudio[]
 
   @@map("studio")
-}
-
-model Season {
-  seasonId    Int      @id @default(autoincrement()) @map("season_id")
-  series      Series   @relation(fields: [seriesId], references: [seriesId], onDelete: Cascade, onUpdate: Cascade)
-  seriesId    Int      @map("series_id")
-  number      Int
-  poster      String?  @db.VarChar(480)
-  summary     String?  @db.VarChar(480)
-  releaseYear Int?     @map("release_year")
-  trailer     String?  @db.VarChar(480)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  episode Episode[]
-
-  @@unique([seriesId, number])
-  @@map("season")
-}
-
-model Series {
-  seriesId    Int      @id @default(autoincrement()) @map("series_id")
-  name        String   @db.VarChar(100)
-  releaseYear Int      @map("release_year")
-  imdb        Imdb     @relation(fields: [imdbId], references: [imdbId], onDelete: Cascade, onUpdate: Cascade)
-  imdbId      String   @map("imdb_id")
-  poster      String?  @db.VarChar(480)
-  cover       String?  @db.VarChar(480)
-  summary     String?  @db.VarChar(480)
-  trailer     String?  @db.VarChar(480)
-  pgRating    String?  @map("pg_rating") @db.VarChar(50)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  season         Season[]
-  episode        Episode[]
-  SeriesCast     SeriesCast[]
-  SeriesDirector SeriesDirector[]
-  SeriesGenre    SeriesGenre[]
-  SeriesLanguage SeriesLanguage[]
-  SeriesRating   SeriesRating[]
-  SeriesServer   SeriesServer[]
-  SeriesStudio   SeriesStudio[]
-  SeriesWriter   SeriesWriter[]
-
-  @@unique([name, releaseYear])
-  @@map("series")
-}
-
-model Server {
-  serverId  Int      @id @default(autoincrement()) @map("server_id")
-  name      String   @unique @db.VarChar(100)
-  url       String   @unique @db.VarChar(480)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  MovieServer MovieServer[]
-  SeriesServer  SeriesServer[]
-
-  @@map("server")
-}
-
-model User {
-  userId           Int      @id @default(autoincrement()) @map("user_id")
-  email            String   @unique @db.VarChar(480)
-  password         String   @db.VarChar(400)
-  userName         String   @unique
-  name             String?  @db.VarChar(100)
-  age              Int
-  image            String?  @default("default.png") @db.VarChar(480)
-  verified         Boolean  @default(false)
-  verificationCode String?  @map("verification_code") @db.VarChar(100)
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
-
-  GenreRating  GenreRating[]
-  MovieHistory MovieHistory[]
-  SeriesHistory SeriesHistory[]
-  MovieRating  MovieRating[]
-  SeriesRating SeriesRating[]
-
-  @@map("users")
 }
 
 model Writer {
@@ -228,14 +167,132 @@ model Writer {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  MovieWriter MovieWriter[]
-  SeriesWriter  SeriesWriter[]
+  ShowWriter ShowWriter[]
 
   @@unique([name, image])
   @@map("writer")
 }
 
+model User {
+  userId           Int      @id @default(autoincrement()) @map("user_id")
+  email            String   @unique @db.VarChar(480)
+  password         String   @db.VarChar(400)
+  userName         String   @unique
+  name             String?  @db.VarChar(100)
+  age              Int?
+  image            String?  @default("default.png") @db.VarChar(480)
+  verified         Boolean  @default(false)
+  verificationCode String?  @map("verification_code") @db.VarChar(100)
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  GenreRating   GenreRating[]
+  MovieHistory  MovieHistory[]
+  SeriesHistory SeriesHistory[]
+  ShowRating    ShowRating[]
+
+  @@map("users")
+}
+
 //----------------------------------------------------- Many To Many Tables ----------------------------------------------------//
+model MovieServer {
+  movie     Movie    @relation(fields: [movieId], references: [movieId], onDelete: Cascade, onUpdate: Cascade)
+  movieId   Int      @map("movie_id")
+  server    Server   @relation(fields: [serverId], references: [serverId], onDelete: Cascade, onUpdate: Cascade)
+  serverId  Int      @map("server_id")
+  url       String   @db.VarChar(480)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([movieId, serverId])
+  @@map("movie_server")
+}
+
+model SeriesServer {
+  episode   Episode  @relation(fields: [episodeId], references: [episodeId], onDelete: Cascade, onUpdate: Cascade)
+  episodeId Int      @map("episode_id")
+  server    Server   @relation(fields: [serverId], references: [serverId], onDelete: Cascade, onUpdate: Cascade)
+  serverId  Int      @map("server_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([serverId, episodeId])
+  @@map("series_server")
+}
+
+model ShowCast {
+  show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId    Int      @map("show_id")
+  actor     Actor    @relation(fields: [actorId], references: [actorId], onDelete: Cascade, onUpdate: Cascade)
+  actorId   Int      @map("actor_id")
+  role      String   @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([showId, actorId])
+  @@map("show_cast")
+}
+
+model ShowDirector {
+  show       Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId     Int      @map("show_id")
+  director   Director @relation(fields: [directorId], references: [directorId], onDelete: Cascade, onUpdate: Cascade)
+  directorId Int      @map("director_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@id([showId, directorId])
+  @@map("show_director")
+}
+
+model ShowGenre {
+  show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId    Int      @map("show_id")
+  genre     Genre    @relation(fields: [genreId], references: [genreId], onDelete: Cascade, onUpdate: Cascade)
+  genreId   Int      @map("genre_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([showId, genreId])
+  @@map("show_genre")
+}
+
+model ShowLanguage {
+  show       Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId     Int      @map("show_id")
+  language   Language @relation(fields: [languageId], references: [languageId], onDelete: Cascade, onUpdate: Cascade)
+  languageId Int      @map("language_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@id([showId, languageId])
+  @@map("show_language")
+}
+
+model ShowStudio {
+  show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId    Int      @map("show_id")
+  studio    Studio   @relation(fields: [studioId], references: [studioId], onDelete: Cascade, onUpdate: Cascade)
+  studioId  Int      @map("studio_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([showId, studioId])
+  @@map("show_studio")
+}
+
+model ShowWriter {
+  show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId    Int      @map("show_id")
+  writer    Writer   @relation(fields: [writerId], references: [writerId], onDelete: Cascade, onUpdate: Cascade)
+  writerId  Int      @map("writer_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([showId, writerId])
+  @@map("show_writer")
+}
+
 model GenreRating {
   user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
   userId    Int      @map("user_id")
@@ -246,43 +303,6 @@ model GenreRating {
 
   @@id([genreId, userId])
   @@map("genre_rating")
-}
-
-model MovieCast {
-  movie     Movie    @relation(fields: [movieId], references: [movieId], onDelete: Cascade, onUpdate: Cascade)
-  movieId   Int      @map("movie_id")
-  actor     Actor    @relation(fields: [actorId], references: [actorId], onDelete: Cascade, onUpdate: Cascade)
-  actorId   Int      @map("actor_id")
-  role      String   @db.VarChar(100)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@id([movieId, actorId])
-  @@map("movie_cast")
-}
-
-model MovieDirector {
-  movie      Movie    @relation(fields: [movieId], references: [movieId], onDelete: Cascade, onUpdate: Cascade)
-  movieId    Int      @map("movie_id")
-  director   Director @relation(fields: [directorId], references: [directorId], onDelete: Cascade, onUpdate: Cascade)
-  directorId Int      @map("director_id")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  @@id([movieId, directorId])
-  @@map("movie_director")
-}
-
-model MovieGenre {
-  movie     Movie    @relation(fields: [movieId], references: [movieId], onDelete: Cascade, onUpdate: Cascade)
-  movieId   Int      @map("movie_id")
-  genre     Genre    @relation(fields: [genreId], references: [genreId], onDelete: Cascade, onUpdate: Cascade)
-  genreId   Int      @map("genre_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@id([movieId, genreId])
-  @@map("movie_genre")
 }
 
 model MovieHistory {
@@ -298,110 +318,11 @@ model MovieHistory {
   @@map("movie_history")
 }
 
-model MovieLanguage {
-  movie      Movie    @relation(fields: [movieId], references: [movieId], onDelete: Cascade, onUpdate: Cascade)
-  movieId    Int      @map("movie_id")
-  language   Language @relation(fields: [languageId], references: [languageId], onDelete: Cascade, onUpdate: Cascade)
-  languageId Int      @map("language_id")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  @@id([movieId, languageId])
-  @@map("movie_language")
-}
-
-model MovieStudio {
-  movie     Movie    @relation(fields: [movieId], references: [movieId], onDelete: Cascade, onUpdate: Cascade)
-  movieId   Int      @map("movie_id")
-  studio    Studio   @relation(fields: [studioId], references: [studioId], onDelete: Cascade, onUpdate: Cascade)
-  studioId  Int      @map("studio_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@id([movieId, studioId])
-  @@map("movie_studio")
-}
-
-model MovieRating {
-  user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
-  userId    Int      @map("user_id")
-  movie     Movie    @relation(fields: [movieId], references: [movieId], onDelete: Cascade, onUpdate: Cascade)
-  movieId   Int      @map("movie_id")
-  rating    Int
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@id([userId, movieId])
-  @@map("movie_rating")
-}
-
-model MovieServer {
-  movie     Movie    @relation(fields: [movieId], references: [movieId], onDelete: Cascade, onUpdate: Cascade)
-  movieId   Int      @map("movie_id")
-  server    Server   @relation(fields: [serverId], references: [serverId], onDelete: Cascade, onUpdate: Cascade)
-  serverId  Int      @map("server_id")
-  url       String   @db.VarChar(480)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@id([movieId, serverId])
-  @@map("movie_server")
-}
-
-model MovieWriter {
-  movie     Movie    @relation(fields: [movieId], references: [movieId], onDelete: Cascade, onUpdate: Cascade)
-  movieId   Int      @map("movie_id")
-  writer    Writer   @relation(fields: [writerId], references: [writerId], onDelete: Cascade, onUpdate: Cascade)
-  writerId  Int      @map("writer_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@id([movieId, writerId])
-  @@map("movie_writer")
-}
-
-model SeriesCast {
-  series    Series   @relation(fields: [seriesId], references: [seriesId], onDelete: Cascade, onUpdate: Cascade)
-  seriesId  Int      @map("series_id")
-  actor     Actor    @relation(fields: [actorId], references: [actorId], onDelete: Cascade, onUpdate: Cascade)
-  actorId   Int      @map("actor_id")
-  role      String   @db.VarChar(100)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@id([actorId, seriesId])
-  @@map("series_cast")
-}
-
-model SeriesDirector {
-  series     Series   @relation(fields: [seriesId], references: [seriesId], onDelete: Cascade, onUpdate: Cascade)
-  seriesId   Int      @map("series_id")
-  director   Director @relation(fields: [directorId], references: [directorId], onDelete: Cascade, onUpdate: Cascade)
-  directorId Int      @map("director_id")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  @@id([seriesId, directorId])
-  @@map("series_director")
-}
-
-model SeriesGenre {
-  series    Series   @relation(fields: [seriesId], references: [seriesId], onDelete: Cascade, onUpdate: Cascade)
-  seriesId  Int      @map("series_id")
-  genre     Genre    @relation(fields: [genreId], references: [genreId], onDelete: Cascade, onUpdate: Cascade)
-  genreId   Int      @map("genre_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@id([seriesId, genreId])
-  @@map("series_genre")
-}
-
 model SeriesHistory {
   user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
   userId    Int      @map("user_id")
-  episoded  Episode   @relation(fields: [episodeId], references: [episodeId], onDelete: Cascade, onUpdate: Cascade)
-  episodeId Int @map("episode_id")
+  episoded  Episode  @relation(fields: [episodeId], references: [episodeId], onDelete: Cascade, onUpdate: Cascade)
+  episodeId Int      @map("episode_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -409,63 +330,15 @@ model SeriesHistory {
   @@map("series_history")
 }
 
-model SeriesLanguage {
-  series     Series   @relation(fields: [seriesId], references: [seriesId], onDelete: Cascade, onUpdate: Cascade)
-  seriesId   Int      @map("series_id")
-  language   Language @relation(fields: [languageId], references: [languageId], onDelete: Cascade, onUpdate: Cascade)
-  languageId Int      @map("language_id")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  @@id([seriesId, languageId])
-  @@map("series_language")
-}
-
-model SeriesRating {
+model ShowRating {
   user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
   userId    Int      @map("user_id")
-  series    Series   @relation(fields: [seriesId], references: [seriesId], onDelete: Cascade, onUpdate: Cascade)
-  seriesId  Int      @map("series_id")
+  show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId    Int      @map("show_id")
   rating    Int
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@id([userId, seriesId])
-  @@map("series_rating")
-}
-
-model SeriesServer {
-  series    Series   @relation(fields: [seriesId], references: [seriesId], onDelete: Cascade, onUpdate: Cascade)
-  seriesId  Int      @map("series_id")
-  server    Server   @relation(fields: [serverId], references: [serverId], onDelete: Cascade, onUpdate: Cascade)
-  serverId  Int      @map("server_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@id([serverId, seriesId])
-  @@map("series_server")
-}
-
-model SeriesStudio {
-  series    Series   @relation(fields: [seriesId], references: [seriesId], onDelete: Cascade, onUpdate: Cascade)
-  seriesId  Int      @map("series_id")
-  studio    Studio   @relation(fields: [studioId], references: [studioId], onDelete: Cascade, onUpdate: Cascade)
-  studioId  Int      @map("studio_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@id([studioId, seriesId])
-  @@map("series_studio")
-}
-
-model SeriesWriter{
-  series    Series   @relation(fields: [seriesId], references: [seriesId], onDelete: Cascade, onUpdate: Cascade)
-  seriesId  Int      @map("series_id")
-  writer    Writer   @relation(fields: [writerId], references: [writerId], onDelete: Cascade, onUpdate: Cascade)
-  writerId  Int       @map("writer_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@id([writerId, seriesId])
-  @@map("series_writer")
+  @@id([userId, showId])
+  @@map("show_rating")
 }
