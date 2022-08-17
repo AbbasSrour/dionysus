@@ -1,6 +1,6 @@
-import { ActorInput, MovieCastInput } from "../schemas/actor.schema";
+import { ActorInput, ShowCastInput } from "../schemas/actor.schema";
 import client from "../utils/prisma.util";
-import { Actor, MovieCast } from "../../prisma/client";
+import { Actor, ShowCast } from "../../prisma/client";
 
 export const createActorService = async (input: ActorInput): Promise<Actor> => {
   return client.actor.create({
@@ -27,14 +27,14 @@ export const getActorByNameAndImageService = async (
   });
 };
 
-export const createMovieCastService = async (
-  input: MovieCastInput
-): Promise<MovieCast> => {
-  const { actorId, role, movieId } = input;
-  return client.movieCast.create({
+export const createShowCastService = async (
+  input: ShowCastInput
+): Promise<ShowCast> => {
+  const { actorId, role, showId } = input;
+  return client.showCast.create({
     data: {
       actorId,
-      movieId,
+      showId,
       role,
     },
   });

@@ -21,6 +21,7 @@ import swaggerUI from "swagger-ui-express";
 import swaggerDocs from "./docs/swagger.doc";
 
 // Routes
+import ShowRoute from "./routes/show.route";
 import UserRoute from "./routes/user.route";
 import AuthRoute from "./routes/auth.route";
 import MovieRoute from "./routes/movie.route";
@@ -98,15 +99,10 @@ app.get("/health", async (req: Request, res: Response) => {
 // Documentation
 app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs, swaggerOpts));
 
-// Authentication Route
 app.use("/api/v1/auth", AuthRoute);
-
-// User Route
 app.use("/api/v1/users", UserRoute);
-
-// Search Route
 app.use("/api/v1/search", SearchRoute);
-
+app.use("/api/v1/shows", ShowRoute);
 app.use("/api/v1/actors", ActorRoute);
 app.use("/api/v1/directors", DirectorRoute);
 app.use("/api/v1/genres", GenreRoute);

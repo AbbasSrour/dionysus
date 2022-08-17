@@ -1,4 +1,4 @@
-import { number, object, string, TypeOf } from "zod";
+import { object, string, TypeOf } from "zod";
 
 export const RegisterUserSchema = object({
   body: object({
@@ -7,14 +7,14 @@ export const RegisterUserSchema = object({
     })
       .min(3, "Username is too short")
       .max(20, "Username is too long"),
-    name: string({
-      required_error: "First name is required",
-    })
-      .min(2, "First name is too short")
-      .max(20, "Last name is too long"),
-    age: number({
-      required_error: "Age is required",
-    }),
+    // name: string({
+    //   required_error: "First name is required",
+    // })
+    //   .min(2, "First name is too short")
+    //   .max(20, "Last name is too long"),
+    // age: number({
+    //   required_error: "Age is required",
+    // }),
     email: string({
       required_error: "Email is required",
     }).email("Invalid email address"),
@@ -23,18 +23,18 @@ export const RegisterUserSchema = object({
     })
       .min(8, "Password is too short")
       .max(32, "Password is too long"),
-    passwordConfirm: string({
+    confirmPassword: string({
       required_error: "Password confirmation is required",
     }),
-  }).refine((data) => data.password === data.passwordConfirm, {
-    path: ["passwordConfirm"],
+  }).refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
     message: "Passwords do not match",
   }),
 });
 
 export type RegisterUserInput = Omit<
   TypeOf<typeof RegisterUserSchema>["body"],
-  "passwordConfirm"
+  "confirmPassword"
 >;
 
 export const LoginUserSchema = object({

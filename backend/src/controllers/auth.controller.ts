@@ -14,6 +14,7 @@ import {
   findUser,
   findUserByEmail,
   findUserById,
+  securePassword,
   signTokens,
   updateVerificationCode,
   updateVerified,
@@ -51,13 +52,11 @@ export const registerUserHandler = async (
 ) => {
   try {
     // Create User
-    const { email, password, userName, age, name } = req.body;
+    const { email, password, userName } = req.body;
     const user = await createUser({
       email: email.toLowerCase(),
-      password: password,
+      password: await securePassword(password),
       userName: userName,
-      age: age,
-      name: name,
     });
 
     // email verification process
@@ -72,6 +71,7 @@ export const registerUserHandler = async (
         message: "Success a verification link was sent to your email address",
       });
     } catch (error) {
+      console.error(error);
       const verificationCode = null;
       await updateVerificationCode(user, verificationCode);
 
@@ -81,13 +81,13 @@ export const registerUserHandler = async (
       });
     }
   } catch (error: any) {
+    console.error(error);
     if (error.code === "P2002") {
       return res.status(409).json({
         status: "fail",
         message: "User with that email already exist",
       });
-    }
-    next(error);
+    } else next(error);
   }
 };
 

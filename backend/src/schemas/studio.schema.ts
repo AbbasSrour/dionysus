@@ -13,10 +13,10 @@ export const StudioSchema = object({
 
 export type StudioInput = TypeOf<typeof StudioSchema>["body"];
 
-export const MovieStudioSchema = object({
+export const ShowStudioSchema = object({
   body: object({
-    movieId: number(),
+    showId: number(),
     studioId: number(),
   }),
 });
-export type MovieStudioInput = TypeOf<typeof MovieStudioSchema>["body"];
+export type ShowStudioInput = TypeOf<typeof ShowStudioSchema>["body"];

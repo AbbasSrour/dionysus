@@ -1,12 +1,12 @@
-import { NextFunction, Request, Response } from "express";
-import { GenreInput, MovieGenreInput } from "../schemas/genre.schema";
+import {NextFunction, Request, Response} from "express";
+import {GenreInput, ShowGenreInput} from "../schemas/genre.schema";
 import {
   createGenreService,
-  createMovieGenreService,
+  createShowGenreService,
   getGenreByIdService,
   getGenreByNameService,
 } from "../services/genre.service";
-import { Genre, Prisma } from "../../prisma/client";
+import {Genre, Prisma} from "../../prisma/client";
 import AppError from "../errors/app.error";
 
 export const createGenreHandler = async (
@@ -14,12 +14,12 @@ export const createGenreHandler = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { name } = req.body;
+  const {name} = req.body;
   try {
-    const genre = await createGenreService({ name });
+    const genre = await createGenreService({name});
     res
       .status(201)
-      .json({ status: "Success, the genre was created", data: { genre } });
+      .json({status: "Success, the genre was created", data: {genre}});
   } catch (error: any) {
     if (error.code === "P2002")
       return res.status(409).json({
@@ -35,18 +35,18 @@ export const getGenreHandler = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { id, name } = req.query;
+  const {id, name} = req.query;
   try {
     let genre: Genre | null;
     if (id) genre = await getGenreByIdService(id);
     else if (name) genre = await getGenreByNameService(name);
     else throw new AppError(400, "Missing id or name");
-    res.status(200).json({ status: "Success", data: { genre } });
+    res.status(200).json({status: "Success", data: {genre}});
   } catch (error) {
     if (error instanceof Prisma.NotFoundError)
       res
         .status(404)
-        .json({ status: "fail", message: "Requested genre not found" });
+        .json({status: "fail", message: "Requested genre not found"});
     else next(error);
   }
 };
@@ -56,35 +56,35 @@ export const getGenreByIdHandler = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { id } = req.params;
+  const {id} = req.params;
   try {
     const genre = await getGenreByIdService(id);
-    res.status(200).json({ success: "Success", data: { genre } });
+    res.status(200).json({success: "Success", data: {genre}});
   } catch (error) {
     if (error instanceof Prisma.NotFoundError)
       res
         .status(404)
-        .json({ status: "fail", message: "Requested genre not found" });
+        .json({status: "fail", message: "Requested genre not found"});
     else next(error);
   }
 };
 
-export const createMovieGenreHandler = async (
-  req: Request<{}, {}, MovieGenreInput>,
+export const createShowGenreHandler = async (
+  req: Request<{}, {}, ShowGenreInput>,
   res: Response,
   next: NextFunction
 ) => {
-  const { movieId, genreId } = req.body;
+  const {showId, genreId} = req.body;
   try {
-    const movieGenre = await createMovieGenreService({ movieId, genreId });
+    const showGenre = await createShowGenreService({showId, genreId});
     res
       .status(201)
-      .json({ status: "Success movie genre created", data: { movieGenre } });
+      .json({status: "Success show genre created", data: {showGenre}});
   } catch (error: any) {
     if (error.code === "P2002")
       return res.status(409).json({
         status: "fail",
-        message: `Relation between genre ${genreId} and movie ${movieId} already exists in the database`,
+        message: `Relation between genre ${genreId} and show ${showId} already exists in the database`,
       });
     next(error);
   }

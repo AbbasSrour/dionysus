@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { LanguageInput, MovieLanguagesInput } from "../schemas/language.schema";
+import { LanguageInput, ShowLanguagesInput } from "../schemas/language.schema";
 import {
   createLanguageService,
-  createMovieLanguageService,
+  createShowLanguageService,
   getLanguageByIdService,
   getLanguageByNameService,
 } from "../services/language.service";
@@ -70,26 +70,26 @@ export const getLanguageByIdHandler = async (
   }
 };
 
-export const createMovieLanguageHandler = async (
-  req: Request<{}, {}, MovieLanguagesInput>,
+export const createShowLanguageHandler = async (
+  req: Request<{}, {}, ShowLanguagesInput>,
   res: Response,
   next: NextFunction
 ) => {
-  const { movieId, languageId } = req.body;
+  const { showId, languageId } = req.body;
   try {
-    const movieLanguage = await createMovieLanguageService({
-      movieId,
+    const showLanguage = await createShowLanguageService({
+      showId,
       languageId,
     });
     res.status(201).json({
-      status: "Success movie language create",
-      data: { movieLanguage },
+      status: "Success show language create",
+      data: { showLanguage },
     });
   } catch (error: any) {
     if (error.code === "P2002")
       return res.status(409).json({
         status: "fail",
-        message: `Relation between language ${languageId} and movie ${movieId} already exists in the database`,
+        message: `Relation between language ${languageId} and show ${showId} already exists in the database`,
       });
     else next(error);
   }

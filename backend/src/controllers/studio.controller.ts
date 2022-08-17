@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { MovieStudioInput, StudioInput } from "../schemas/studio.schema";
+import { ShowStudioInput, StudioInput } from "../schemas/studio.schema";
 import {
-  createMovieStudioService,
+  createShowStudioService,
   createStudioService,
   getStudioByIdService,
   getStudioByNameService,
@@ -73,26 +73,26 @@ export const getStudioByIdHandler = async (
   }
 };
 
-export const createMovieStudioHandler = async (
-  req: Request<{}, {}, MovieStudioInput>,
+export const createShowStudioHandler = async (
+  req: Request<{}, {}, ShowStudioInput>,
   res: Response,
   next: NextFunction
 ) => {
-  const { movieId, studioId } = req.body;
+  const { showId, studioId } = req.body;
   try {
-    const movieStudio = await createMovieStudioService({
-      movieId,
+    const showStudio = await createShowStudioService({
+      showId,
       studioId,
     });
     res.status(201).json({
-      status: "Success movie production company created",
-      data: { movieStudio },
+      status: "Success show production company created",
+      data: { showStudio },
     });
   } catch (error: any) {
     if (error.code === "P2002")
       return res.status(409).json({
         status: "fail",
-        message: `Relation between production company ${studioId} and movie ${movieId} already exists in the database`,
+        message: `Relation between production company ${studioId} and show ${showId} already exists in the database`,
       });
     else next(error);
   }

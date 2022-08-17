@@ -1,13 +1,10 @@
 import express from "express";
 import { ApiCheck } from "../middleware/api.middleware";
 import { Validate } from "../middleware/validate.middleware";
-import {
-  LanguageSchema,
-  MovieLanguageSchema,
-} from "../schemas/language.schema";
+import { LanguageSchema, ShowLanguageSchema } from "../schemas/language.schema";
 import {
   createLanguageHandler,
-  createMovieLanguageHandler,
+  createShowLanguageHandler,
   getLanguageByIdHandler,
   getLanguageHandler,
 } from "../controllers/language.controller";
@@ -20,10 +17,10 @@ Router.route("/")
 
 Router.route("/:id").get(getLanguageByIdHandler);
 
-Router.route("/movie").post(
+Router.route("/show").post(
   ApiCheck,
-  Validate(MovieLanguageSchema),
-  createMovieLanguageHandler
+  Validate(ShowLanguageSchema),
+  createShowLanguageHandler
 );
 
 export default Router;

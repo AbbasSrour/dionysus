@@ -1,22 +1,9 @@
-import { number, object, string, TypeOf } from "zod";
+import { number, object, TypeOf } from "zod";
 
 export const MovieSchema = object({
   body: object({
-    name: string({
-      required_error: "Movie name is required",
-    }),
-    releaseYear: number({
-      required_error: "The year the movie was released in is required",
-    }),
-    imdbId: string(),
-    poster: string(),
-    movieLength: number(),
-    cover: string(),
-    summary: string(),
-    pgRating: string(),
-    budget: number(),
-    revenue: number(),
-    trailer: string(),
+    showId: number(),
+    length: number(),
   }),
 });
 export type MovieInput = TypeOf<typeof MovieSchema>["body"];

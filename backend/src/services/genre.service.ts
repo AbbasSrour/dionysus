@@ -1,5 +1,5 @@
-import { GenreInput, MovieGenreInput } from "../schemas/genre.schema";
-import { Genre, MovieGenre } from "../../prisma/client";
+import { GenreInput, ShowGenreInput } from "../schemas/genre.schema";
+import { Genre, ShowGenre } from "../../prisma/client";
 import client from "../utils/prisma.util";
 
 export const createGenreService = async (input: GenreInput): Promise<Genre> => {
@@ -18,9 +18,9 @@ export const getGenreByNameService = async (
   return client.genre.findUniqueOrThrow({ where: { name: genreName } });
 };
 
-export const createMovieGenreService = async (
-  input: MovieGenreInput
-): Promise<MovieGenre> => {
-  const { movieId, genreId } = input;
-  return client.movieGenre.create({ data: input });
+export const createShowGenreService = async (
+  input: ShowGenreInput
+): Promise<ShowGenre> => {
+  const { showId, genreId } = input;
+  return client.showGenre.create({ data: input });
 };

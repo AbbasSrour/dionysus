@@ -11,10 +11,10 @@ export const DirectorSchema = object({
 
 export type DirectorInput = TypeOf<typeof DirectorSchema>["body"];
 
-export const MovieDirectorSchema = object({
+export const ShowDirectorSchema = object({
   body: object({
-    movieId: number(),
+    showId: number(),
     directorId: number(),
   }),
 });
-export type MovieDirectorInput = TypeOf<typeof MovieDirectorSchema>["body"];
+export type ShowDirectorInput = TypeOf<typeof ShowDirectorSchema>["body"];

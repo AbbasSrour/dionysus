@@ -11,9 +11,9 @@ export const createImdbHandler = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { rating, voteCount, imdbId } = req.body;
+  const { rating, voteCount, imdbId, showId } = req.body;
   try {
-    const imdb = await createImdbService({ rating, voteCount, imdbId });
+    const imdb = await createImdbService({ rating, voteCount, imdbId, showId });
     res
       .status(201)
       .json({ status: "Success imdb new entry created", data: { imdb } });

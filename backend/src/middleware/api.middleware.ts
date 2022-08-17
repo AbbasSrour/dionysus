@@ -10,7 +10,7 @@ export const ApiCheck = (req: Request, res: Response, next: NextFunction) => {
     } else if (apikey !== env.API_KEY)
       return next(new AppError(500, `Wrong Api Key`));
     next();
-  } catch (e) {
-    next(e);
+  } catch (error) {
+    next(error);
   }
 };

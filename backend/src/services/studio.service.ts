@@ -1,5 +1,5 @@
-import { MovieStudioInput, StudioInput } from "../schemas/studio.schema";
-import { MovieStudio, Studio } from "../../prisma/client";
+import { ShowStudioInput, StudioInput } from "../schemas/studio.schema";
+import { ShowStudio, Studio } from "../../prisma/client";
 import client from "../utils/prisma.util";
 
 export const createStudioService = async (
@@ -20,9 +20,9 @@ export const getStudioByNameService = async (
   return client.studio.findUniqueOrThrow({ where: { name } });
 };
 
-export const createMovieStudioService = async (
-  input: MovieStudioInput
-): Promise<MovieStudio> => {
-  const { movieId, studioId } = input;
-  return client.movieStudio.create({ data: input });
+export const createShowStudioService = async (
+  input: ShowStudioInput
+): Promise<ShowStudio> => {
+  const { showId, studioId } = input;
+  return client.showStudio.create({ data: input });
 };

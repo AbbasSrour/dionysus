@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { DirectorInput, MovieDirectorInput } from "../schemas/director.schema";
+import { DirectorInput, ShowDirectorInput } from "../schemas/director.schema";
 import {
   createDirectorService,
-  createMovieDirectorService,
+  createShowDirectorService,
   getDirectorByIdService,
   getDirectorByNameAndImageService,
 } from "../services/director.service";
@@ -73,26 +73,26 @@ export const getDirectorByIdHandler = async (
   }
 };
 
-export const createMovieDirectorHandler = async (
-  req: Request<{}, {}, MovieDirectorInput>,
+export const createShowDirectorHandler = async (
+  req: Request<{}, {}, ShowDirectorInput>,
   res: Response,
   next: NextFunction
 ) => {
-  const { movieId, directorId } = req.body;
+  const { showId, directorId } = req.body;
   try {
-    const movieDirector = await createMovieDirectorService({
-      movieId,
+    const showDirector = await createShowDirectorService({
+      showId,
       directorId,
     });
     res.status(201).json({
-      status: "Success movie director created",
-      data: { movieDirector },
+      status: "Success show director created",
+      data: { showDirector },
     });
   } catch (error: any) {
     if (error.code === "P2002")
       return res.status(409).json({
         status: "fail",
-        message: `Relation between director ${directorId} and movie ${movieId} already exists in the database`,
+        message: `Relation between director ${directorId} and show ${showId} already exists in the database`,
       });
     else next(error);
   }

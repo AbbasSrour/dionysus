@@ -10,10 +10,10 @@ export const GenreSchema = object({
 
 export type GenreInput = TypeOf<typeof GenreSchema>["body"];
 
-export const MovieGenreSchema = object({
+export const ShowGenreSchema = object({
   body: object({
-    movieId: number(),
+    showId: number(),
     genreId: number(),
   }),
 });
-export type MovieGenreInput = TypeOf<typeof MovieGenreSchema>["body"];
+export type ShowGenreInput = TypeOf<typeof ShowGenreSchema>["body"];

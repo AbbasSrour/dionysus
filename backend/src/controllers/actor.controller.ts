@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { ActorInput, MovieCastInput } from "../schemas/actor.schema";
+import { ActorInput, ShowCastInput } from "../schemas/actor.schema";
 import {
   createActorService,
-  createMovieCastService,
+  createShowCastService,
   getActorByIdService,
   getActorByNameAndImageService,
 } from "../services/actor.service";
@@ -71,22 +71,23 @@ export const getActorByIdHandler = async (
   }
 };
 
-export const createMovieCastHandler = async (
-  req: Request<{}, {}, MovieCastInput>,
+export const createShowCastHandler = async (
+  req: Request<{}, {}, ShowCastInput>,
   res: Response,
   next: NextFunction
 ) => {
-  const { movieId, actorId, role } = req.body;
+  const { showId, actorId, role } = req.body;
   try {
-    const movieCast = await createMovieCastService({ movieId, role, actorId });
-    res
-      .status(201)
-      .json({ status: "Success movie cast created", data: { movieCast } });
+    const showCast = await createShowCastService({ showId, role, actorId });
+    res.status(201).json({
+      status: "Success show cast created",
+      data: { showCast },
+    });
   } catch (error: any) {
     if (error.code === "P2002")
       return res.status(409).json({
         status: "fail",
-        message: `Relation of actor ${actorId} and movie ${movieId} with role ${role} already exists in the database`,
+        message: `Relation of actor ${actorId} and show ${showId} with role ${role} already exists in the database`,
       });
     else next(error);
   }

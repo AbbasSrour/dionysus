@@ -1,6 +1,6 @@
-import { DirectorInput, MovieDirectorInput } from "../schemas/director.schema";
+import { DirectorInput, ShowDirectorInput } from "../schemas/director.schema";
 import client from "../utils/prisma.util";
-import { Director, MovieDirector } from "../../prisma/client";
+import { Director, ShowDirector } from "../../prisma/client";
 
 export const createDirectorService = async (
   input: DirectorInput
@@ -23,9 +23,8 @@ export const getDirectorByNameAndImageService = async (
   });
 };
 
-export const createMovieDirectorService = async (
-  input: MovieDirectorInput
-): Promise<MovieDirector> => {
-  const { movieId, directorId } = input;
-  return client.movieDirector.create({ data: input });
+export const createShowDirectorService = async (
+  input: ShowDirectorInput
+): Promise<ShowDirector> => {
+  return client.showDirector.create({ data: input });
 };

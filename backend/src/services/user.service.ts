@@ -20,16 +20,12 @@ export const findUserByEmail = async ({
   email,
 }: {
   email: string;
-}): Promise<User | null> => {
-  return client.user.findUnique({ where: { email: email } });
+}): Promise<User> => {
+  return client.user.findUniqueOrThrow({ where: { email: email } });
 };
 
 export const findUserById = async (id: number): Promise<User | null> => {
-  return client.user.findUnique({ where: { userId: id } });
-};
-
-export const findUser = async (object: object): Promise<User | null> => {
-  return client.user.findFirst(object);
+  return client.user.findUniqueOrThrow({ where: { userId: id } });
 };
 
 export const updateVerificationCode = async (
@@ -91,12 +87,8 @@ export const createVerificationCode = async () => {
   return { verificationCode, hashedVerificationCode };
 };
 
-export const securePassword = async (
-  password: string
-): Promise<string | null> => {
-  if (password) {
-    const hashedPassword: string = await HashPassword(password);
-    password = await EncryptPassword(hashedPassword, env.ENC_KEY);
-  }
+export const securePassword = async (password: string): Promise<string> => {
+  const hashedPassword: string = await HashPassword(password);
+  password = await EncryptPassword(hashedPassword, env.ENC_KEY);
   return password;
 };

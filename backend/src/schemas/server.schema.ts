@@ -22,3 +22,12 @@ export const MovieServerSchema = object({
   }),
 });
 export type MovieServerInput = TypeOf<typeof MovieServerSchema>["body"];
+
+export const EpisodeServerSchema = object({
+  body: object({
+    episodeId: number(),
+    serverId: number(),
+    url: string({ required_error: "Movie Url is required" }),
+  }),
+});
+export type EpisodeServerInput = TypeOf<typeof EpisodeServerSchema>["body"];

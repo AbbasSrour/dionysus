@@ -1,9 +1,9 @@
 import express from "express";
 import { ApiCheck } from "../middleware/api.middleware";
 import { Validate } from "../middleware/validate.middleware";
-import { MovieStudioSchema, StudioSchema } from "../schemas/studio.schema";
+import { ShowStudioSchema, StudioSchema } from "../schemas/studio.schema";
 import {
-  createMovieStudioHandler,
+  createShowStudioHandler,
   createStudioHandler,
   getStudioByIdHandler,
   getStudioHandler,
@@ -17,10 +17,10 @@ Router.route("/")
 
 Router.route("/:id").get(getStudioByIdHandler);
 
-Router.route("/movie").post(
+Router.route("/show").post(
   ApiCheck,
-  Validate(MovieStudioSchema),
-  createMovieStudioHandler
+  Validate(ShowStudioSchema),
+  createShowStudioHandler
 );
 
 export default Router;

@@ -1,9 +1,9 @@
 import express from "express";
 import { ApiCheck } from "../middleware/api.middleware";
 import { Validate } from "../middleware/validate.middleware";
-import { MovieWriterSchema, WriterSchema } from "../schemas/writer.schema";
+import { ShowWriterSchema, WriterSchema } from "../schemas/writer.schema";
 import {
-  createMovieWriterHandler,
+  createShowWriterHandler,
   createWriterHandler,
   getWriterByIdHandler,
   getWriterHandler,
@@ -17,10 +17,10 @@ Router.route("/")
 
 Router.route("/:id").get(getWriterByIdHandler);
 
-Router.route("/movie").post(
+Router.route("/show").post(
   ApiCheck,
-  Validate(MovieWriterSchema),
-  createMovieWriterHandler
+  Validate(ShowWriterSchema),
+  createShowWriterHandler
 );
 
 export default Router;

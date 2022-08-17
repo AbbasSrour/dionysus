@@ -10,10 +10,10 @@ export const WriterSchema = object({
 });
 export type WriterInput = TypeOf<typeof WriterSchema>["body"];
 
-export const MovieWriterSchema = object({
+export const ShowWriterSchema = object({
   body: object({
-    movieId: number(),
+    showId: number(),
     writerId: number(),
   }),
 });
-export type MovieWriterInput = TypeOf<typeof MovieWriterSchema>["body"];
+export type ShowWriterInput = TypeOf<typeof ShowWriterSchema>["body"];

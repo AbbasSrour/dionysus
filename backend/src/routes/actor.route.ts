@@ -1,10 +1,10 @@
 import express from "express";
 import { ApiCheck } from "../middleware/api.middleware";
 import { Validate } from "../middleware/validate.middleware";
-import { ActorSchema, MovieCastSchema } from "../schemas/actor.schema";
+import { ActorSchema, ShowCastSchema } from "../schemas/actor.schema";
 import {
   createActorHandler,
-  createMovieCastHandler,
+  createShowCastHandler,
   getActorByIdHandler,
   getActorHandler,
 } from "../controllers/actor.controller";
@@ -17,10 +17,10 @@ Router.route("/")
 
 Router.route("/:id").get(getActorByIdHandler);
 
-Router.route("/movie").post(
+Router.route("/show").post(
   ApiCheck,
-  Validate(MovieCastSchema),
-  createMovieCastHandler
+  Validate(ShowCastSchema),
+  createShowCastHandler
 );
 
 export default Router;

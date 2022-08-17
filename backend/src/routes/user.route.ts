@@ -1,10 +1,14 @@
 import express from "express";
-import { getMeHandler } from "../controllers/users.controller";
+import {
+  checkIfEmailAvailableHandler,
+  getMeHandler,
+} from "../controllers/users.controller";
 import { deserializeUser } from "../middleware/deserialize-user.middleware";
 import { requireUser } from "../middleware/require-user.middleware";
 
 const Router = express.Router();
 
-Router.get("/me", deserializeUser, requireUser, getMeHandler);
+Router.route("/me").get(deserializeUser, requireUser, getMeHandler);
 
+Router.route("/:email/available").get(checkIfEmailAvailableHandler);
 export default Router;

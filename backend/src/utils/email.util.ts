@@ -34,9 +34,17 @@ export class Email {
   }
 
   private newTransport() {
-    if (env.NODE_ENV === "production") console.log("Hello from email class");
+    // return nodemailer.createTransport({
+    //   host: smtp.host,
+    //   port: smtp.port,
+    //   secure: false,
+    //   auth: {
+    //     user: smtp.user,
+    //     pass: smtp.pass,
+    //   },
+    // });
     return nodemailer.createTransport({
-      ...smtp,
+      service: "Gmail",
       auth: {
         user: smtp.user,
         pass: smtp.pass,

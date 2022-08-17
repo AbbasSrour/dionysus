@@ -1,5 +1,6 @@
 import { AnyZodObject, ZodError } from "zod";
 import { NextFunction, Request, Response } from "express";
+import log from "../utils/logger.util";
 
 export const Validate =
   (schema: AnyZodObject) =>
@@ -14,6 +15,7 @@ export const Validate =
       });
       next();
     } catch (error: any) {
+      log.error(error);
       if (error instanceof ZodError) {
         return res.status(400).json({
           status: "fail",

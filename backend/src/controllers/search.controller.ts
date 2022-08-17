@@ -28,7 +28,7 @@ export const SearchHandler = async (
   // });
 
   try {
-    const scrape = await got.post(`http://localhost:4001/api/v1/search`, {
+    const scrape = await got.post(`http://localhost:4001/api/v1/scrape`, {
       json: {
         apikey: `${env.API_KEY}`,
         searchTerm: `${searchTerm}`,

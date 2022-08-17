@@ -1,13 +1,10 @@
 import express from "express";
 import { ApiCheck } from "../middleware/api.middleware";
 import { Validate } from "../middleware/validate.middleware";
-import {
-  DirectorSchema,
-  MovieDirectorSchema,
-} from "../schemas/director.schema";
+import { DirectorSchema, ShowDirectorSchema } from "../schemas/director.schema";
 import {
   createDirectorHandler,
-  createMovieDirectorHandler,
+  createShowDirectorHandler,
   getDirectorByIdHandler,
   getDirectorHandler,
 } from "../controllers/director.controller";
@@ -20,10 +17,10 @@ Router.route("/")
 
 Router.route("/:id").get(getDirectorByIdHandler);
 
-Router.route("/movie").post(
+Router.route("/show").post(
   ApiCheck,
-  Validate(MovieDirectorSchema),
-  createMovieDirectorHandler
+  Validate(ShowDirectorSchema),
+  createShowDirectorHandler
 );
 
 export default Router;

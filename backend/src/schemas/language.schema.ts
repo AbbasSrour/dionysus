@@ -10,10 +10,10 @@ export const LanguageSchema = object({
 
 export type LanguageInput = TypeOf<typeof LanguageSchema>["body"];
 
-export const MovieLanguageSchema = object({
+export const ShowLanguageSchema = object({
   body: object({
-    movieId: number(),
+    showId: number(),
     languageId: number(),
   }),
 });
-export type MovieLanguagesInput = TypeOf<typeof MovieLanguageSchema>["body"];
+export type ShowLanguagesInput = TypeOf<typeof ShowLanguageSchema>["body"];

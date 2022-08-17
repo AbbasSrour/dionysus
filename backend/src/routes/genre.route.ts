@@ -1,10 +1,10 @@
 import express from "express";
 import { ApiCheck } from "../middleware/api.middleware";
 import { Validate } from "../middleware/validate.middleware";
-import { GenreSchema, MovieGenreSchema } from "../schemas/genre.schema";
+import { GenreSchema, ShowGenreSchema } from "../schemas/genre.schema";
 import {
   createGenreHandler,
-  createMovieGenreHandler,
+  createShowGenreHandler,
   getGenreByIdHandler,
   getGenreHandler,
 } from "../controllers/genre.controller";
@@ -17,10 +17,10 @@ Router.route("/")
 
 Router.route("/:id").get(getGenreByIdHandler);
 
-Router.route("/movie").post(
+Router.route("/show").post(
   ApiCheck,
-  Validate(MovieGenreSchema),
-  createMovieGenreHandler
+  Validate(ShowGenreSchema),
+  createShowGenreHandler
 );
 
 export default Router;

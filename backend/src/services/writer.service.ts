@@ -1,5 +1,5 @@
-import { MovieWriterInput, WriterInput } from "../schemas/writer.schema";
-import { MovieWriter, Writer } from "../../prisma/client";
+import { ShowWriterInput, WriterInput } from "../schemas/writer.schema";
+import { ShowWriter, Writer } from "../../prisma/client";
 import client from "../utils/prisma.util";
 
 export const createWriterService = async (
@@ -27,9 +27,9 @@ export const getWriterByNameAndImageService = async (
   });
 };
 
-export const createMovieWriterService = async (
-  input: MovieWriterInput
-): Promise<MovieWriter> => {
-  const { movieId, writerId } = input;
-  return client.movieWriter.create({ data: input });
+export const createShowWriterService = async (
+  input: ShowWriterInput
+): Promise<ShowWriter> => {
+  const { showId, writerId } = input;
+  return client.showWriter.create({ data: input });
 };

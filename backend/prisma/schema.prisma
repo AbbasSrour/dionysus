@@ -14,10 +14,7 @@ model Show {
   showId      Int      @id @default(autoincrement()) @map("show_id")
   name        String   @db.VarChar(100)
   releaseYear Int
-  poster      String?  @db.VarChar(480)
-  cover       String?  @db.VarChar(480)
   summary     String?  @db.VarChar(480)
-  trailer     String?  @db.VarChar(480)
   pgRating    String?  @map("pg_rating") @db.VarChar(50)
   budget      Int?
   revenue     Int?
@@ -26,7 +23,10 @@ model Show {
 
   Imdb         Imdb?
   Movie        Movie?
-  Episode      Episode?
+  Episode      Episode[]
+  Poster       Poster[]
+  Cover        Cover[]
+  Trailer      Trailer[]
   ShowCast     ShowCast[]
   ShowDirector ShowDirector[]
   ShowGenre    ShowGenre[]
@@ -68,7 +68,7 @@ model Movie {
 model Episode {
   episodeId   Int      @id @default(autoincrement()) @map("episode_id")
   show        Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
-  showId      Int      @unique @map("show_id")
+  showId      Int      @map("show_id")
   season      Int      @map("season")
   number      Int
   name        String?  @db.VarChar(100)
@@ -82,7 +82,7 @@ model Episode {
   SeriesServer  SeriesServer[]
   SeriesHistory SeriesHistory[]
 
-  @@unique([number, season])
+  @@unique([number, season, showId])
   @@map("episode")
 }
 
@@ -173,14 +173,50 @@ model Writer {
   @@map("writer")
 }
 
+model Poster {
+  posterId  Int      @id @default(autoincrement()) @map("poster_id")
+  show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId    Int      @map("show_id")
+  url       String   @unique @db.VarChar(480)
+  default   Boolean @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("poster")
+}
+
+model Cover {
+  coverId   Int      @id @default(autoincrement()) @map("cover_id")
+  show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId    Int      @map("show_id")
+  url       String   @unique @db.VarChar(480)
+  default   Boolean @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("cover")
+}
+
+model Trailer {
+  trailerId Int      @id @default(autoincrement()) @map("tailer_id")
+  show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId    Int      @map("show_id")
+  url       String   @unique @db.VarChar(480)
+  default   Boolean @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("trailer")
+}
+
 model User {
   userId           Int      @id @default(autoincrement()) @map("user_id")
   email            String   @unique @db.VarChar(480)
   password         String   @db.VarChar(400)
-  userName         String   @unique
-  name             String?  @db.VarChar(100)
-  age              Int?
-  image            String?  @default("default.png") @db.VarChar(480)
+  userName         String
+  // name             String?  @db.VarChar(100)
+  // age              Int?
+  // image            String?  @default("default.png") @db.VarChar(480)
   verified         Boolean  @default(false)
   verificationCode String?  @map("verification_code") @db.VarChar(100)
   createdAt        DateTime @default(now()) @map("created_at")
@@ -213,6 +249,7 @@ model SeriesServer {
   episodeId Int      @map("episode_id")
   server    Server   @relation(fields: [serverId], references: [serverId], onDelete: Cascade, onUpdate: Cascade)
   serverId  Int      @map("server_id")
+  url       String   @db.VarChar(480)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

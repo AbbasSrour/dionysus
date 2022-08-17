@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { MovieWriterInput, WriterInput } from "../schemas/writer.schema";
+import { ShowWriterInput, WriterInput } from "../schemas/writer.schema";
 import {
-  createMovieWriterService,
+  createShowWriterService,
   createWriterService,
   getWriterByIdService,
   getWriterByNameAndImageService,
@@ -70,22 +70,22 @@ export const getWriterByIdHandler = async (
   }
 };
 
-export const createMovieWriterHandler = async (
-  req: Request<{}, {}, MovieWriterInput>,
+export const createShowWriterHandler = async (
+  req: Request<{}, {}, ShowWriterInput>,
   res: Response,
   next: NextFunction
 ) => {
-  const { writerId, movieId } = req.body;
+  const { writerId, showId } = req.body;
   try {
-    const movieWriter = createMovieWriterService({ movieId, writerId });
+    const showWriter = createShowWriterService({ showId, writerId });
     res
       .status(201)
-      .json({ status: "Success movie writer created", data: { movieWriter } });
+      .json({ status: "Success show writer created", data: { showWriter } });
   } catch (error: any) {
     if (error.code === "P2002")
       return res.status(409).json({
         status: "fail",
-        message: `Relation between writer ${writerId} and movie ${movieId} already exists in the database`,
+        message: `Relation between writer ${writerId} and show ${showId} already exists in the database`,
       });
     else next(error);
   }

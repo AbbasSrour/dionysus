@@ -9,13 +9,13 @@ export const ActorSchema = object({
 
 export type ActorInput = TypeOf<typeof ActorSchema>["body"];
 
-export const MovieCastSchema = object({
+export const ShowCastSchema = object({
   body: object({
-    movieId: number(),
+    showId: number(),
     actorId: number(),
     role: string({ required_error: "Role is required" })
       .min(2, "Role name is too short")
-      .max(30, "Role is too long"),
+      .max(50, "Role is too long"),
   }),
 });
-export type MovieCastInput = TypeOf<typeof MovieCastSchema>["body"];
+export type ShowCastInput = TypeOf<typeof ShowCastSchema>["body"];
