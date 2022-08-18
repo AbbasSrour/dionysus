@@ -1,14 +1,15 @@
-type MovieSchema = {
-  title: string;
-  overview: string;
-  poster: string;
-  trailer: string;
-  link: string;
-  length: string;
-  releaseYear: number;
-  pgRating: string;
-  genre: string;
-  cover: string;
-};
+import { BaseSchema } from "./base.schema";
 
-export default MovieSchema;
+export interface GetMovieInterface {
+  showId?: number;
+  movieId?: number;
+}
+
+export interface MovieInput {
+  length: number;
+  showId: number;
+}
+
+export interface MovieSchema extends MovieInput, BaseSchema {
+  movieId: number;
+}

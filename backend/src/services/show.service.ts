@@ -19,6 +19,13 @@ export const getShowByNameReleaseYearService = async (
   });
 };
 
+export const getShowByImdbIdShow = async (imdbId: string) => {
+  const show = await client.imdb.findUniqueOrThrow({ where: { imdbId } });
+  return client.show.findUniqueOrThrow({
+    where: { showId: show.showId },
+  });
+};
+
 export const searchShowByNameService = async (
   name: string
 ): Promise<Array<Show> | null> => {
@@ -29,4 +36,8 @@ export const searchShowByNameService = async (
       },
     },
   });
+};
+
+export const getPopularShowService = async (type: string): Promise<Show> => {
+  return client.show.findFirstOrThrow();
 };

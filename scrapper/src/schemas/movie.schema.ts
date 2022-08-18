@@ -1,22 +1,15 @@
-import { number, object, string, TypeOf } from "zod";
+import { BaseSchema } from "./base.schema";
 
-export const MovieSchema = object({
-  body: object({
-    name: string({
-      required_error: "Movie name is required",
-    }),
-    releaseYear: number({
-      required_error: "The year the movie was released in is required",
-    }),
-    imdbId: string(),
-    poster: string(),
-    movieLength: number(),
-    cover: string(),
-    summary: string(),
-    pgRating: string(),
-    budget: number(),
-    revenue: number(),
-    trailer: string(),
-  }),
-});
-export type MovieInput = TypeOf<typeof MovieSchema>["body"];
+export interface GetMovieInterface {
+  showId?: number;
+  movieId?: number;
+}
+
+export interface MovieInput {
+  length: number;
+  showId: number;
+}
+
+export interface MovieSchema extends MovieInput, BaseSchema {
+  movieId: number;
+}

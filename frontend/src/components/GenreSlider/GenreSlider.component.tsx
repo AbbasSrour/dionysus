@@ -16,7 +16,7 @@ const GenreSlider: React.FC<Props> = ({ genres }) => {
     null
   ); // direction of movement of animation
   const [lowestVisibleIndex, setLowestVisibleIndex] = useState(0); // lowest visible index of slider content
-  const [itemsInRow, setItemsInRow] = useState(7); // number of items in the slider content changed dynamically on window size
+  const [itemsInRow, setItemsInRow] = useState(5); // number of items in the slider content changed dynamically on window size
   const [slider, setSlider] = useState(true);
 
   let totalItems = genres.length;

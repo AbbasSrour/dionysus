@@ -9,7 +9,7 @@
     height: 50vh;
 
     background-size: cover;
-    background-position: start;
+    background-position: top;
     background-repeat: no-repeat;
 
     &::before {
@@ -67,18 +67,41 @@
         padding-left: 0;
       }
 
-      & > * {
+      .title {
+        font-size: 4rem;
         margin-bottom: 2rem;
       }
 
-      .title {
-        font-size: 4rem;
-        line-height: 1;
-      }
-
       .genre-slider {
+        margin: 0;
         width: 70%;
         height: 5rem;
+      }
+
+      .overview {
+        font-size: 1.3rem;
+        margin-top: -0.3rem;
+        margin-bottom: 2rem;
+
+      }
+
+      .btns {
+        display: flex;
+        width: fit-content;
+
+        & > * {
+          margin-right: 2rem;
+          height: 4rem;
+          width: 12rem;
+
+          .icon {
+            line-height: 4.6rem;
+          }
+
+          & > * {
+            line-height: 4rem;
+          }
+        }
       }
     }
   }

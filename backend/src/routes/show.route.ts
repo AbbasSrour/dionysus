@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createShowHandler,
+  getPopularShowHandler,
   getShowByIdHandler,
   getShowHandler,
 } from "../controllers/show.controller";
@@ -13,6 +14,8 @@ const Router = express.Router();
 Router.route("/")
   .get(getShowHandler)
   .post(ApiCheck, Validate(ShowSchema), createShowHandler);
+
+Router.route("/popular/:type").get(getPopularShowHandler);
 
 Router.route("/:id").get(getShowByIdHandler);
 

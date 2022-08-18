@@ -99,10 +99,11 @@ app.get("/health", async (req: Request, res: Response) => {
 // Documentation
 app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs, swaggerOpts));
 
+app.use("/api/v1/shows", ShowRoute);
+
 app.use("/api/v1/auth", AuthRoute);
 app.use("/api/v1/users", UserRoute);
 app.use("/api/v1/search", SearchRoute);
-app.use("/api/v1/shows", ShowRoute);
 app.use("/api/v1/actors", ActorRoute);
 app.use("/api/v1/directors", DirectorRoute);
 app.use("/api/v1/genres", GenreRoute);

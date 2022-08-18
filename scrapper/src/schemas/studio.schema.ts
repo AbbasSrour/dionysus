@@ -1,22 +1,24 @@
-import { number, object, string, TypeOf } from "zod";
+import { BaseSchema } from "./base.schema";
 
-export const StudioSchema = object({
-  body: object({
-    name: string({
-      required_error: "The name of the production company is required",
-    })
-      .min(3, "The name is too short")
-      .max(40, "The name is too long"),
-    image: string(),
-  }),
-});
+export interface GetStudioInterface {
+  name?: string;
+  id?: number;
+}
 
-export type StudioInput = TypeOf<typeof StudioSchema>["body"];
+export interface StudioInput {
+  name: string;
+  image: string;
+}
 
-export const MovieStudioSchema = object({
-  body: object({
-    movieId: number(),
-    studioId: number(),
-  }),
-});
-export type MovieStudioInput = TypeOf<typeof MovieStudioSchema>["body"];
+export interface StudioSchema extends StudioInput, BaseSchema {
+  studioId: number;
+}
+
+export interface ShowStudioInput {
+  studioId: number;
+  showId: number;
+
+}
+
+export interface ShowStudioSchema extends BaseSchema, ShowStudioInput {
+}

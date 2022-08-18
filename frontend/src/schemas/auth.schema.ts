@@ -1,11 +1,42 @@
 import * as yup from "yup";
+import ky from "ky";
+
+//TODO optimize regex
 
 const passwordRegex =
   /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}/;
+const usernameRegex = /^(?=[a-zA-Z._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/;
 
 export const RegisterSchema = yup.object().shape({
-  email: yup.string().email("Please enter a valid email").required("Required"),
-  userName: yup.string().min(3).required("Required"),
+  email: yup
+    .string()
+    .email("Please enter a valid email")
+    .required("Required")
+    .test(
+      "Unique Email",
+      "Email already in use", // <- key, message
+      (value) => {
+        return new Promise((resolve, reject) => {
+          ky.get(`http://localhost:4000/api/v1/users/${value}/available`)
+            .then((res) => {
+              resolve(true);
+            })
+            .catch(async (error) => {
+              if (
+                (await error.response.json()).data.message ===
+                "email is not available"
+              ) {
+                resolve(false);
+              }
+            });
+        });
+      }
+    ),
+  userName: yup
+    .string()
+    .min(4)
+    .required("Required")
+    .matches(usernameRegex, "No special characters or numbers allowed"),
   password: yup
     .string()
     .min(8)

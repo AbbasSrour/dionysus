@@ -1,8 +1,15 @@
-import { DirectorInput, MovieDirectorInput } from "../schemas/director.schema";
+import {
+  DirectorInput,
+  DirectorSchema,
+  getDirectorInterface,
+  ShowDirectorInput,
+} from "../schemas/director.schema";
 import got from "got";
 import { env } from "../utils/validate-env.util";
 
-export const createDirectorService = async (input: DirectorInput) => {
+export const createDirectorService = async (
+  input: DirectorInput
+): Promise<DirectorSchema> => {
   const response = await got.post(`${env.DB_WRAPPER}/api/v1/directors`, {
     json: {
       apikey: env.API_KEY,
@@ -12,13 +19,9 @@ export const createDirectorService = async (input: DirectorInput) => {
   return await JSON.parse(response.body).data.director;
 };
 
-interface getDirectorInterface {
-  name?: string;
-  image?: string;
-  id?: number;
-}
-
-export const getDirectorService = async (data: getDirectorInterface) => {
+export const getDirectorService = async (
+  data: getDirectorInterface
+): Promise<DirectorSchema> => {
   const { name, image, id } = data;
   let response;
   if (id)
@@ -34,17 +37,19 @@ export const getDirectorService = async (data: getDirectorInterface) => {
         image,
       },
     });
-  else return Error;
+  else throw Error;
   return await JSON.parse(response.body).data.director;
 };
 
-export const createMovieDirector = async (input: MovieDirectorInput) => {
-  const response = await got.post(`${env.DB_WRAPPER}/api/v1/directors/movie`, {
+export const createMovieDirector = async (
+  input: ShowDirectorInput
+): Promise<DirectorSchema> => {
+  const response = await got.post(`${env.DB_WRAPPER}/api/v1/directors/show`, {
     json: {
       apikey: env.API_KEY,
-      movieId: input.movieId,
+      showId: input.showId,
       directorId: input.directorId,
     },
   });
-  return JSON.parse(response.body).data.director;
+  return await JSON.parse(response.body).data.director;
 };

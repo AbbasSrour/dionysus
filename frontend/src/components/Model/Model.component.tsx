@@ -5,6 +5,7 @@ import GenreSlider from "../GenreSlider/GenreSlider.component";
 import SeriesSchema from "../../schemas/SeriesSchema.schema";
 import Slider from "../Slider/Slider.component";
 import { dummyActors, dummyGenres, dummyShows } from "../../assets/duumyData";
+import { Button, OutlinedButton } from "../Button/Button.component";
 
 interface Props {
   movie?: MovieSchema;
@@ -32,7 +33,12 @@ const Model: React.FC<Props> = ({ movie, series }) => {
           <h1 className="title">{show?.title}</h1>
           <GenreSlider genres={dummyGenres.slice(0, 4)} />
           <p className="overview">{movie?.overview}</p>
-          <Slider type={"actor-card"} data={dummyActors} padding={"0"} />
+          <div className={"btns"}>
+            <Button clean={false} circular={true}>
+              Play
+            </Button>
+            <OutlinedButton>Trailer</OutlinedButton>
+          </div>
         </div>
       </div>
     </div>

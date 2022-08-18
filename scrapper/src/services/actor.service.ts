@@ -1,24 +1,28 @@
-import { ActorInput, MovieCastInput } from "../schemas/actor.schema";
+import {
+  ActorInput,
+  ActorSchema,
+  getActorInterface,
+  ShowCastInput,
+  ShowCastSchema,
+} from "../schemas/actor.schema";
 import { env } from "../utils/validate-env.util";
 import got from "got";
 
-export const createActorService = async (input: ActorInput) => {
+export const createActorService = async (
+  input: ActorInput
+): Promise<ActorSchema> => {
   const response = await got.post(`${env.DB_WRAPPER}/api/v1/actors`, {
     json: {
       apikey: env.API_KEY,
       ...input,
     },
   });
-  return JSON.parse(response.body).data.actor;
+  return await JSON.parse(response.body).data.actor;
 };
 
-interface getActorInterface {
-  name?: string;
-  image?: string;
-  id?: number;
-}
-
-export const getActorService = async (data: getActorInterface) => {
+export const getActorService = async (
+  data: getActorInterface
+): Promise<ActorSchema> => {
   const { id, image, name } = data;
   let response;
   if (id)
@@ -29,15 +33,18 @@ export const getActorService = async (data: getActorInterface) => {
     response = await got.get(`${env.DB_WRAPPER}/api/v1/actors`, {
       searchParams: { name, image },
     });
+  // todo customize error
   else throw Error;
   return await JSON.parse(response.body).data.actor;
 };
 
-export const createMovieCastService = async (input: MovieCastInput) => {
-  const response = await got.post(`${env.DB_WRAPPER}/api/v1/actors/movie`, {
+export const createShowCastService = async (
+  input: ShowCastInput
+): Promise<ShowCastSchema> => {
+  const response = await got.post(`${env.DB_WRAPPER}/api/v1/actors/show`, {
     json: {
       apikey: env.API_KEY,
-      movieId: input.movieId,
+      showId: input.showId,
       actorId: input.actorId,
       role: input.role,
     },

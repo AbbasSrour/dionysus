@@ -3,6 +3,7 @@ import StarWarsImage from "./images/viewers-starwars.png";
 import MarvelImage from "./images/viewers-marvel.png";
 import DisneyImage from "./images/viewers-disney.png";
 import PixarImage from "./images/viewers-pixar.png";
+import { ActorSchema } from "../schemas/actor.schema";
 
 const show1 = {
   title: "No Time To Die",
@@ -166,4 +167,70 @@ export const dummyShows = [
   show8,
   show9,
   show10,
+];
+
+export const dummyActors: Array<ActorSchema> = [
+  {
+    name: dummyShows[0].title,
+    role: dummyShows[0].releaseYear.toString(),
+    image: dummyShows[0].poster,
+  },
+  {
+    name: dummyShows[1].title,
+    role: dummyShows[1].releaseYear.toString(),
+    image: dummyShows[1].poster,
+  },
+  {
+    name: dummyShows[2].title,
+    role: dummyShows[2].releaseYear.toString(),
+    image: dummyShows[2].poster,
+  },
+  {
+    name: dummyShows[3].title,
+    role: dummyShows[3].releaseYear.toString(),
+    image: dummyShows[3].poster,
+  },
+  {
+    name: dummyShows[4].title,
+    role: dummyShows[4].releaseYear.toString(),
+    image: dummyShows[4].poster,
+  },
+  {
+    name: dummyShows[5].title,
+    role: dummyShows[5].releaseYear.toString(),
+    image: dummyShows[5].poster,
+  },
+  {
+    name: dummyShows[6].title,
+    role: dummyShows[6].releaseYear.toString(),
+    image: dummyShows[6].poster,
+  },
+];
+
+export const dummyActorsFunc = () => {
+  const arr = new Array<ActorSchema>();
+  for (let i = 0; i < 20; i++) {
+    arr.push({
+      name: dummyShows[6].title,
+      role: dummyShows[6].releaseYear.toString(),
+      image: dummyShows[6].poster,
+    });
+  }
+  return arr;
+};
+
+export const dummyActors2 = dummyActorsFunc();
+
+export const dummyGenres = [
+  "action",
+  "comedy",
+  "thriller",
+  "horror",
+  "adventure",
+  "sitcom",
+  "helloworld",
+  "movie",
+  "series",
+  "bullshit",
+  "trailer",
 ];

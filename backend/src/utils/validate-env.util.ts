@@ -1,4 +1,4 @@
-import { cleanEnv, port, str, num } from "envalid";
+import { cleanEnv, num, port, str } from "envalid";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -28,6 +28,8 @@ export const env = cleanEnv(process.env, {
   PSQL_DB_USER_NAME: str(),
   PSQL_DB_PASSWORD: str(),
   PSQL_DB_PORT: port(),
+  API_KEY_TD: str(),
+  TD_ADDRESS: str(),
 });
 
 const ValidateEnv = () => {

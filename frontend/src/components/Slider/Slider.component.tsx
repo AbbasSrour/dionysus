@@ -13,9 +13,10 @@ interface Props {
   data: Array<MovieSchema | ActorSchema>;
   type: string;
   padding: string;
+  name?: string;
 }
 
-export const Slider: React.FC<Props> = ({ data, type, padding }) => {
+export const Slider: React.FC<Props> = ({ data, type, padding, name }) => {
   let totalItems = data.length;
 
   const [sliderHasMoved, setSliderHasMoved] = useState(false); // boolean to display prev arrow
@@ -55,7 +56,6 @@ export const Slider: React.FC<Props> = ({ data, type, padding }) => {
   useEffect(() => {
     handleWindowResize();
     window.addEventListener("resize", handleWindowResize);
-    console.log(itemsInRow);
 
     return () => {
       window.removeEventListener("resize", handleWindowResize);
@@ -97,7 +97,6 @@ export const Slider: React.FC<Props> = ({ data, type, padding }) => {
 
     // combine indexes
     const indexToDisplay = [...left, ...mid, ...right];
-    console.log({ indexToDisplay });
 
     // add on leading and trailing indexes for peek image when sliding
     if (sliderHasMoved && slider) {
@@ -257,20 +256,28 @@ export const Slider: React.FC<Props> = ({ data, type, padding }) => {
   }
 
   return (
-    <div className="show-list">
+    <div className="slider">
+      {name ? (
+        <span className={"slider__name"} style={{ marginLeft: `4.5%` }}>
+          {name}
+        </span>
+      ) : null}
       {sliderHasMoved && slider && (
-        <div className="show-list__arrow left">
+        <div className="slider__arrow left">
           <ArrowBackIosOutlined onClick={() => handlePrev()} />
         </div>
       )}
       <div
-        className="show-list__content"
-        style={{ ...style, padding: `${padding}` }}
+        className="slider__content"
+        style={{
+          ...style,
+          marginLeft: `${padding}`,
+        }}
       >
         {renderSliderContent()}
       </div>
       {slider && (
-        <div className="show-list__arrow right">
+        <div className="slider__arrow right">
           <ArrowForwardIosOutlined onClick={() => handleNext()} />
         </div>
       )}

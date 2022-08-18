@@ -1,24 +1,27 @@
-import { MovieStudioInput, StudioInput } from "../schemas/studio.schema";
+import {
+  GetStudioInterface,
+  ShowStudioInput,
+  StudioInput,
+  StudioSchema,
+} from "../schemas/studio.schema";
 import got from "got";
 import { env } from "../utils/validate-env.util";
 
-export const createStudioService = async (input: StudioInput) => {
+export const createStudioService = async (
+  input: StudioInput
+): Promise<StudioSchema> => {
   const response = await got.post(`${env.DB_WRAPPER}/api/v1/studios`, {
     json: {
       apikey: env.API_KEY,
       ...input,
     },
   });
-  // @ts-ignore
   return await JSON.parse(response.body).data.studio;
 };
 
-interface GetSudioInterface {
-  name?: string;
-  id?: number;
-}
-
-export const getSudioService = async (data: GetSudioInterface) => {
+export const getStudioService = async (
+  data: GetStudioInterface
+): Promise<StudioSchema> => {
   const { id, name } = data;
   let response;
   if (id)
@@ -33,11 +36,13 @@ export const getSudioService = async (data: GetSudioInterface) => {
   return await JSON.parse(response.body).data.studio;
 };
 
-export const createMovieStudioService = async (input: MovieStudioInput) => {
-  const response = await got.post(`${env.DB_WRAPPER}/api/v1/studios/movie`, {
+export const createMovieStudioService = async (
+  input: ShowStudioInput
+): Promise<StudioSchema> => {
+  const response = await got.post(`${env.DB_WRAPPER}/api/v1/studios/show`, {
     json: {
       apikey: env.API_KEY,
-      movieId: input.movieId,
+      showId: input.showId,
       studioId: input.studioId,
     },
   });

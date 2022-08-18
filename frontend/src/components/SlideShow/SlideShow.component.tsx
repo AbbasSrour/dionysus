@@ -2,7 +2,7 @@ import React from "react";
 import "./SlideShow.scss";
 import MovieSchema from "../../schemas/movie.schema";
 import { motion } from "framer-motion";
-import { dummyShows } from "../../assets/shows";
+import { dummyShows } from "../../assets/duumyData";
 
 interface Props {
   shows: Array<MovieSchema>;

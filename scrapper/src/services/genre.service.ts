@@ -1,8 +1,14 @@
-import { GenreInput, MovieGenreInput } from "../schemas/genre.schema";
+import {
+  GenreInput,
+  GenreSchema,
+  ShowGenreInput,
+} from "../schemas/genre.schema";
 import got from "got";
 import { env } from "../utils/validate-env.util";
 
-export const createGenreService = async (input: GenreInput) => {
+export const createGenreService = async (
+  input: GenreInput
+): Promise<GenreSchema> => {
   const response = await got.post(`${env.DB_WRAPPER}/api/v1/genres`, {
     json: {
       apikey: env.API_KEY,
@@ -17,7 +23,9 @@ interface GenreServiceInterface {
   name?: string;
 }
 
-export const getGenreService = async (data: GenreServiceInterface) => {
+export const getGenreService = async (
+  data: GenreServiceInterface
+): Promise<GenreSchema> => {
   const { id, name } = data;
   let response;
   if (id)
@@ -32,11 +40,11 @@ export const getGenreService = async (data: GenreServiceInterface) => {
   return await JSON.parse(response.body).data.genre;
 };
 
-export const createMovieGenreService = async (input: MovieGenreInput) => {
-  const response = await got.post(`${env.DB_WRAPPER}/api/v1/genres/movie`, {
+export const createMovieGenreService = async (input: ShowGenreInput) => {
+  const response = await got.post(`${env.DB_WRAPPER}/api/v1/genres/show`, {
     json: {
       apikey: env.API_KEY,
-      movieId: input.movieId,
+      showId: input.showId,
       genreId: input.genreId,
     },
   });

@@ -17,9 +17,8 @@ import morganMiddleware from "./middleware/morgan.middleware";
 // Documentation
 // import swaggerUI from "swagger-ui-express";
 // import swaggerDocs from "./docs/swagger.doc";
-
 // Routes
-import SearchRoute from "./routes/search.route";
+import ScrapeRoute from "./routes/scrape.route";
 
 //------------------------------------------ Setup --------------------------------------------------------//
 // Environment
@@ -72,7 +71,7 @@ app.get("/health", async (req: Request, res: Response) => {
 // app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs, swaggerOpts));
 
 // Search Route
-app.use("/api/v1/search", SearchRoute);
+app.use("/api/v1/scrape", ScrapeRoute);
 
 // UNHANDLED ROUTE
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

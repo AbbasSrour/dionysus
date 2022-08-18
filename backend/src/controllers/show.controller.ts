@@ -3,6 +3,7 @@ import { ShowInput } from "../schemas/show.schema";
 import { Prisma, Show } from "../../prisma/client";
 import {
   createShowService,
+  getPopularShowService,
   getShowByIdService,
   getShowByNameReleaseYearService,
 } from "../services/show.service";
@@ -80,6 +81,37 @@ export const getShowByIdHandler = async (
       res
         .status(404)
         .json({ status: "fail", message: "Requested show not found" });
+    next(error);
+  }
+};
+
+export const getPopularShowHandler = async (
+  req: Request<{ type: string }, {}, {}, {}>,
+  res: Response,
+  next: NextFunction
+) => {
+  let { type } = req.params;
+  try {
+    if (!type || (type !== "movie" && type !== "tv")) type = "movie";
+    const show = await getPopularShowService(type);
+    console.log(show);
+    console.log(type);
+    // const show = getShowByImdbId(imdbId)
+    //   .catch(async (error) => {
+    //     const scrape = await got.post(`http://localhost:4001/api/v1/scrape`, {
+    //       json: {
+    //         apikey: `${env.API_KEY}`,
+    //         imdbId,
+    //       },
+    //     });
+    //     return await JSON.parse(scrape.body);
+    //   })
+    //   .then((show) => getShowByIdService(show.showId))
+    //   .catch((error) => console.log(error));
+
+    res.status(200).json({ status: "success", data: { show } });
+  } catch (error) {
+    log.error(error);
     next(error);
   }
 };

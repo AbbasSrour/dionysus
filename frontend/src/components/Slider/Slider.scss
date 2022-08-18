@@ -1,12 +1,18 @@
-//TODO Change CSS classNames
-.show-list {
+.slider {
   position: relative;
-  margin-bottom: 40px;
-  //overflow-x: hidden;
+  overflow: visible;
+
+  &__name {
+    color: white;
+    font-size: 2rem;
+
+  }
 
   /* ======================================== Show Box ========================================= */
   &__content {
     white-space: nowrap;
+
+    margin-top: 1rem !important;
 
     // TODO: Move this to Show Box SCSS File
 
@@ -31,7 +37,7 @@
 
   /* ======================================== Arrows ========================================= */
   &__arrow {
-    display: none;
+    //display: none;
     align-items: center;
     justify-content: center;
     height: 100%;

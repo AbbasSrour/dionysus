@@ -31,6 +31,11 @@
   &__container {
     @include flex(center, center);
     position: relative;
+    margin-left: 10rem;
+
+    @include mobile {
+      margin-left: 0;
+    }
 
     &__info {
       width: 55%;
@@ -38,7 +43,7 @@
       position: relative;
       color: white;
 
-      @include tablet {
+      @include mobile {
         width: 100%;
       }
 
@@ -50,10 +55,6 @@
         font-size: 5rem;
         font-weight: 700;
         line-height: 1;
-
-        @include tablet {
-          font-size: 4rem;
-        }
       }
 
       .overview {
@@ -61,16 +62,13 @@
         font-size: 1.2rem;
       }
 
-      .btns > * ~ * {
-        margin-left: 1rem;
+      .btns {
+        display: flex;
+        width: fit-content;
       }
 
-      .btns,
-      .title,
-      .overview {
-        opacity: 0;
-        transform: translateY(-100px);
-        transition: transform 0.5s ease, opacity 0.5s ease;
+      .btns > * ~ * {
+        margin-left: 2rem;
       }
     }
 
@@ -80,44 +78,14 @@
       position: relative;
 
       img {
-        width: 20rem;
+        width: 25rem;
         border-radius: var(--border-radius-def);
         box-shadow: var(--sh-box-def);
-
-        transform: scale(0);
-        transition: transform 0.7s ease;
       }
 
-      @include tablet {
+      @include mobile {
         display: none;
       }
-    }
-  }
-
-  &__container > &__container__poster {
-    img {
-      transform: scale(1);
-    }
-  }
-
-  &__container > &__container__info {
-    .btns,
-    .title,
-    .overview {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .title {
-      transition-delay: 0.3s, 0.3s;
-    }
-
-    .overview {
-      transition-delay: 0.6s, 0.6s;
-    }
-
-    .btns {
-      transition-delay: 0.9s, 0.9s;
     }
   }
 }

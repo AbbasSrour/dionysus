@@ -30,10 +30,10 @@ const Form: React.FC = () => {
           },
         }
       );
-    } catch (error) {
-      console.log(error);
+      actions.resetForm();
+    } catch (error: any) {
+      console.log("helloworld:", error.response.statusCode);
     }
-    actions.resetForm();
   };
   const registerOnSubmitHandler = async (
     values: FormikValues,
@@ -45,16 +45,14 @@ const Form: React.FC = () => {
         {
           json: {
             email: values.email,
-            passowrd: values.password,
+            password: values.password,
             userName: values.userName,
             confirmPassword: values.confirmPassword,
           },
         }
       );
-    } catch (error) {
-      console.log(error);
-    }
-    actions.resetForm();
+      actions.resetForm();
+    } catch (error: any) {}
   };
 
   const loginFormik = useFormik({
@@ -62,6 +60,9 @@ const Form: React.FC = () => {
       email: "",
       password: "",
     },
+    enableReinitialize: true,
+    validateOnChange: true,
+    validateOnBlur: true,
     validationSchema: LoginSchema,
     onSubmit: loginOnSubmitHandler,
   });
@@ -72,6 +73,9 @@ const Form: React.FC = () => {
       password: "",
       confirmPassword: "",
     },
+    enableReinitialize: true,
+    validateOnChange: true,
+    validateOnBlur: true,
     validationSchema: RegisterSchema,
     onSubmit: registerOnSubmitHandler,
   });
@@ -82,6 +86,7 @@ const Form: React.FC = () => {
         <button
           style={!register ? { color: "white" } : { color: "grey" }}
           onClick={() => {
+            registerFormik.resetForm();
             setRegister(false);
           }}
         >
@@ -91,6 +96,7 @@ const Form: React.FC = () => {
         <button
           style={register ? { color: "white" } : { color: "grey" }}
           onClick={() => {
+            loginFormik.resetForm();
             setRegister(true);
           }}
         >
@@ -134,7 +140,7 @@ const Form: React.FC = () => {
                   : loginFormik.errors.password
               }
             />
-            <CheckBox boxId={"TermsAndConditions"} />
+            <a>Forget Password?</a>
           </>
         ) : (
           <>
@@ -208,7 +214,7 @@ const Form: React.FC = () => {
                   : registerFormik.errors.confirmPassword
               }
             />
-            <a>Forget Password?</a>
+            <CheckBox boxId={"TermsAndConditions"} />
           </>
         )}
         <button className="Form__button" type={"submit"}>

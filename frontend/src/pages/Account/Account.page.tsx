@@ -9,6 +9,7 @@ const AccountPage = () => {
   const [register, setRegister] = useState(false);
   return (
     <div className="AccountPage">
+      <h1>Dionysus</h1>
       <Form />
     </div>
   );
