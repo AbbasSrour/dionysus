@@ -24,9 +24,8 @@ model Show {
   Imdb         Imdb?
   Movie        Movie?
   Episode      Episode[]
-  Poster       Poster[]
-  Cover        Cover[]
-  Trailer      Trailer[]
+  Image        Image[]
+  Video        Video[]
   ShowCast     ShowCast[]
   ShowDirector ShowDirector[]
   ShowGenre    ShowGenre[]
@@ -173,40 +172,42 @@ model Writer {
   @@map("writer")
 }
 
-model Poster {
-  posterId  Int      @id @default(autoincrement()) @map("poster_id")
+// TODO Link langauges to the language entity
+model Video {
+  videoId Int      @id @default(autoincrement()) @map("video_id")
   show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
   showId    Int      @map("show_id")
+  name      String?
   url       String   @unique @db.VarChar(480)
-  default   Boolean @default(false)
+  site      String?   @db.VarChar(480)
+  quality   Int?
+  type      String?
+  official  Boolean?
+  language  String?
+  isDefault Boolean  @default(false) @map("default")
+  publishedAt DateTime
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@map("poster")
+  @@map("video")
 }
 
-model Cover {
-  coverId   Int      @id @default(autoincrement()) @map("cover_id")
+// TODO Link langauges to the language entity
+model Image {
+  imageId   Int      @id @default(autoincrement()) @map("image_id")
   show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
   showId    Int      @map("show_id")
   url       String   @unique @db.VarChar(480)
-  default   Boolean @default(false)
+  type      String?
+  height    Int?
+  width     Int?
+  aspectRatio Float? @map("aspect_ratio")
+  language  String?
+  isDefault Boolean  @default(false) @map("default")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@map("cover")
-}
-
-model Trailer {
-  trailerId Int      @id @default(autoincrement()) @map("tailer_id")
-  show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
-  showId    Int      @map("show_id")
-  url       String   @unique @db.VarChar(480)
-  default   Boolean @default(false)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("trailer")
+  @@map("image")
 }
 
 model User {
@@ -214,9 +215,6 @@ model User {
   email            String   @unique @db.VarChar(480)
   password         String   @db.VarChar(400)
   userName         String
-  // name             String?  @db.VarChar(100)
-  // age              Int?
-  // image            String?  @default("default.png") @db.VarChar(480)
   verified         Boolean  @default(false)
   verificationCode String?  @map("verification_code") @db.VarChar(100)
   createdAt        DateTime @default(now()) @map("created_at")

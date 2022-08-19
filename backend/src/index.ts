@@ -34,6 +34,8 @@ import LanguageRoute from "./routes/language.route";
 import StudioRoute from "./routes/studio.route";
 import ServerRoute from "./routes/server.route";
 import SearchRoute from "./routes/search.route";
+import TrailerRoute from "./routes/video.route";
+import ImageRoute from "./routes/image.route";
 
 //------------------------------------------ Setup ------------------------------------------------------//
 // Environment
@@ -113,6 +115,8 @@ app.use("/api/v1/studios", StudioRoute);
 app.use("/api/v1/servers", ServerRoute);
 app.use("/api/v1/writers", WriterRoute);
 app.use("/api/v1/movies", MovieRoute);
+app.use("/api/v1/videos", TrailerRoute);
+app.use("/api/v1/images", ImageRoute);
 
 // UNHANDLED ROUTE
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

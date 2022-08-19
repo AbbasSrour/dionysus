@@ -26,6 +26,11 @@ import { StudioSchema } from "../schemas/studio.schema";
 import { scrapeStudiosFromImdb } from "../scrape/studio.scrape";
 import { WriterSchema } from "../schemas/writer.schema";
 import { scrapeWritersFromImdb } from "../scrape/writer.scrape";
+import { scrapeImagesFromTmdb } from "../scrape/image.scrape";
+import { createImageService } from "../services/image.service";
+import { env } from "../utils/validate-env.util";
+import { scrapeVideosFromTmdb } from "../scrape/video.scrape";
+import { createVideoService } from "../services/video.service";
 
 // TODO: Needs a lot of rethinking for async error handling
 // TODO: Refactor some more because this is fucking blocking everything with one hundred awaits use promise.all
@@ -35,13 +40,11 @@ export const ScrapeHandler = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { searchTerm, imdbId } = req.body;
+  const { searchTerm } = req.body;
   let shows = new Array<object>();
   try {
     //////////////////////////////////////////Sync 1////////////////////////////////////////////////////
-    let showList = new Array<string>();
-    if (imdbId) showList.push(imdbId);
-    else showList = await SearchImdb(searchTerm);
+    const showList = await SearchImdb(searchTerm);
 
     for (let i = 0; i < showList.length; i++) {
       // Todo: Promise.all both to make it faster
@@ -127,6 +130,73 @@ export const ScrapeHandler = async (
         })
       );
 
+      const videos = scrapeVideosFromTmdb(showList[i])
+        .then((data) =>
+          data.results.forEach((video) => {
+            let path: string;
+            if (video.site === "YouTube")
+              path = "https://www.youtube.com/embed/";
+            else path = "https://www.themoviedb.org/video/play?key=";
+            createVideoService({
+              isDefault: false,
+              language: video.iso_639_1,
+              name: video.name,
+              official: video.official,
+              publishedAt: video.published_at,
+              quality: video.size,
+              showId: show.showId,
+              site: video.site,
+              type: video.type,
+              url: `${path}${video.key}`,
+            }).catch((error) => console.log(error));
+          })
+        )
+        .catch((error) => console.log(error));
+
+      const images = scrapeImagesFromTmdb(showList[i])
+        .then((data) => {
+          data.backdrops.forEach((image, index) =>
+            createImageService({
+              showId: show.showId,
+              url: `${env.TD_IMAGE_ADDRESS}/original/${image.file_path}`,
+              type: "backdrop",
+              height: image.height,
+              width: image.width,
+              aspectRatio: image.aspect_ratio,
+              language: image.iso_639_1,
+              isDefault: false,
+            }).catch((error) => log.error(error))
+          );
+
+          data.posters.forEach((image) =>
+            createImageService({
+              showId: show.showId,
+              url: `${env.TD_IMAGE_ADDRESS}/original/${image.file_path}`,
+              type: "poster",
+              height: image.height,
+              width: image.width,
+              aspectRatio: image.aspect_ratio,
+              language: image.iso_639_1,
+              isDefault: false,
+            }).catch((error) => log.error(error))
+          );
+
+          const vidoes = data.logos.forEach((image) =>
+            createImageService({
+              showId: show.showId,
+              url: `${env.TD_IMAGE_ADDRESS}/original/${image.file_path}`,
+              type: "logo",
+              height: image.height,
+              width: image.width,
+              aspectRatio: image.aspect_ratio,
+              language: image.iso_639_1,
+              isDefault: false,
+            }).catch((error) => log.error(error))
+          );
+          return data;
+        })
+        .catch((error) => console.error(error));
+
       const languages = new Array<LanguageSchema>();
       scrapeLanguagesFromImdb(imdbPage)
         .then((data) =>
@@ -140,10 +210,10 @@ export const ScrapeHandler = async (
                   showId: show.showId,
                 });
               })
-              .catch((error) => log.error(error))
+              .catch((error) => console.error(error))
           )
         )
-        .catch((err) => log.error(err));
+        .catch((error) => console.error(error));
 
       const actors = new Array<{
         name: string;
