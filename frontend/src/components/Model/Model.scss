@@ -68,8 +68,19 @@
       }
 
       .title {
-        font-size: 4rem;
+        display: flex;
+        align-content: center;
+        justify-content: left;
         margin-bottom: 2rem;
+
+        h2 {
+          font-size: 4rem;
+          font-weight: 700;
+        }
+
+        img {
+          width: 400px;
+        }
       }
 
       .genre-slider {

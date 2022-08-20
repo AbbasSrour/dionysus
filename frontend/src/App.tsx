@@ -17,7 +17,7 @@ function App() {
         <Routes>
           <Route path={"/"} element={<HomePage />} />
           <Route path={"/account"} element={<AccountPage />} />
-          <Route path={"/show"} element={<ShowPage />} />
+          <Route path={"/show/:type/:id"} element={<ShowPage />} />
           <Route path="/search" element={<SearchPage />} />
         </Routes>
       </Router>

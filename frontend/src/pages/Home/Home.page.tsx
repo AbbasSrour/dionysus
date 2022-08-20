@@ -8,6 +8,7 @@ import BoxSlider from "../../components/BoxSlider/BoxSlider.component";
 import {
   dummyActors,
   dummyActors2,
+  dummyShows,
   dummyShows as shows,
 } from "../../assets/duumyData";
 import Slider from "../../components/Slider/Slider.component";
@@ -16,6 +17,8 @@ import {
   Button,
   OutlinedButton,
 } from "../../components/Button/Button.component";
+import ShowCard from "../../components/ShowCard/ShowCard.component";
+import ShowBox from "../../components/ShowBox/ShowBox.component";
 
 const disney = {
   name: "disney",
@@ -24,15 +27,6 @@ const disney = {
 };
 
 const Home: React.FC = () => {
-  // useEffect(async () => {
-  //   const res = await fetch(
-  //     `https://api.themoviedb.org/3/movie/upcoming?api_key=${apiKey}`
-  //   );
-  //   const data = await res.json();
-  //
-  //   this.setState({ movies: data.results });
-  // });
-
   let sliced = [];
   for (let i = 0; i < 4; i++) {
     sliced.push(shows[i]);
@@ -47,6 +41,10 @@ const Home: React.FC = () => {
         padding={"4%"}
         name={"Suggested For you"}
       />
+      <div style={{ height: "70vh" }}>
+        <ShowCard />
+        {/*<ShowBox width={"500px"} show={dummyShows[0]} />*/}
+      </div>
       {/*TODO Move This to separate component*/}
       <div className={"home-page__studios"}>
         <StudioBox studio={disney} />

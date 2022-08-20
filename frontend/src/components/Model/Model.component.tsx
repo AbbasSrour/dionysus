@@ -1,28 +1,23 @@
 import React from "react";
-import MovieSchema from "../../schemas/movie.schema";
 import "./Model.scss";
 import GenreSlider from "../GenreSlider/GenreSlider.component";
-import SeriesSchema from "../../schemas/SeriesSchema.schema";
-import Slider from "../Slider/Slider.component";
-import { dummyActors, dummyGenres, dummyShows } from "../../assets/duumyData";
+import { dummyActors, dummyGenres } from "../../assets/duumyData";
 import { Button, OutlinedButton } from "../Button/Button.component";
+import { Show } from "../../schemas/show.schema";
 
 interface Props {
-  movie?: MovieSchema;
-  series?: SeriesSchema;
+  show: Show;
 }
 
-const Model: React.FC<Props> = ({ movie, series }) => {
-  let show;
-  if (movie) show = movie;
-  else if (series) show = series;
+const Model: React.FC<Props> = ({ show }) => {
+  const type = "movie";
   //TODO else do some shit
 
   return (
     <div className={"model"}>
       <div
         className={"model__banner"}
-        style={{ backgroundImage: `url(${show?.cover})` }}
+        style={{ backgroundImage: `url(${show?.backdrop})` }}
       />
       <div className={"model__content"}>
         <div
@@ -30,9 +25,11 @@ const Model: React.FC<Props> = ({ movie, series }) => {
           style={{ backgroundImage: `url(${show?.poster})` }}
         />
         <div className="model__content__info">
-          <h1 className="title">{show?.title}</h1>
+          <div className="title">
+            {show?.logo ? <img src={`${show?.logo}`} /> : <h2>{show?.name}</h2>}
+          </div>
           <GenreSlider genres={dummyGenres.slice(0, 4)} />
-          <p className="overview">{movie?.overview}</p>
+          <p className="overview">{show?.summary}</p>
           <div className={"btns"}>
             <Button clean={false} circular={true}>
               Play

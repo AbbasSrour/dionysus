@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import Button from "../Button/Button.component";
 import "./ShowCard.scss";
+import { dummyShows } from "../../assets/duumyData";
 
 type Props = {
   index: number;
@@ -23,17 +23,20 @@ const item = {
   genre: "Action",
 };
 
+const show = dummyShows[0];
 const ShowCard: React.FC = () => {
   const [isHovered, setHovered] = useState(false);
   return (
     <Link to={item.link}>
       <div
         className="show-card"
-        style={{ backgroundImage: `url(${item.poster})` }}
+        onMouseEnter={() => {
+          setTimeout(() => setHovered(true), 5000);
+        }}
+        onMouseLeave={() => setHovered(false)}
       >
-        <Button>
-          <i className="bx bx-play"></i>
-        </Button>
+        <img src={item.poster} />
+        {isHovered && <video src={show.trailer} autoPlay={true} loop />}
       </div>
     </Link>
   );

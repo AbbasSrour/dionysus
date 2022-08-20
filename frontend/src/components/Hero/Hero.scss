@@ -52,9 +52,19 @@
       }
 
       .title {
-        font-size: 5rem;
-        font-weight: 700;
-        line-height: 1;
+        display: flex;
+        align-content: center;
+        justify-content: center;
+
+        h2 {
+          font-size: 5rem;
+          font-weight: 700;
+          line-height: 1;
+        }
+
+        img {
+          width: 400px;
+        }
       }
 
       .overview {

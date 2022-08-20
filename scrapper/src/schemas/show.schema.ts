@@ -8,7 +8,7 @@ export interface ShowInput {
   name: string;
   releaseYear: number;
   summary: string;
-  pgRating: number;
+  pgRating: string;
   budget: number;
   revenue: number;
 }

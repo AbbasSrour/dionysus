@@ -8,7 +8,7 @@
   top: 0;
   left: 0;
   height: 5rem;
-  width: 99vw;
+  width: 100vw;
   z-index: 99;
   transition: height 0.3s ease, background-color 0.3s ease;
 
@@ -59,12 +59,6 @@
         align-content: center;
         justify-content: center;
 
-        @include mobile {
-          span {
-            display: none;
-          }
-        }
-
         .icon-wrapper {
           display: flex;
           align-content: center;
@@ -73,6 +67,17 @@
           .icon {
             margin-right: 0.5rem;
             fill: white;
+          }
+        }
+
+        @include mobile {
+          span {
+            display: none;
+          }
+          .icon-wrapper {
+            .icon {
+              margin-right: 0;
+            }
           }
         }
       }
@@ -127,7 +132,7 @@
     justify-content: center;
     border-radius: 50%;
     border: 0.2rem solid rgb(255, 255, 255, 0.5);
-    margin-right: 1rem;
+    margin-right: 1.5rem;
 
 
     img {

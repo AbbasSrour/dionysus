@@ -24,3 +24,9 @@ export const createShowGenreService = async (
   const { showId, genreId } = input;
   return client.showGenre.create({ data: input });
 };
+
+export const getShowGenresService = async (
+  showId: number
+): Promise<Array<ShowGenre>> => {
+  return client.showGenre.findMany({ where: { showId: showId } });
+};

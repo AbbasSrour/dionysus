@@ -2,23 +2,21 @@ import React, { useEffect, useState } from "react";
 import "./Hero.scss";
 import { Button, OutlinedButton } from "../Button/Button.component";
 import { Api } from "../../api/ApiConfig";
-import { ShowSchema } from "../../schemas/show.schema";
+import { Show } from "../../schemas/show.schema";
 
 const HeroHeader: React.FC = (props) => {
   const [mobile, setMobile] = useState(false);
-  const [show, setShow] = useState<ShowSchema>();
-
-  const item = {
-    background:
-      "https://nofilmschool.com/sites/default/files/styles/facebook/public/no-time-to-die-characters.jpeg?itok=XGwl7JpO",
-    poster: "https://pics.filmaffinity.com/no_time_to_die-525355918-large.jpg",
-  };
+  const [heroShow, setHeroShow] = useState<Show>();
 
   useEffect(() => {
-    const api = new Api();
-    const res = api.getShow("shows/popular/movie", {}).then((res) => {
-      setShow(res);
-    });
+    let myShow = new Show();
+    let item;
+    const res = myShow
+      .initPopular("movie")
+      .then((res) => myShow.addDefaultImage("all"))
+      .then((res) => setHeroShow(myShow));
+
+    console.log(heroShow);
   }, []);
 
   useEffect(() => {
@@ -36,13 +34,21 @@ const HeroHeader: React.FC = (props) => {
     <div
       className="hero-section"
       style={{
-        backgroundImage: `url(${mobile ? item.poster : item.background})`,
+        backgroundImage: `url(${
+          mobile ? heroShow?.poster : heroShow?.backdrop
+        })`,
       }}
     >
       <div className="hero-section__container">
         <div className="hero-section__container__info">
-          <h2 className="title">{show?.name}</h2>
-          <div className="overview">{show?.summary}</div>
+          <div className="title">
+            {heroShow?.logo ? (
+              <img src={`${heroShow?.logo}`} />
+            ) : (
+              <h2>{heroShow?.name}</h2>
+            )}
+          </div>
+          <div className="overview">{heroShow?.summary}</div>
           <div className="btns">
             <Button circular={true} clean={false}>
               Play
@@ -51,7 +57,7 @@ const HeroHeader: React.FC = (props) => {
           </div>
         </div>
         <div className="hero-section__container__poster">
-          <img src={item.poster} alt="" />
+          <img src={heroShow?.poster} alt="" />
         </div>
       </div>
     </div>
