@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "skipLibCheck": true,
+    "outDir": "./build",
+    "rootDir": "."
+  },
+  "exclude": [
+    "tests",
+    "./jest.config.ts",
+    "src/migrations"
+  ],
+  "include": [
+    "config",
+    "src/"
+  ],
+  "ts-node": {
+    "transpileOnly": true,
+    "files": true,
+    "compilerOptions": {
+      "rootDir": "."
+    },
+    "include": [
+      "src/",
+      "config/"
+    ],
+    "exclude": [
+      "node_modules",
+      "tests"
+    ]
+  }
+}

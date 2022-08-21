@@ -8,12 +8,11 @@ RUN apk add --no-cache curl \
 
 WORKDIR /usr/share/app
 
-COPY ["package.json",  "tsconfig.json","./"]
+COPY ["package.json", "prisma", "tsconfig.json","./"]
 
 RUN ["pnpm", "install"]
 
 COPY ["src", "tsconfig.json","./"]
-COPY ["./src","./src"]
 
 RUN ["pnpm","build"]
 
@@ -29,7 +28,7 @@ WORKDIR /usr/app
 
 COPY ["package.json", "./"]
 
-COPY ["stage.env", "./.env"]
+COPY [".env", "./.env"]
 
 #RUN ["pnpm", "install", "--only=production"]
 COPY --from=build /usr/share/app/node_modules ./node_modules
@@ -40,9 +39,4 @@ ENV NODE_ENV=staging
 
 EXPOSE 4000/tcp
 
-# Using pnpm to run server yiels: 3 processes, 5 with cross env
-#CMD ["pnpm", "stage"]
-# Running node without pnpm yields: 1 process
-#CMD ["node", "build/src/index.js"]
-# Entrypoint instead of cmd allows for easier overridding of the starting command
 ENTRYPOINT ["node", "build/src/index.js"]

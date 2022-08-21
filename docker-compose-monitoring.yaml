@@ -1,16 +1,45 @@
 version: "3.8"
 
 volumes:
-  Prometheus: {}
-  PrometheusData: {}
-  AlertManager: {}
-  Syslog: {}
-  Loki: {}
-  LokiData: {}
-  Promtail: {}
+  Prometheus: { }
+  PrometheusData: { }
+  AlertManager: { }
+  Syslog: { }
+  Loki: { }
+  LokiData: { }
+  Promtail: { }
+  GrafanaData: { }
+  GrafanaConfig: { }
+
+networks:
+  dio:
+    driver: bridge
 
 
 services:
+  ############################################## Visualization ###################################################
+  ### v9.0.2
+  grafana:
+    build:
+      context: ./server/monitoring/grafana
+      dockerfile: Dockerfile
+    container_name: grafana
+    volumes:
+      - GrafanaData:/var/lib/grafana
+      - GrafanaConfig:/etc/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: unless-stopped
+    expose:
+      - 3000
+    networks:
+      - dio
+    labels:
+      org.label-schema.group: "Visualization"
+
+
   ############################################ Monitoring #######################################################
   ### v2.36.2
   prometheus:

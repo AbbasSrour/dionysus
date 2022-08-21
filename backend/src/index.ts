@@ -1,14 +1,14 @@
 //------------------------------------------ Imports --------------------------------------------------------//
 // Environment
 import dotenv from "dotenv";
-import ValidateEnv, { env } from "./utils/validate-env.util";
+import ValidateEnv, {env} from "./utils/validate-env.util";
 
 // Rest
-import express, { Application, NextFunction, Request, Response } from "express";
+import express, {Application, NextFunction, Request, Response} from "express";
 import AppError from "./errors/app.error";
 
 // Utils
-import { ConnectRedis, RedisClient } from "./utils/redis.util";
+import {ConnectRedis, RedisClient} from "./utils/redis.util";
 import log from "./utils/logger.util";
 
 // Middleware
@@ -21,21 +21,9 @@ import swaggerUI from "swagger-ui-express";
 import swaggerDocs from "./docs/swagger.doc";
 
 // Routes
-import ShowRoute from "./routes/show.route";
 import UserRoute from "./routes/user.route";
 import AuthRoute from "./routes/auth.route";
-import MovieRoute from "./routes/movie.route";
-import ActorRoute from "./routes/actor.route";
-import ImdbRoute from "./routes/imdb.route";
-import DirectorRoute from "./routes/director.route";
-import WriterRoute from "./routes/writer.route";
-import GenreRoute from "./routes/genre.route";
-import LanguageRoute from "./routes/language.route";
-import StudioRoute from "./routes/studio.route";
-import ServerRoute from "./routes/server.route";
-import SearchRoute from "./routes/search.route";
-import TrailerRoute from "./routes/video.route";
-import ImageRoute from "./routes/image.route";
+import ShowDbServiceRoute from "./routes/show-db-service.route";
 
 //------------------------------------------ Setup ------------------------------------------------------//
 // Environment
@@ -56,6 +44,9 @@ ConnectRedis()
     log.error(error.messages);
     throw error;
   });
+
+// Rabbitmq
+// CreateChannel("check");
 
 //------------------------------------------ Middleware ------------------------------------------------//
 
@@ -95,28 +86,16 @@ app.get("/", (req: Request, res: Response) => {
 // Health Check Route
 app.get("/health", async (req: Request, res: Response) => {
   const redisMessage = await RedisClient.get("try");
-  res.status(200).json({ status: "success", redisMessage });
+  res.status(200).json({status: "success", redisMessage});
 });
 
 // Documentation
 app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs, swaggerOpts));
 
-app.use("/api/v1/shows", ShowRoute);
-
 app.use("/api/v1/auth", AuthRoute);
 app.use("/api/v1/users", UserRoute);
-app.use("/api/v1/search", SearchRoute);
-app.use("/api/v1/actors", ActorRoute);
-app.use("/api/v1/directors", DirectorRoute);
-app.use("/api/v1/genres", GenreRoute);
-app.use("/api/v1/imdb", ImdbRoute);
-app.use("/api/v1/languages", LanguageRoute);
-app.use("/api/v1/studios", StudioRoute);
-app.use("/api/v1/servers", ServerRoute);
-app.use("/api/v1/writers", WriterRoute);
-app.use("/api/v1/movies", MovieRoute);
-app.use("/api/v1/videos", TrailerRoute);
-app.use("/api/v1/images", ImageRoute);
+
+app.use(ShowDbServiceRoute);
 
 // UNHANDLED ROUTE
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

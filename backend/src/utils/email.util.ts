@@ -1,8 +1,8 @@
 import nodemailer from "nodemailer";
-import { convert } from "html-to-text";
+import {convert} from "html-to-text";
 import pug from "pug";
-import { env } from "./validate-env.util";
-import { User } from "../../prisma/client";
+import {env} from "./validate-env.util";
+import {User} from "../../prisma/client";
 
 const smtp = {
   host: env.EMAIL_HOST,
@@ -34,15 +34,6 @@ export class Email {
   }
 
   private newTransport() {
-    // return nodemailer.createTransport({
-    //   host: smtp.host,
-    //   port: smtp.port,
-    //   secure: false,
-    //   auth: {
-    //     user: smtp.user,
-    //     pass: smtp.pass,
-    //   },
-    // });
     return nodemailer.createTransport({
       service: "Gmail",
       auth: {
