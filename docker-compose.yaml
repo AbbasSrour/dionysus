@@ -27,8 +27,6 @@ services:
       - 9229
     networks:
       dio:
-    volumes:
-      - ./backend:/usr/app/
     restart: unless-stopped
     labels:
       org.label-schema.group: "Backend"
