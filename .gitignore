@@ -7,3 +7,5 @@ tests/coverage
 migrations/
 prisma/client
 prisma/migrations
+dist
+*/prisma/client/

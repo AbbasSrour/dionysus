@@ -1,0 +1,2 @@
+docker-*.yaml merge=ours
+Dockerfile merge=ours

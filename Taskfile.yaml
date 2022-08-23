@@ -1,0 +1,15 @@
+version: "3"
+
+vars:
+  SERVICE:
+
+tasks:
+  build:
+    desc: Build docker service images
+    cmds:
+      - docker compose up {{.SERVICE}} --build
+  prune:
+    desc: Clear all docker data
+    cmds:
+      - docker system prune -a
+

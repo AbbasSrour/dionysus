@@ -27,9 +27,22 @@ services:
       - 9229
     networks:
       dio:
+    volumes:
+      - ./backend:/usr/app/
     restart: unless-stopped
     labels:
       org.label-schema.group: "Backend"
+
+  apollo:
+    build:
+      context: ./apollo
+      dockerfile: Dockerfile
+    container_name: apollo
+    networks:
+      dio:
+    restart: unless-stopped
+    labels:
+      org.label-schema.group: "Apollo"
 
   # scraper:
   #   build:
@@ -55,16 +68,6 @@ services:
   #    labels:
   #      org.label-schema.group: "Engine"
   #
-  #  apollo:
-  #    build:
-  #      context: ./apollo
-  #      dockerfile: Dockerfile
-  #    container_name: apollo
-  #    networks:
-  #      dio:
-  #    restart: unless-stopped
-  #    labels:
-  #      org.label-schema.group: "Apollo"
 
   ############################################## Databases ########################################################
   redis:

@@ -8,12 +8,11 @@ RUN apk add --no-cache curl \
 
 WORKDIR /usr/share/app
 
-COPY ["package.json",  "tsconfig.json","./"]
+COPY ["package.json","./"]
 
 RUN ["pnpm", "install"]
 
-COPY ["src", "tsconfig.json","./"]
-COPY ["./src","./src"]
+COPY ["src","tsconfig.json","prisma","./"]
 
 RUN ["pnpm","build"]
 

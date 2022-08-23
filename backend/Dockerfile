@@ -1,6 +1,6 @@
 FROM node:alpine AS build
 
-LABEL org.opencontainers.image.vendor=dionysus-api
+LABEL org.opencontainers.image.vendor=dionysus-hercules
 LABEL com.dionysus.intermediate=true
 
 RUN apk add --no-cache curl \
@@ -8,18 +8,18 @@ RUN apk add --no-cache curl \
 
 WORKDIR /usr/share/app
 
-COPY ["package.json", "prisma", "tsconfig.json","./"]
+COPY ["package.json","./"]
 
-RUN ["pnpm", "install"]
+RUN ["pnpm","install"]
 
-COPY ["src", "tsconfig.json","./"]
+COPY ["src","prisma","tsconfig.json","./"]
 
 RUN ["pnpm","build"]
 
 FROM node:alpine
 
-LABEL org.opencontainers.image.vendor=dionysus-api
-LABEL org.opencontainers.image.tile="Dionysus Rest Api"
+LABEL org.opencontainers.image.vendor=dionysus-hercules
+LABEL org.opencontainers.image.tile="Dionysus Hercules Rest Api"
 
 RUN apk add --no-cache curl \
      && curl -sL https://unpkg.com/@pnpm/self-installer | node
@@ -30,12 +30,11 @@ COPY ["package.json", "./"]
 
 COPY [".env", "./.env"]
 
-#RUN ["pnpm", "install", "--only=production"]
-COPY --from=build /usr/share/app/node_modules ./node_modules
+RUN ["pnpm", "install", "--only=production"]
 
 COPY --from=build /usr/share/app/build ./build
 
-ENV NODE_ENV=staging
+ENV NODE_ENV=development
 
 EXPOSE 4000/tcp
 
