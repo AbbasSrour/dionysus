@@ -55,17 +55,17 @@ services:
     labels:
       org.label-schema.group: "Scraper"
 
-  #  engine:
-  #    build:
-  #      context: ./engine
-  #      dockerfile: Dockerfile
-  #    container_name: engine
-  #    networks:
-  #      dio:
-  #    restart: unless-stopped
-  #    labels:
-  #      org.label-schema.group: "Engine"
-  #
+  engine:
+    build:
+      context: ./engine
+      dockerfile: Dockerfile
+    container_name: engine
+    networks:
+      dio:
+    restart: unless-stopped
+    labels:
+      org.label-schema.group: "Engine"
+
 
   ############################################## Databases ########################################################
   redis:
