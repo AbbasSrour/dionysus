@@ -44,18 +44,18 @@ services:
     labels:
       org.label-schema.group: "Apollo"
 
-  # scraper:
-  #   build:
-  #     context: ./scrapper
-  #     dockerfile: Dockerfile
-  #   container_name: scraper
-  #   expose:
-  #     - 4001
-  #   networks:
-  #     dio:
-  #   restart: unless-stopped
-  #   labels:
-  #     org.label-schema.group: "Scraper"
+  scraper:
+    build:
+      context: ./scrapper
+      dockerfile: Dockerfile
+    container_name: scraper
+    expose:
+      - 4001
+    networks:
+      dio:
+    restart: unless-stopped
+    labels:
+      org.label-schema.group: "Scraper"
 
   #  engine:
   #    build:
