@@ -1,12 +1,11 @@
-import {Module} from '@nestjs/common';
-import {ShowService} from './show.service';
-import {ShowController} from './show.controller';
-import {AppLogger} from '../common/logger';
+import { Module } from '@nestjs/common';
+import { ShowController } from './show.controller';
+import { ShowService } from './show.service';
+import { PrismaService } from '../common/prisma/prisma.service';
 
 @Module({
-  imports: [],
-  providers: [ShowService, AppLogger],
   controllers: [ShowController],
+  providers: [ShowService, PrismaService],
+  imports: [],
 })
-export class ShowModule {
-}
+export class ShowModule {}

@@ -7,7 +7,7 @@ generator client {
 //TODO Change This
 datasource db {
   provider = "postgresql"
-  url      = env("APOLLO_DB_URL")
+  url      = env("APOLLO_DATABASE_URL")
 }
 
 //--------------------------------------------------------- Base Tables ------------------------------------------------------------//
@@ -159,7 +159,7 @@ model Studio {
 model Writer {
   writerId  Int      @id @default(autoincrement()) @map("writer_id")
   name      String   @db.VarChar(100)
-  image     String   @db.VarChar(480)
+  image     String?   @db.VarChar(480)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -182,7 +182,7 @@ model Video {
   official  Boolean?
   language  String?
   isDefault Boolean  @default(false) @map("default")
-  publishedAt DateTime
+  publishedAt DateTime?
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

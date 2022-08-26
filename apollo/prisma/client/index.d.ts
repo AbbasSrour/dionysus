@@ -148,7 +148,7 @@ export type Studio = {
 export type Writer = {
   writerId: number
   name: string
-  image: string
+  image: string | null
   createdAt: Date
   updatedAt: Date
 }
@@ -168,7 +168,7 @@ export type Video = {
   official: boolean | null
   language: string | null
   isDefault: boolean
-  publishedAt: Date
+  publishedAt: Date | null
   createdAt: Date
   updatedAt: Date
 }
@@ -11760,7 +11760,7 @@ export namespace Prisma {
   export type WriterGroupByOutputType = {
     writerId: number
     name: string
-    image: string
+    image: string | null
     createdAt: Date
     updatedAt: Date
     _count: WriterCountAggregateOutputType | null
@@ -12784,7 +12784,7 @@ export namespace Prisma {
     official: boolean | null
     language: string | null
     isDefault: boolean
-    publishedAt: Date
+    publishedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: VideoCountAggregateOutputType | null
@@ -23137,7 +23137,7 @@ export namespace Prisma {
     NOT?: Enumerable<WriterWhereInput>
     writerId?: IntFilter | number
     name?: StringFilter | string
-    image?: StringFilter | string
+    image?: StringNullableFilter | string | null
     createdAt?: DateTimeFilter | Date | string
     updatedAt?: DateTimeFilter | Date | string
     ShowWriter?: ShowWriterListRelationFilter
@@ -23176,7 +23176,7 @@ export namespace Prisma {
     NOT?: Enumerable<WriterScalarWhereWithAggregatesInput>
     writerId?: IntWithAggregatesFilter | number
     name?: StringWithAggregatesFilter | string
-    image?: StringWithAggregatesFilter | string
+    image?: StringNullableWithAggregatesFilter | string | null
     createdAt?: DateTimeWithAggregatesFilter | Date | string
     updatedAt?: DateTimeWithAggregatesFilter | Date | string
   }
@@ -23196,7 +23196,7 @@ export namespace Prisma {
     official?: BoolNullableFilter | boolean | null
     language?: StringNullableFilter | string | null
     isDefault?: BoolFilter | boolean
-    publishedAt?: DateTimeFilter | Date | string
+    publishedAt?: DateTimeNullableFilter | Date | string | null
     createdAt?: DateTimeFilter | Date | string
     updatedAt?: DateTimeFilter | Date | string
   }
@@ -23258,7 +23258,7 @@ export namespace Prisma {
     official?: BoolNullableWithAggregatesFilter | boolean | null
     language?: StringNullableWithAggregatesFilter | string | null
     isDefault?: BoolWithAggregatesFilter | boolean
-    publishedAt?: DateTimeWithAggregatesFilter | Date | string
+    publishedAt?: DateTimeNullableWithAggregatesFilter | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter | Date | string
     updatedAt?: DateTimeWithAggregatesFilter | Date | string
   }
@@ -24400,7 +24400,7 @@ export namespace Prisma {
 
   export type WriterCreateInput = {
     name: string
-    image: string
+    image?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     ShowWriter?: ShowWriterCreateNestedManyWithoutWriterInput
@@ -24409,7 +24409,7 @@ export namespace Prisma {
   export type WriterUncheckedCreateInput = {
     writerId?: number
     name: string
-    image: string
+    image?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     ShowWriter?: ShowWriterUncheckedCreateNestedManyWithoutWriterInput
@@ -24417,7 +24417,7 @@ export namespace Prisma {
 
   export type WriterUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
-    image?: StringFieldUpdateOperationsInput | string
+    image?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ShowWriter?: ShowWriterUpdateManyWithoutWriterNestedInput
@@ -24426,7 +24426,7 @@ export namespace Prisma {
   export type WriterUncheckedUpdateInput = {
     writerId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    image?: StringFieldUpdateOperationsInput | string
+    image?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ShowWriter?: ShowWriterUncheckedUpdateManyWithoutWriterNestedInput
@@ -24435,14 +24435,14 @@ export namespace Prisma {
   export type WriterCreateManyInput = {
     writerId?: number
     name: string
-    image: string
+    image?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type WriterUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
-    image?: StringFieldUpdateOperationsInput | string
+    image?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -24450,7 +24450,7 @@ export namespace Prisma {
   export type WriterUncheckedUpdateManyInput = {
     writerId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    image?: StringFieldUpdateOperationsInput | string
+    image?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -24465,7 +24465,7 @@ export namespace Prisma {
     official?: boolean | null
     language?: string | null
     isDefault?: boolean
-    publishedAt: Date | string
+    publishedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -24481,7 +24481,7 @@ export namespace Prisma {
     official?: boolean | null
     language?: string | null
     isDefault?: boolean
-    publishedAt: Date | string
+    publishedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -24496,7 +24496,7 @@ export namespace Prisma {
     official?: NullableBoolFieldUpdateOperationsInput | boolean | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
-    publishedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -24512,7 +24512,7 @@ export namespace Prisma {
     official?: NullableBoolFieldUpdateOperationsInput | boolean | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
-    publishedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -24528,7 +24528,7 @@ export namespace Prisma {
     official?: boolean | null
     language?: string | null
     isDefault?: boolean
-    publishedAt: Date | string
+    publishedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -24542,7 +24542,7 @@ export namespace Prisma {
     official?: NullableBoolFieldUpdateOperationsInput | boolean | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
-    publishedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -24558,7 +24558,7 @@ export namespace Prisma {
     official?: NullableBoolFieldUpdateOperationsInput | boolean | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
-    publishedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25790,6 +25790,17 @@ export namespace Prisma {
     not?: NestedBoolFilter | boolean
   }
 
+  export type DateTimeNullableFilter = {
+    equals?: Date | string | null
+    in?: Enumerable<Date> | Enumerable<string> | null
+    notIn?: Enumerable<Date> | Enumerable<string> | null
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeNullableFilter | Date | string | null
+  }
+
   export type VideoCountOrderByAggregateInput = {
     videoId?: SortOrder
     showId?: SortOrder
@@ -25864,6 +25875,20 @@ export namespace Prisma {
     _count?: NestedIntFilter
     _min?: NestedBoolFilter
     _max?: NestedBoolFilter
+  }
+
+  export type DateTimeNullableWithAggregatesFilter = {
+    equals?: Date | string | null
+    in?: Enumerable<Date> | Enumerable<string> | null
+    notIn?: Enumerable<Date> | Enumerable<string> | null
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeNullableWithAggregatesFilter | Date | string | null
+    _count?: NestedIntNullableFilter
+    _min?: NestedDateTimeNullableFilter
+    _max?: NestedDateTimeNullableFilter
   }
 
   export type ImageCountOrderByAggregateInput = {
@@ -27223,6 +27248,10 @@ export namespace Prisma {
     set?: boolean
   }
 
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
   export type ShowCreateNestedOneWithoutImageInput = {
     create?: XOR<ShowCreateWithoutImageInput, ShowUncheckedCreateWithoutImageInput>
     connectOrCreate?: ShowCreateOrConnectWithoutImageInput
@@ -27650,6 +27679,17 @@ export namespace Prisma {
     not?: NestedBoolFilter | boolean
   }
 
+  export type NestedDateTimeNullableFilter = {
+    equals?: Date | string | null
+    in?: Enumerable<Date> | Enumerable<string> | null
+    notIn?: Enumerable<Date> | Enumerable<string> | null
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeNullableFilter | Date | string | null
+  }
+
   export type NestedBoolNullableWithAggregatesFilter = {
     equals?: boolean | null
     not?: NestedBoolNullableWithAggregatesFilter | boolean | null
@@ -27664,6 +27704,20 @@ export namespace Prisma {
     _count?: NestedIntFilter
     _min?: NestedBoolFilter
     _max?: NestedBoolFilter
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter = {
+    equals?: Date | string | null
+    in?: Enumerable<Date> | Enumerable<string> | null
+    notIn?: Enumerable<Date> | Enumerable<string> | null
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeNullableWithAggregatesFilter | Date | string | null
+    _count?: NestedIntNullableFilter
+    _min?: NestedDateTimeNullableFilter
+    _max?: NestedDateTimeNullableFilter
   }
 
   export type ImdbCreateWithoutShowInput = {
@@ -27788,7 +27842,7 @@ export namespace Prisma {
     official?: boolean | null
     language?: string | null
     isDefault?: boolean
-    publishedAt: Date | string
+    publishedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -27803,7 +27857,7 @@ export namespace Prisma {
     official?: boolean | null
     language?: string | null
     isDefault?: boolean
-    publishedAt: Date | string
+    publishedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -28089,7 +28143,7 @@ export namespace Prisma {
     official?: BoolNullableFilter | boolean | null
     language?: StringNullableFilter | string | null
     isDefault?: BoolFilter | boolean
-    publishedAt?: DateTimeFilter | Date | string
+    publishedAt?: DateTimeNullableFilter | Date | string | null
     createdAt?: DateTimeFilter | Date | string
     updatedAt?: DateTimeFilter | Date | string
   }
@@ -30057,7 +30111,7 @@ export namespace Prisma {
 
   export type WriterCreateWithoutShowWriterInput = {
     name: string
-    image: string
+    image?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -30065,7 +30119,7 @@ export namespace Prisma {
   export type WriterUncheckedCreateWithoutShowWriterInput = {
     writerId?: number
     name: string
-    image: string
+    image?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -30130,7 +30184,7 @@ export namespace Prisma {
 
   export type WriterUpdateWithoutShowWriterInput = {
     name?: StringFieldUpdateOperationsInput | string
-    image?: StringFieldUpdateOperationsInput | string
+    image?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30138,7 +30192,7 @@ export namespace Prisma {
   export type WriterUncheckedUpdateWithoutShowWriterInput = {
     writerId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    image?: StringFieldUpdateOperationsInput | string
+    image?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30179,7 +30233,7 @@ export namespace Prisma {
     official?: boolean | null
     language?: string | null
     isDefault?: boolean
-    publishedAt: Date | string
+    publishedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -30308,7 +30362,7 @@ export namespace Prisma {
     official?: NullableBoolFieldUpdateOperationsInput | boolean | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
-    publishedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30323,7 +30377,7 @@ export namespace Prisma {
     official?: NullableBoolFieldUpdateOperationsInput | boolean | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
-    publishedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30338,7 +30392,7 @@ export namespace Prisma {
     official?: NullableBoolFieldUpdateOperationsInput | boolean | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
-    publishedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

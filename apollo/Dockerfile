@@ -1,4 +1,4 @@
-FROM node:alpine AS build
+FROM node:alpine AS development
 
 LABEL org.opencontainers.image.vendor=dionysus-apollo
 LABEL com.dionysus.intermediate=true
@@ -12,11 +12,15 @@ COPY ["package.json","./"]
 
 RUN ["pnpm", "install"]
 
-COPY ["src", "prisma/client","tsconfig.json","tsconfig.build.json","./"]
+COPY [".", "."]
+
+RUN ["pnpm", "prisma", "generate"]
+
+#RUN ["pnpm", "prisma", "migrate", "dev"]
 
 RUN ["pnpm","build"]
 
-FROM node:alpine
+FROM node:alpine AS production
 
 LABEL org.opencontainers.image.vendor=dionysus-apollo
 LABEL org.opencontainers.image.tile="Dionysus Apollo Rest Api"
@@ -26,16 +30,16 @@ RUN apk add --no-cache curl \
 
 WORKDIR /usr/app
 
-COPY ["package.json", "./"]
-
-COPY [".env", "./.env"]
+COPY ["package.json", ".env", "./"]
 
 RUN ["pnpm", "install", "--only=production"]
 
-COPY --from=build /usr/share/app/build ./build
+COPY --from=development /usr/share/app/build ./build
 
-ENV NODE_ENV=development
+COPY --from=development /usr/share/app/prisma ./build/prisma
 
-EXPOSE 4001/tcp
+ENV NODE_ENV=staging
+
+EXPOSE 4000/tcp
 
 ENTRYPOINT ["node", "build/src/index.js"]

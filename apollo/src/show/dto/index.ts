@@ -1,1 +1,1 @@
-export * from './show.dto';
+export * from './create-show.dto';
