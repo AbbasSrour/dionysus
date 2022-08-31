@@ -20,7 +20,7 @@ export const createImageHandler = async (
       language,
       type,
     });
-    res.status(201).json({ status: "Success", data: { poster: image } });
+    res.status(201).json({ status: "Success", data: { image } });
   } catch (error: any) {
     if (error.code === "P2002")
       return res.status(409).json({

@@ -1,73 +1,42 @@
 ############################################### Setup #######################################################
-version: "3.8"
+version: '3.8'
 
 volumes:
-  RedisDB: { }
-  Nginx: { }
-  ElasticData: { }
-  ElasticConfig: { }
-  Kibana: { }
-  PsqlData: { }
-  RabbitmqLog: { }
-  RabbitmqLib: { }
+  RedisDB: {}
+  Nginx: {}
+  ElasticData: {}
+  ElasticConfig: {}
+  Kibana: {}
+  RabbitmqLog: {}
+  RabbitmqLib: {}
+  database-data: {}
 
 networks:
   dio:
     driver: bridge
+  dio-test:
 
 services:
-  ################################################ Api #######################################################
-  backend:
+  ################################################ Hercules #######################################################
+  hercules:
     build:
-      context: ./backend
+      context: ./hercules
       dockerfile: Dockerfile
-    container_name: backend
+    container_name: hercules
     expose:
       - 4000
-      - 9229
     networks:
       dio:
     restart: unless-stopped
     labels:
-      org.label-schema.group: "Backend"
+      org.label-schema.group: 'Backend'
 
-  apollo:
-    build:
-      context: ./apollo
-      dockerfile: Dockerfile
-    container_name: apollo
-    networks:
-      dio:
-    restart: unless-stopped
-    labels:
-      org.label-schema.group: "Apollo"
+  # hercules_db:
+  #   image: postgres:14-alpine
+  #   container_name: PsqlDb
+  #   expose:
+  #     - 5432:5432
 
-  scraper:
-    build:
-      context: ./scrapper
-      dockerfile: Dockerfile
-    container_name: scraper
-    expose:
-      - 4001
-    networks:
-      dio:
-    restart: unless-stopped
-    labels:
-      org.label-schema.group: "Scraper"
-
-  engine:
-    build:
-      context: ./engine
-      dockerfile: Dockerfile
-    container_name: engine
-    networks:
-      dio:
-    restart: unless-stopped
-    labels:
-      org.label-schema.group: "Engine"
-
-
-  ############################################## Databases ########################################################
   redis:
     image: redis:alpine
     container_name: redis
@@ -78,8 +47,83 @@ services:
     networks:
       dio:
     labels:
-      org.label-schema.group: "Api"
+      org.label-schema.group: 'Api'
 
+  ################################################ Apollo #######################################################
+  apollo:
+    build:
+      context: ./apollo
+      dockerfile: Dockerfile
+      target: development
+    command: pnpm run start:dev
+    container_name: apollo
+#    expose:
+#      - 4001
+    ports:
+      - '4001:4001'
+    networks:
+      - dio-test
+    restart: unless-stopped
+    labels:
+      org.label-schema.group: 'Apollo'
+    volumes:
+      - ./apollo:/usr/share/app
+      - /usr/share/app/node_modules
+    depends_on:
+      - apollo-db
+
+  apollo-db:
+    image: postgres:14-alpine
+    container_name: apollo-db
+    ports:
+      - 5434:5432
+    networks:
+      - dio-test
+    environment:
+      POSTGRES_USER: ares
+      POSTGRES_PASSWORD: 7142
+      POSTGRES_DB: apollo
+
+  #  scraper:
+  #    build:
+  #      context: ./scrapper
+  #      dockerfile: Dockerfile
+  #    container_name: scraper
+  #    expose:
+  #      - 4001
+  #    networks:
+  #      dio:
+  #    restart: unless-stopped
+  #    labels:
+  #      org.label-schema.group: "Scraper"
+
+  ################################################ Coeus #######################################################
+  coeus:
+    build:
+      context: ./coeus
+      dockerfile: Dockerfile
+    container_name: coeus
+    expose:
+      - 4002
+    restart: unless-stopped
+    labels:
+      org.label-schema.group: 'Coeus'
+
+  ############################################## Athena ########################################################
+  athena:
+    build:
+      context: ./athena
+      dockerfile: Dockerfile
+    container_name: athena
+    expose:
+      - 4003
+    networks:
+      dio:
+    restart: unless-stopped
+    labels:
+      org.label-schema.group: 'Athena'
+
+  ############################################## Elastic ########################################################
   #  elasticsearch_zues:
   #    build:
   #      context: ./server/elk/elasticsearch
@@ -115,14 +159,6 @@ services:
   # healthcheck:
   #   test: ["CMD", "sh", "-c", "curl -sf --insecure https://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@localhost:9200/_cat/health | grep -ioE 'green|yellow' || echo 'not green/yellow cluster status'"]
 
-  #  PsqlDb:
-  #    image: postgres:14-alpine
-  #    container_name: PsqlDb
-  #    volumes:
-  #      - PsqlData:/var/lib/postgresql/data
-  #    expose:
-  #      - 5432:5432
-
   ################################################# System ########################################################
   ### v1.23.0-alpine
   nginx:
@@ -131,11 +167,11 @@ services:
       dockerfile: Dockerfile
     container_name: nginx
     ports:
-      - "3000:3000"
-      - "3100:3100"
-      - "4000:4000"
-      - "5601:5601"
-      - "8081:8081"
+      - '3000:3000'
+      - '3100:3100'
+      - '4000:4000'
+      - '5601:5601'
+      - '8081:8081'
 
     volumes:
       - Nginx:/etc/nginx
@@ -143,8 +179,7 @@ services:
       - dio
     restart: unless-stopped
     labels:
-      org.label-schema.group: "System"
-
+      org.label-schema.group: 'System'
 #  rabbitmq:
 #    image: rabbitmq:3.9.22-management-alpine
 #    container_name: "rabbitmq"

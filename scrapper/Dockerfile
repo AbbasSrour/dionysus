@@ -1,4 +1,4 @@
-FROM node:alpine AS build
+FROM node:alpine AS development
 
 LABEL org.opencontainers.image.vendor=dionysus-scraper
 LABEL com.dionysus.intermediate=true
@@ -16,7 +16,7 @@ COPY ["src","tsconfig.json","prisma","./"]
 
 RUN ["pnpm","build"]
 
-FROM node:alpine
+FROM node:alpine AS production
 
 LABEL org.opencontainers.image.vendor=dionysus-engine
 LABEL org.opencontainers.image.tile="Dionysus Rest Engine Api"
