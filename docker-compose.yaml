@@ -14,28 +14,45 @@ volumes:
 networks:
   dio:
     driver: bridge
-  dio-test:
 
 services:
   ################################################ Hercules #######################################################
   hercules:
     build:
-      context: ./hercules
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: ./apps/hercules/Dockerfile
+      target: development
+    command:
+      [
+        'sh',
+        '-c',
+        'pnpm prisma generate --schema="./apps/hercules/prisma/schema.prisma" && pnpm prisma migrate dev --schema="./apps/hercules/prisma/schema.prisma" && pnpm run start:dev hercules',
+      ]
+    env_file: ./backend/apps/hercules/.env
     container_name: hercules
-    expose:
-      - 4000
+    volumes:
+      - ./backend:/usr/share/app
+      - /usr/share/app/node_modules
+    ports:
+      - '4000:4000'
+      - '5555:5555'
     networks:
-      dio:
+      - dio
     restart: unless-stopped
     labels:
       org.label-schema.group: 'Backend'
 
-  # hercules_db:
-  #   image: postgres:14-alpine
-  #   container_name: PsqlDb
-  #   expose:
-  #     - 5432:5432
+  hercules-db:
+    image: postgres:14-alpine
+    container_name: hercules-db
+    ports:
+      - 5433:5432
+    networks:
+      - dio
+    environment:
+      POSTGRES_USER: ares
+      POSTGRES_PASSWORD: 7142
+      POSTGRES_DB: hercules
 
   redis:
     image: redis:alpine
@@ -52,22 +69,26 @@ services:
   ################################################ Apollo #######################################################
   apollo:
     build:
-      context: ./apollo
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: ./apps/apollo/Dockerfile
       target: development
-    command: pnpm run start:dev
+    command:
+      [
+        'sh',
+        '-c',
+        'pnpm prisma generate --schema="./apps/apollo/prisma/schema.prisma" && pnpm prisma migrate dev --schema="./apps/apollo/prisma/schema.prisma" && pnpm run start:dev apollo',
+      ]
+    env_file: ./backend/apps/apollo/.env
     container_name: apollo
-#    expose:
-#      - 4001
     ports:
       - '4001:4001'
     networks:
-      - dio-test
+      - dio
     restart: unless-stopped
     labels:
       org.label-schema.group: 'Apollo'
     volumes:
-      - ./apollo:/usr/share/app
+      - ./backend:/usr/share/app
       - /usr/share/app/node_modules
     depends_on:
       - apollo-db
@@ -78,7 +99,7 @@ services:
     ports:
       - 5434:5432
     networks:
-      - dio-test
+      - dio
     environment:
       POSTGRES_USER: ares
       POSTGRES_PASSWORD: 7142
@@ -100,7 +121,7 @@ services:
   ################################################ Coeus #######################################################
   coeus:
     build:
-      context: ./coeus
+      context: ./backend/coeus
       dockerfile: Dockerfile
     container_name: coeus
     expose:
@@ -112,7 +133,7 @@ services:
   ############################################## Athena ########################################################
   athena:
     build:
-      context: ./athena
+      context: ./backend/athena
       dockerfile: Dockerfile
     container_name: athena
     expose:
@@ -180,15 +201,16 @@ services:
     restart: unless-stopped
     labels:
       org.label-schema.group: 'System'
-#  rabbitmq:
-#    image: rabbitmq:3.9.22-management-alpine
-#    container_name: "rabbitmq"
-#    ports:
-#      - 5673:5672
-#      - 15673:15672
-#    volumes:
-#      - RabbitmqLib:/var/lib/rabbitmq/
-#      - RabbitmqLog:/var/log/rabbitmq
-#    networks:
-#      - dio
+
+  rabbitmq:
+    image: rabbitmq:3.9.22-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - 5673:5672
+      - 15673:15672
+    volumes:
+      - RabbitmqLib:/var/lib/rabbitmq/
+      - RabbitmqLog:/var/log/rabbitmq
+    networks:
+      - dio
 ################################################################################################################

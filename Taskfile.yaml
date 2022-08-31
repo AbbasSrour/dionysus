@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 
 vars:
   SERVICE:
@@ -12,4 +12,21 @@ tasks:
     desc: Clear all docker data
     cmds:
       - docker system prune -a
-
+  hercules:
+    desc: Start hercules
+    cmds:
+      - docker compose up hercules hercules-db redis --build &
+  apollo:
+    desc: Start apollo
+    cmds:
+      - docker compose up apollo apollo-db --build &
+  all:
+    desc: start all services
+    cmds:
+      - task: apollo
+      - task: hercules
+      - docker compose up rabbitmq --build &
+  clean:
+    desc: Volume prune and remove containers
+    cmds:
+      - docker compose down && docker volume prune
