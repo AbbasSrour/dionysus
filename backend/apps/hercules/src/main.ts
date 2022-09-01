@@ -4,10 +4,6 @@ import * as cookieParser from 'cookie-parser';
 import { PrismaService } from './common/prisma';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
-import {
-  PrismaConflictInterceptor,
-  PrismaNotFoundInterceptor,
-} from '@app/common/interceptors';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { RmqService } from '@app/common';
 
@@ -22,7 +18,9 @@ async function bootstrap() {
   await prismaService.enableShutdownHooks(app);
   const config = app.get(ConfigService);
   const rmqService = app.get<RmqService>(RmqService);
-  app.connectMicroservice(rmqService.getOptions('HERCULES'));
+  app.connectMicroservice(
+    rmqService.getOptions('hercules', config.get('rmqUrl')),
+  );
 
   // Pipes
   app.useGlobalPipes(
@@ -35,15 +33,15 @@ async function bootstrap() {
   );
 
   // Interceptors
-  app.useGlobalInterceptors(new PrismaConflictInterceptor());
-  app.useGlobalInterceptors(new PrismaNotFoundInterceptor());
+  // app.useGlobalInterceptors(new PrismaConflictInterceptor());
+  // app.useGlobalInterceptors(new PrismaNotFoundInterceptor());
 
   // Documentation
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('Apollo')
-    .setDescription('Apollo Rest API description')
+    .setTitle('Hercules')
+    .setDescription('Hercules Rest API description')
     .setVersion('1.0')
-    .addTag('apollo')
+    .addTag('hercules')
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);

@@ -18,6 +18,7 @@ import { ConfigModule } from '@nestjs/config';
 import configuration from './common/config/configuration';
 import { validateEnv } from './common/config/validate-env';
 import { PrismaModule } from './common/prisma';
+import { RmqService } from '../../../libs/common/src';
 
 @Module({
   imports: [
@@ -50,6 +51,6 @@ import { PrismaModule } from './common/prisma';
     PrismaModule,
   ],
   controllers: [ApolloController],
-  providers: [ApolloService],
+  providers: [ApolloService, RmqService],
 })
 export class ApolloModule {}

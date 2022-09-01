@@ -17,7 +17,12 @@ export class ApolloController {
 
   @EventPattern('test')
   async test(@Payload() data: any, @Ctx() ctx: RmqContext) {
-    console.log(data);
-    this.rmqService.ack(ctx);
+    try {
+      console.log('hello');
+      console.log(data);
+      this.rmqService.ack(ctx);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

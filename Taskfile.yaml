@@ -15,17 +15,23 @@ tasks:
   hercules:
     desc: Start hercules
     cmds:
-      - docker compose up hercules hercules-db redis --build &
+      - docker compose up hercules hercules-db redis --build
   apollo:
     desc: Start apollo
     cmds:
-      - docker compose up apollo apollo-db --build &
+      - docker compose up apollo apollo-db --build
+  server:
+    desc: Start server services
+    cmds:
+      - docker compose up rabbitmq --build
   all:
     desc: start all services
-    cmds:
+    deps:
       - task: apollo
       - task: hercules
-      - docker compose up rabbitmq --build &
+      - task: server
+    cmds:
+      - echo "done"
   clean:
     desc: Volume prune and remove containers
     cmds:

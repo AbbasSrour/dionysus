@@ -2,11 +2,13 @@ import { Module } from '@nestjs/common';
 import { HerculesController } from './hercules.controller';
 import { HerculesService } from './hercules.service';
 import { PrismaModule } from './common/prisma';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configuration, validateEnv } from './common/config';
 import { AuthModule } from './auth';
 import { UserModule } from './user';
 import { RmqModule } from '../../../libs/common/src';
+
+const config = new ConfigService();
 
 @Module({
   imports: [
@@ -27,7 +29,9 @@ import { RmqModule } from '../../../libs/common/src';
     AuthModule,
     UserModule,
     RmqModule.register({
-      name: 'APOLLO CLIENT',
+      name: 'APOLLO',
+      queue: 'apollo',
+      url: config.get('rmqUrl'),
     }),
   ],
   controllers: [HerculesController],

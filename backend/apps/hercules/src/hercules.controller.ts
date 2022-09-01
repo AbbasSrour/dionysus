@@ -7,7 +7,7 @@ import { lastValueFrom } from 'rxjs';
 export class HerculesController {
   constructor(
     private readonly herculesService: HerculesService,
-    @Inject('APOLLO CLIENT') private apolloClient: ClientProxy,
+    @Inject('APOLLO') private apolloClient: ClientProxy,
   ) {}
 
   @Get()
@@ -17,10 +17,14 @@ export class HerculesController {
 
   @Get('/test')
   async testRmq() {
-    console.log(
-      await lastValueFrom(
-        this.apolloClient.emit('test', { message: 'hello world' }),
-      ),
-    );
+    try {
+      console.log(
+        await lastValueFrom(
+          this.apolloClient.emit"test"', { message:"hello world"' },
+        ,
+      );
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

@@ -47,6 +47,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/coeus/tsconfig.app.json"
       }
+    },
+    "hesita": {
+      "type": "application",
+      "root": "apps/hesita",
+      "entryFile": "main",
+      "sourceRoot": "apps/hesita/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/hesita/tsconfig.app.json"
+      }
     }
   },
   "compilerOptions": {

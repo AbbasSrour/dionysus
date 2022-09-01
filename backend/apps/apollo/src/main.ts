@@ -22,7 +22,9 @@ async function bootstrap() {
   await prismaService.enableShutdownHooks(app);
   const config = app.get(ConfigService);
   const rmqService = app.get<RmqService>(RmqService);
-  app.connectMicroservice(rmqService.getOptions('APOLLO'));
+  app.connectMicroservice(
+    rmqService.getOptions('apollo', config.getOrThrow('rmqUrl')),
+  );
 
   // Pipes
   app.useGlobalPipes(
