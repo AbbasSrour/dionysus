@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma';
 import { User } from '@prisma/client-hercules';
 import { ConfigService } from '@nestjs/config';
-import * as crypto from 'crypto';
 import { RedisService } from '../common/redis';
 import { JwtService } from '@nestjs/jwt';
 import { CryptoService } from './crypto.service';
@@ -37,35 +36,61 @@ export class AuthService {
       { sub: user.userId },
       {
         secret: `${this.config.getOrThrow<string>(
-          'jwt.refreshToken.privateKey',
+          "jwt.refreshToken.privateKey"
         )}`,
-        expiresIn: `${this.config.get<string>('jwt.refreshToken.expiration')}m`,
-        algorithm: 'RS256',
+        expiresIn: `${this.config.get<string>("jwt.refreshToken.expiration")}m`,
+        algorithm: "RS256"
       },
     );
     return { accessToken, refreshToken };
   }
 
-  async createVerificationCode() {
-    const verificationCode = crypto.randomBytes(32).toString('hex');
-    const hashedVerificationCode = crypto
-      .createHash('sha256')
-      .update(verificationCode)
-      .digest('hex');
-    return { verificationCode, hashedVerificationCode };
+  async deleteSession(user: User) {
+    return await this.redis.client.del(`${user.userId}`).then(
+      (resolve) => true,
+      (reject) => false
+    );
   }
 
-  async updateVerificationStatus(user: User, verified: boolean) {
+  async updateVerificationStatus(userId: number, verified: boolean) {
     return this.client.user.update({
-      where: { userId: user.userId },
-      data: { verified },
+      where: { userId },
+      data: { verified }
     });
   }
 
-  async updateVerificationCode(user: User, code: string | null) {
-    return this.client.user.update({
-      where: { userId: user.userId },
-      data: { verificationCode: code },
+  async createVerificationCode(user: User) {
+    const verificationCode = await this.jwt.signAsync(
+      {
+        sub: user.userId,
+        email: user.email,
+        userName: user.userName
+      },
+      {
+        secret: `${this.config.getOrThrow<string>(
+          "jwt.accessToken.privateKey"
+        )}`,
+        expiresIn: `${60}m`,
+        algorithm: "RS256"
+      }
+    );
+    await this.redis.client.set(`${verificationCode}`, JSON.stringify(user), {
+      EX: 60 * 60
+    });
+    return verificationCode;
+  }
+
+  async deleteVerificationCode(verificationCode: string) {
+    await this.redis.client.del(`${verificationCode}`);
+  }
+
+  async verifyToken(token: string) {
+    let check = this.redis.client.get(`${token}`);
+    if (!check) return null;
+
+    return await this.jwt.verifyAsync(token, {
+      secret: this.config.getOrThrow("accessToken.publicKey"),
+      algorithms: ["RS256"]
     });
   }
 
@@ -73,7 +98,7 @@ export class AuthService {
     const hashedPassword: string = await this.crypto.HashPassword(password);
     return await this.crypto.EncryptPassword(
       hashedPassword,
-      this.config.getOrThrow<string>('encKey'),
+      this.config.getOrThrow<string>("encKey")
     );
   }
 

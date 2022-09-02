@@ -3,7 +3,10 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   InternalServerErrorException,
+  Param,
+  Patch,
   Post,
   Res,
   UnauthorizedException,
@@ -16,7 +19,8 @@ import { EmailService } from '../common/email';
 import { RedisService } from '../common/redis';
 import { GetCurrentUser } from '@app/common';
 import { CookieOptions, Response } from 'express';
-import { User } from '@prisma/client-hercules';
+import { User } from"@prisma/client-hercules"';
+import { ResetPasswordDto } from"./dto/reset-password.dto"';
 
 @Controller('auth')
 export class AuthController {
@@ -62,29 +66,22 @@ export class AuthController {
     const user = await this.userService.createUser({
       userName: userDto.userName,
       email: userDto.email.toLowerCase(),
-      password: await this.authService.securePassword(userDto.password),
+      password: await this.authService.securePassword(userDto.password)
     });
     if (!user) throw new BadRequestException();
 
-    const { hashedVerificationCode, verificationCode } =
-      await this.authService.createVerificationCode();
-
-    await this.authService.updateVerificationCode(user, hashedVerificationCode);
-
-    const redirectUrl = `${this.config.get<string>(
-      'origin',
-    )}/verifyemail/${verificationCode}`;
+    const verificationCode = await this.authService.createVerificationCode(
+      user
+    );
 
     try {
-      await this.email.sendVerificationCode(user);
-      return { message: 'Success, a verification link was sent to your email' };
+      await this.email.sendVerificationCode(user, verificationCode);
+      return { message: "Success, a verification link was sent to your email" };
     } catch (error) {
-      const verificationCode = null;
-      await this.authService.updateVerificationCode(user, verificationCode);
+      await this.authService.deleteVerificationCode(verificationCode);
       console.log(error);
-
       throw new InternalServerErrorException({
-        message: 'There was an error sending email, please try again',
+        message: "There was an error sending email, please try again"
       });
     }
   }
@@ -113,36 +110,94 @@ export class AuthController {
       user,
     );
 
-    res.cookie('access_token', accessToken, this.accessTokenCookieOptions);
-    res.cookie('refresh_token', refreshToken, this.refreshTokenCookieOptions);
-    res.cookie('logged_in', true, {
+    res.cookie("access_token", accessToken, this.accessTokenCookieOptions);
+    res.cookie("refresh_token", refreshToken, this.refreshTokenCookieOptions);
+    res.cookie("logged_in", true, {
       ...this.accessTokenCookieOptions,
-      httpOnly: false,
+      httpOnly: false
     });
 
-    return { 'logged-in': true };
+    return { "logged-in": true };
   }
 
-  @Get('/refresh')
-  async refreshAccessTokenHandler(
+  @Get("/logout")
+  async logoutUser(
     @GetCurrentUser() user: User,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    await this.authService.deleteSession(user);
+
+    res.cookie("accessToken", "", { maxAge: -1 });
+    res.cookie("refreshToken", "", { maxAge: -1 });
+    res.cookie("logged_in", "", { maxAge: -1 });
+
+    return;
+  }
+
+  @Get("/refresh-tokens")
+  async refreshAccessToken(
+    @GetCurrentUser() user: User,
+    @Res({ passthrough: true }) res: Response
   ) {
     const newTokens = await this.authService.signTokens(user);
 
     res.cookie(
-      'access_token',
+      "access_token",
       newTokens.accessToken,
-      this.accessTokenCookieOptions,
+      this.accessTokenCookieOptions
     );
     res.cookie(
-      'refresh_token',
+      "refresh_token",
       newTokens.refreshToken,
-      this.refreshTokenCookieOptions,
+      this.refreshTokenCookieOptions
     );
-    res.cookie('logged_in', true, {
+    res.cookie("logged_in", true, {
       ...this.accessTokenCookieOptions,
-      httpOnly: false,
+      httpOnly: false
     });
+  }
+
+  @Get("/email/verify/:token")
+  async verifyEmail(@Param("token") token: string) {
+    const payload = await this.authService.verifyToken(token);
+    if (!payload) throw new HttpException("Could not verify email", 401);
+
+    await this.authService.updateVerificationStatus(payload.userId, true);
+    return "Success";
+  }
+
+  //TODO: Delete from redis the key
+  @Get("/email/resend-verification/:email")
+  async resendEmailVerificationCode(@Param("email") email: string) {
+    const user = await this.userService.findUserByEmail({ email });
+    const verificationCode = await this.authService.createVerificationCode(
+      user
+    );
+    await this.email.sendVerificationCode(user, verificationCode);
+    return { message: "Success, a verification link was sent to your email" };
+  }
+
+  @Get("/forgot-password/:email")
+  async forgotPassword(@Param("email") email: string) {
+    const user = await this.userService.findUserByEmail({ email });
+    const verificationCode = await this.authService.createVerificationCode(
+      user
+    );
+    await this.email.sendPasswordResetToken(user, verificationCode);
+    return { message: "Success, a verification link was sent to your email" };
+  }
+
+  @Patch("/reset-password/:email")
+  async resetPassword(@Body() body: ResetPasswordDto, @Param() email: string) {
+    const user = await this.userService.findUserByEmail({ email });
+    const verify = this.authService.verifyToken(body.token);
+    if (verify) await this.authService.deleteVerificationCode(body.token);
+
+    await this.userService.updatePassword(
+      user.userId,
+      await this.authService.securePassword(body.password)
+    );
+    user.password = null;
+    return user;
   }
 }

@@ -25,4 +25,12 @@ export class UserService {
   async findUserById(id: number): Promise<User | null> {
     return this.client.user.findUniqueOrThrow({ where: { userId: id } });
   }
+
+  // TODO find out way update doesn't take email
+  async updatePassword(userId: number, password: string) {
+    return this.client.user.update({
+      where: { userId },
+      data: { password },
+    });
+  }
 }
