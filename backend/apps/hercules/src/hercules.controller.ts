@@ -1,7 +1,8 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
 import { HerculesService } from './hercules.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
+import { AccessTokenGuard } from './common/guards';
 
 @Controller()
 export class HerculesController {
@@ -11,6 +12,7 @@ export class HerculesController {
   ) {}
 
   @Get()
+  @UseGuards(AccessTokenGuard)
   getHello(): string {
     return this.herculesService.getHello();
   }
@@ -20,8 +22,8 @@ export class HerculesController {
     try {
       console.log(
         await lastValueFrom(
-          this.apolloClient.emit"test"', { message:"hello world"' },
-        ,
+          this.apolloClient.emit('test', { message: 'hello world' }),
+        ),
       );
     } catch (error) {
       console.log(error);

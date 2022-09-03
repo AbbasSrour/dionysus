@@ -5,6 +5,7 @@ import { createTransport } from 'nodemailer';
 import { User } from '@prisma/client-hercules';
 import * as pug from 'pug';
 import { convert } from 'html-to-text';
+import rootPath from '../../root.path';
 
 @Injectable()
 export class EmailService {
@@ -23,7 +24,7 @@ export class EmailService {
   }
 
   async sendVerificationCode(user: User, token: string) {
-    const html = pug.renderFile(`${__dirname}/views/verificationCode.pug`, {
+    const html = pug.renderFile(`${rootPath}/views/verificationCode.pug`, {
       userName: user.userName,
       subject: 'Account Verification Code',
       url: `${this.config.get('origin')}/verify-email/${token}`,
@@ -37,10 +38,10 @@ export class EmailService {
   }
 
   async sendPasswordResetToken(user: User, token: string) {
-    const html = pug.renderFile(`${__dirname}/views/resetPassword.pug`, {
+    const html = pug.renderFile(`${rootPath}/views/resetPassword.pug`, {
       userName: user.userName,
-      subject: 'Reset Password',
-      url: `${this.config.get('origin')}/reset-password`,
+      subject:"Reset Password"',
+      url: `${this.config.get"origin"')}/reset-password/${token},
     });
     await this.send({
       to: user.email,

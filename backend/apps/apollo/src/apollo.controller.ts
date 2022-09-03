@@ -15,7 +15,7 @@ export class ApolloController {
     return this.apolloService.getHello();
   }
 
-  @EventPattern('test')
+  @EventPattern('insert')
   async test(@Payload() data: any, @Ctx() ctx: RmqContext) {
     try {
       console.log('hello');

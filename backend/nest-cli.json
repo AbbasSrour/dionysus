@@ -18,7 +18,18 @@
       "entryFile": "main",
       "sourceRoot": "apps/hercules/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/hercules/tsconfig.app.json"
+        "tsConfigPath": "apps/hercules/tsconfig.app.json",
+        "plugins": [
+          "@nestjs/swagger"
+        ],
+        "assets": [
+          {
+            "include": "**/*.pug",
+            "exclude": "**/omitted.graphql",
+            "outDir": "dist/apps/hercules/apps/hercules/src",
+            "watchAssets": true
+          }
+        ]
       }
     },
     "apollo": {
@@ -39,15 +50,6 @@
         "tsConfigPath": "apps/athena/tsconfig.app.json"
       }
     },
-    "coeus": {
-      "type": "application",
-      "root": "apps/coeus",
-      "entryFile": "main",
-      "sourceRoot": "apps/coeus/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/coeus/tsconfig.app.json"
-      }
-    },
     "hesita": {
       "type": "application",
       "root": "apps/hesita",
@@ -56,10 +58,19 @@
       "compilerOptions": {
         "tsConfigPath": "apps/hesita/tsconfig.app.json"
       }
+    },
+    "coeus": {
+      "type": "application",
+      "root": "apps/coeus",
+      "entryFile": "main",
+      "sourceRoot": "apps/coeus/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/coeus/tsconfig.app.json"
+      }
     }
   },
   "compilerOptions": {
-    "webpack": false,
+    "webpack": true,
     "tsConfigPath": "apps/hercules/tsconfig.app.json"
   },
   "monorepo": true,

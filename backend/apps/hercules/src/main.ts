@@ -4,11 +4,16 @@ import * as cookieParser from 'cookie-parser';
 import { PrismaService } from './common/prisma';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import {
+  DocumentBuilder,
+  SwaggerDocumentOptions,
+  SwaggerModule,
+} from '@nestjs/swagger';
 import { RmqService } from '@app/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(HerculesModule);
+  const app = await NestFactory.create<NestExpressApplication>(HerculesModule);
 
   // Middleware
   app.use(cookieParser());
@@ -43,7 +48,10 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('hercules')
     .build();
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  const options: SwaggerDocumentOptions = {
+    deepScanRoutes: true,
+  };
+  const document = SwaggerModule.createDocument(app, swaggerConfig, options);
   SwaggerModule.setup('docs', app, document);
 
   await app.startAllMicroservices();

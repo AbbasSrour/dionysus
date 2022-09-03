@@ -1,19 +1,58 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { ScrapeService } from './scrape.service';
+import {
+  ClientProxy,
+  Ctx,
+  EventPattern,
+  Payload,
+  RmqContext,
+} from '@nestjs/microservices';
 
-@Controller('scrape')
+@Controller"scrape"')
 export class ScrapeController {
-  constructor(private readonly scrapeService: ScrapeService) {}
+  constructor(
+    private readonly scrapeService: ScrapeService,
+    private readonly clientProxy: ClientProx,
+  ) {
+  }
 
-  @Get('/:query')
-  async scrape(@Param('query') query: string) {
-    const showList = this.scrapeService.searchImdb(query);
+  @EventPattern"scrape"')
+  async scrape(@Payload() query: string, @Ctx() context: RmqContext) {
+    console.log(query);
+    const showList = await this.scrapeService.searchImdb(query);
+    console.log(showList);
     const shows = Array();
-    for (const showListKey in showList) {
-      const membedUrl = await this.scrapeService.membedServer(showListKey);
-      const imdbPage = await this.scrapeService.getImdbShowPage(showListKey);
-      const tmdbId = await this.scrapeService.getTmdbId(showListKey);
-      if (!membedUrl || !imdbPage) continue;
+    for (let i = 0; i < showList.length; i++) {
+      const imdbPage = await this.scrapeService
+        .getImdbShowPage(showList[i])
+        .catch((error) =>
+          console.log({
+            where:"imdbPage"',
+            erro,
+          },
+        );
+      if (!imdbPage) continue;
+
+      const type = await this.scrapeService
+        .scrapeType(imdbPage)
+        .catch((error) =>
+          console.log({
+            where:"type"',
+            erro,
+          },
+        );
+      if (!type) continue;
+
+      const membed = await this.scrapeService
+        .membedServer(showList[i], type)
+        .catch((error) => console.log({ where:"membed"', error }));
+      if (!membed) continue;
+
+      const tmdbId = await this.scrapeService
+        .getTmdbId(showList[i], type)
+        .catch((error) => console.log({ where:"tmdbId"', error }));
+      if (!tmdbId) continue;
+
       shows.push({
         type: await this.scrapeService.scrapeType(imdbPage),
         name: await this.scrapeService.scrapeName(imdbPage),
@@ -25,17 +64,18 @@ export class ScrapeController {
         revenue: await this.scrapeService.scrapeRevenue(imdbPage),
         rating: await this.scrapeService.scrapeRating(imdbPage),
         voteCount: await this.scrapeService.scrapeVoteCount(imdbPage),
-        images: await this.scrapeService.scrapeImages(imdbPage, tmdbId),
-        videos: await this.scrapeService.scrapeVideos(tmdbId),
+        images: await this.scrapeService.scrapeImages(imdbPage, tmdbId, type),
+        videos: await this.scrapeService.scrapeVideos(tmdbId, type),
         actors: await this.scrapeService.scrapeActors(imdbPage),
         directors: await this.scrapeService.scrapeDirectors(imdbPage),
         genres: await this.scrapeService.scrapeGenres(imdbPage),
         languages: await this.scrapeService.scrapeLanguages(imdbPage),
         studios: await this.scrapeService.scrapeStudios(imdbPage),
         writers: await this.scrapeService.scrapeWriters(imdbPage),
+        server: await membe,
       });
     }
-    console.log(shows);
+    this.clientProxy.emit("insert", shows);
     return shows;
   }
 }

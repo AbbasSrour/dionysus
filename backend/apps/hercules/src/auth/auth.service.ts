@@ -17,6 +17,8 @@ export class AuthService {
   ) {}
 
   async signTokens(user: User) {
+    console.log(user);
+    user.password = null;
     await this.redis.client.set(`${user.userId}`, JSON.stringify(user), {
       EX: this.config.getOrThrow<number>('redis.expiration') * 60,
     });
@@ -36,11 +38,11 @@ export class AuthService {
       { sub: user.userId },
       {
         secret: `${this.config.getOrThrow<string>(
-          "jwt.refreshToken.privateKey"
+        "jwt.refreshToken.privateKey"',
         )}`,
-        expiresIn: `${this.config.get<string>("jwt.refreshToken.expiration")}m`,
-        algorithm: "RS256"
-      },
+        expiresIn: `${this.config.get<string"jwt.refreshToken.expiration"n')}m`,
+        algorithm"RS256"',
+     },
     );
     return { accessToken, refreshToken };
   }
@@ -48,34 +50,36 @@ export class AuthService {
   async deleteSession(user: User) {
     return await this.redis.client.del(`${user.userId}`).then(
       (resolve) => true,
-      (reject) => false
+      (reject) => false,
     );
   }
 
   async updateVerificationStatus(userId: number, verified: boolean) {
+    console.log(userId);
     return this.client.user.update({
       where: { userId },
-      data: { verified }
+      data: { verified },
     });
   }
 
   async createVerificationCode(user: User) {
+    user.password = null;
     const verificationCode = await this.jwt.signAsync(
       {
         sub: user.userId,
         email: user.email,
-        userName: user.userName
+        userName: user.userName,
       },
       {
         secret: `${this.config.getOrThrow<string>(
-          "jwt.accessToken.privateKey"
+          'jwt.accessToken.privateKey',
         )}`,
         expiresIn: `${60}m`,
-        algorithm: "RS256"
-      }
+        algorithm: 'RS256',
+      },
     );
     await this.redis.client.set(`${verificationCode}`, JSON.stringify(user), {
-      EX: 60 * 60
+      EX: 60 * 60,
     });
     return verificationCode;
   }
@@ -89,8 +93,8 @@ export class AuthService {
     if (!check) return null;
 
     return await this.jwt.verifyAsync(token, {
-      secret: this.config.getOrThrow("accessToken.publicKey"),
-      algorithms: ["RS256"]
+      secret: this.config.getOrThrow('jwt.accessToken.publicKey'),
+      algorithms: ['RS256'],
     });
   }
 
@@ -98,7 +102,7 @@ export class AuthService {
     const hashedPassword: string = await this.crypto.HashPassword(password);
     return await this.crypto.EncryptPassword(
       hashedPassword,
-      this.config.getOrThrow<string>("encKey")
+      this.config.getOrThrow<string>('encKey'),
     );
   }
 

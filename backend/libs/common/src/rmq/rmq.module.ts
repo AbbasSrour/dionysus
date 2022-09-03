@@ -15,7 +15,6 @@ interface RmqModuleOptions {
 })
 export class RmqModule {
   static register({ name, queue, url }: RmqModuleOptions): DynamicModule {
-    console.log({ name, queue, url });
     return {
       module: RmqModule,
       imports: [

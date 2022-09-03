@@ -10,17 +10,18 @@ import {
   Post,
   Res,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto, RegisterUserDto } from './dto';
 import { UserService } from '../user';
 import { ConfigService } from '@nestjs/config';
 import { EmailService } from '../common/email';
-import { RedisService } from '../common/redis';
 import { GetCurrentUser } from '@app/common';
 import { CookieOptions, Response } from 'express';
-import { User } from"@prisma/client-hercules"';
-import { ResetPasswordDto } from"./dto/reset-password.dto"';
+import { User } from '@prisma/client-hercules';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { RefreshTokenGuard } from '../common/guards';
 
 @Controller('auth')
 export class AuthController {
@@ -58,7 +59,6 @@ export class AuthController {
     private readonly userService: UserService,
     private readonly config: ConfigService,
     private readonly email: EmailService,
-    private readonly redis: RedisService,
   ) {}
 
   @Post('register/local')
@@ -66,17 +66,18 @@ export class AuthController {
     const user = await this.userService.createUser({
       userName: userDto.userName,
       email: userDto.email.toLowerCase(),
-      password: await this.authService.securePassword(userDto.password)
+      password: await this.authService.securePassword(userDto.passwor),
     });
     if (!user) throw new BadRequestException();
 
+    user.password = null;
     const verificationCode = await this.authService.createVerificationCode(
-      user
+      user,
     );
 
     try {
       await this.email.sendVerificationCode(user, verificationCode);
-      return { message: "Success, a verification link was sent to your email" };
+      return { message:"Success, a verification link was sent to your email"' };
     } catch (error) {
       await this.authService.deleteVerificationCode(verificationCode);
       console.log(error);
@@ -101,13 +102,13 @@ export class AuthController {
       !user ||
       !(await this.authService.comparePasswords(password, user.password))
     )
-      throw new UnauthorizedException({ message: 'Invalid email or password' });
+      throw new UnauthorizedException({ message: "Invalid email or password" });
 
     if (!user.verified)
-      throw new UnauthorizedException({ message: 'Account not verified' });
+      throw new UnauthorizedException({ message: "Account not verified" });
 
     const { accessToken, refreshToken } = await this.authService.signTokens(
-      user,
+      user
     );
 
     res.cookie("access_token", accessToken, this.accessTokenCookieOptions);
@@ -123,7 +124,7 @@ export class AuthController {
   @Get("/logout")
   async logoutUser(
     @GetCurrentUser() user: User,
-    @Res({ passthrough: true }) res: Response
+    @Res({ passthrough: true }) res: Response,
   ) {
     await this.authService.deleteSession(user);
 
@@ -135,10 +136,13 @@ export class AuthController {
   }
 
   @Get("/refresh-tokens")
-  async refreshAccessToken(
+  @UseGuards(RefreshTokenGuard)
+  async refreshTokens(
     @GetCurrentUser() user: User,
-    @Res({ passthrough: true }) res: Response
+    @Res({ passthrough: true }) res: Response,
   ) {
+    console.log(user);
+    user.password = null;
     const newTokens = await this.authService.signTokens(user);
 
     res.cookie(
@@ -162,7 +166,7 @@ export class AuthController {
     const payload = await this.authService.verifyToken(token);
     if (!payload) throw new HttpException("Could not verify email", 401);
 
-    await this.authService.updateVerificationStatus(payload.userId, true);
+    await this.authService.updateVerificationStatus(payload.sub, true);
     return "Success";
   }
 
@@ -170,6 +174,8 @@ export class AuthController {
   @Get("/email/resend-verification/:email")
   async resendEmailVerificationCode(@Param("email") email: string) {
     const user = await this.userService.findUserByEmail({ email });
+    user.password = null;
+    console.log(user);
     const verificationCode = await this.authService.createVerificationCode(
       user
     );
@@ -180,6 +186,7 @@ export class AuthController {
   @Get("/forgot-password/:email")
   async forgotPassword(@Param("email") email: string) {
     const user = await this.userService.findUserByEmail({ email });
+    user.password = null;
     const verificationCode = await this.authService.createVerificationCode(
       user
     );
@@ -188,7 +195,10 @@ export class AuthController {
   }
 
   @Patch("/reset-password/:email")
-  async resetPassword(@Body() body: ResetPasswordDto, @Param() email: string) {
+  async resetPassword(
+    @Body() body: ResetPasswordDto,
+    @Param("email") email: string,
+  ) {
     const user = await this.userService.findUserByEmail({ email });
     const verify = this.authService.verifyToken(body.token);
     if (verify) await this.authService.deleteVerificationCode(body.token);

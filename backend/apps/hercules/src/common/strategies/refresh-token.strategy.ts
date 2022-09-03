@@ -34,7 +34,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
       'refresh_token' in req.cookies &&
       req.cookies.refresh_token.length > 0
     )
-      return req.cookies.access_token;
+      return req.cookies.refresh_token;
     return null;
   }
 

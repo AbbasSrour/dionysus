@@ -48,7 +48,7 @@ export class ImdbService {
   }
 
   async getShowPage(imdbId: string): Promise<cheerio.Root> {
-    const IMDB_LINK = 'https://www.imdb.com/title/' + imdbId;
+    const IMDB_LINK = `https://www.imdb.com/title/${imdbId}`;
     const response = await got.get(IMDB_LINK, {
       followRedirect: true,
       headers: {
@@ -61,14 +61,16 @@ export class ImdbService {
 
   async getType($: cheerio.Root): Promise<string> {
     let num = 0;
-    await $('ul[data-testid="hero-title-block__metadata"]').each((i, elem) => {
-      num++;
-    });
+    await "ul[data-testid=\"hero-title-block__metadata\"]"]')
+      .fin"li"i')
+      .each((i, elem) => {
+        num++;
+      });
     if (num === 4)
-      return await $('ul[data-testid="hero-title-block__metadata"]')
-        .find('li:nth-child(1) > a')
+      return await "ul[data-testid=\"hero-title-block__metadata\"]"]')
+        .fin"li:nth-child(1)")')
         .text();
-    else return 'Movie';
+    else retur"Movie"e';
   }
 
   async getName($: cheerio.Root): Promise<string> {

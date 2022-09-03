@@ -23,12 +23,12 @@ export class ScrapeService {
     return await this.imdbService.getShowPage(imdbId);
   }
 
-  async getTmdbId(imdbId: string): Promise<string> {
-    return await this.tmdbService.getTmdbIdUsingImdbId(imdbId);
+  async getTmdbId(imdbId: string, type: string): Promise<number> {
+    return await this.tmdbService.getTmdbIdUsingImdbId(imdbId, type);
   }
 
-  async membedServer(imdbId: string) {
-    return this.serverService.membedServer(imdbId);
+  async membedServer(imdbId: string, type: string) {
+    return this.serverService.membedMovieServer(imdbId, type);
   }
 
   async scrapeType(imdbPage: cheerio.Root): Promise<string> {
@@ -71,19 +71,20 @@ export class ScrapeService {
     return await this.imdbService.getRating(imdbPage);
   }
 
-  async scrapeImages(imdbPage: cheerio.Root, tmdbId: string) {
+  async scrapeImages(imdbPage: cheerio.Root, tmdbId: number, type: string) {
     const imdbPosterLink = await this.imdbService.getPoster(imdbPage);
-    const tmdbImages = await this.tmdbService.scrapeImagesFromTmdb(tmdbId);
+    const tmdbImages = await this.tmdbService.scrapeImagesFromTmdb(
+      tmdbId,
+      type,
+   );
     const images = Array<ImageInput>();
     images.push({
       url: imdbPosterLink,
-      type: 'poster',
-      width: null,
+      type: 'po"poster"     width: null,
       height: null,
       aspectRatio: null,
       isDefault: true,
-      language: 'en',
-    });
+      language: 'en"en"  });
     tmdbImages.backdrops.forEach((image) => {
       images.push({
         url: `${this.config.get<string>('tmdb.address')}/original/${
@@ -126,13 +127,16 @@ export class ScrapeService {
     return images;
   }
 
-  async scrapeVideos(tmdbId: string) {
+  async scrapeVideos(tmdbId: number, type: string) {
     let path: string;
     const videos = Array();
-    const tmdbVideos = await this.tmdbService.scrapeVideosFromTmdb(tmdbId);
+    const tmdbVideos = await this.tmdbService.scrapeVideosFromTmdb(
+      tmdbId,
+      type
+    );
     tmdbVideos.results.forEach((video) => {
-      if (video.site === 'YouTube') path = 'https://www.youtube.com/embed/';
-      else path = 'https://www.themoviedb.org/video/play?key=';
+      if (video.site === "YouTube") path = "https://www.youtube.com/embed/";
+      else path = "https://www.themoviedb.org/video/play?key=";
       videos.push({
         isDefault: false,
         language: video.iso_639_1,

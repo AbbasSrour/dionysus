@@ -6,7 +6,8 @@
   },
   "include": [
     "src/**/*",
-    "prisma/**/*"
+    "prisma/**/*",
+    "src/views/*"
   ],
   "exclude": [
     "node_modules",
