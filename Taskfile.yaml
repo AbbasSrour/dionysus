@@ -12,23 +12,42 @@ tasks:
     desc: Clear all docker data
     cmds:
       - docker system prune -a
-  hercules:
-    desc: Start hercules
-    cmds:
-      - docker compose up hercules hercules-db redis --build
   apollo:
     desc: Start apollo
     cmds:
       - docker compose up apollo apollo-db --build
+  coeus:
+    desc: Start coeus
+    cmds:
+      - docker compose up coeus --build
+  hercules:
+    desc: Start hercules
+    cmds:
+      - docker compose up hercules hercules-db redis --build
+  hesita:
+    desc: Start hesita
+    cmds:
+      - docker compose up hesita --build
   server:
     desc: Start server services
     cmds:
       - docker compose up rabbitmq --build
+  zues:
+    desc: Start zues node
+    cmds:
+      - docker compose up zues --build
+  kibana: 
+    desc: Start kibana
+    cmds:
+      - docker compose up kibana --build
   all:
     desc: start all services
     deps:
       - task: apollo
       - task: hercules
+      - task: hesita
+      - task: coeus
+      - task: zues
       - task: server
     cmds:
       - echo "done"
