@@ -2,14 +2,14 @@
 version: '3.8'
 
 volumes:
-  RedisDB: {}
-  Nginx: {}
-  ElasticData: {}
-  ElasticConfig: {}
-  Kibana: {}
-  RabbitmqLog: {}
-  RabbitmqLib: {}
-  database-data: {}
+  RedisDB: { }
+  Nginx: { }
+  ElasticData: { }
+  ElasticConfig: { }
+  Kibana: { }
+  RabbitmqLog: { }
+  RabbitmqLib: { }
+  database-data: { }
 
 networks:
   dio:
@@ -71,7 +71,7 @@ services:
   ################################################ Apollo #######################################################
   apollo:
     build:
-      context: ./backend
+      context: ./dio
       dockerfile: ./apps/apollo/Dockerfile
       target: development
     command:
@@ -80,7 +80,7 @@ services:
         '-c',
         'pnpm prisma generate --schema="./apps/apollo/prisma/schema.prisma" && pnpm prisma migrate dev --schema="./apps/apollo/prisma/schema.prisma" && pnpm run start apollo',
       ]
-    env_file: ./backend/apps/apollo/.env
+    env_file: ./dio/apps/apollo/.env
     container_name: apollo
     ports:
       - '4001:4001'
@@ -90,7 +90,7 @@ services:
     labels:
       org.label-schema.group: 'Apollo'
     volumes:
-      - ./backend/apps/apollo:/usr/share/app/apps/apollo
+      - ./dio:/usr/share/app
       - /usr/share/app/node_modules
     depends_on:
       - apollo-db
@@ -110,11 +110,11 @@ services:
   ################################################ Coeus #######################################################
   coeus:
     build:
-      context: ./backend
+      context: ./dio
       dockerfile: ./apps/coeus/Dockerfile
       target: development
-    command: ['sh', '-c', 'pnpm run start:dev coeus']
-    env_file: ./backend/apps/hesita/.env
+    command: [ 'sh', '-c', 'pnpm run start coeus' ]
+    env_file: ./dio/apps/coeus/.env
     container_name: coeus
     ports:
       - '4002:4002'
@@ -124,7 +124,7 @@ services:
     labels:
       org.label-schema.group: 'Coeus'
     volumes:
-      - ./backend/apps/coeus:/usr/share/app/apps/coeus
+      - ./dio:/usr/share/app
       - /usr/share/app/node_modules
 
   ############################################## Athena ########################################################
@@ -144,11 +144,11 @@ services:
   ############################################## Hesita ########################################################
   hesita:
     build:
-      context: ./backend
+      context: ./dio
       dockerfile: ./apps/hesita/Dockerfile
       target: development
-    command: ['sh', '-c', 'pnpm run start:dev hesita']
-    env_file: ./backend/apps/hesita/.env
+    command: [ 'sh', '-c', 'pnpm run start hesita' ]
+    env_file: ./dio/apps/hesita/.env
     container_name: hesita
     ports:
       - '4004:4004'
@@ -158,7 +158,7 @@ services:
     labels:
       org.label-schema.group: 'Hesita'
     volumes:
-      - ./backend/apps/hesita:/usr/share/app/apps/hesita
+      - ./dio/apps/hesita:/usr/share/app/apps/hesita
       - /usr/share/app/node_modules
 
   ############################################## Elastic ########################################################

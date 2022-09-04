@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json",
+  "version": 2,
+  "projects": {
+    "apollo": "apps/apollo",
+    "coeus": "apps/coeus",
+    "common": "libs/common",
+    "hercules": "apps/hercules",
+    "hesita": "apps/hesita"
+  }
+}
