@@ -1,20 +1,19 @@
-version: "3.8"
+version: '3.8'
 
 volumes:
-  Prometheus: { }
-  PrometheusData: { }
-  AlertManager: { }
-  Syslog: { }
-  Loki: { }
-  LokiData: { }
-  Promtail: { }
-  GrafanaData: { }
-  GrafanaConfig: { }
+  Prometheus: {}
+  PrometheusData: {}
+  AlertManager: {}
+  Syslog: {}
+  Loki: {}
+  LokiData: {}
+  Promtail: {}
+  GrafanaData: {}
+  GrafanaConfig: {}
 
 networks:
   dio:
     driver: bridge
-
 
 services:
   ############################################## Visualization ###################################################
@@ -32,13 +31,12 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
       - GF_USERS_ALLOW_SIGN_UP=false
     restart: unless-stopped
-    expose:
-      - 3000
+    ports:
+      - '3000:3000'
     networks:
       - dio
     labels:
-      org.label-schema.group: "Visualization"
-
+      org.label-schema.group: 'Visualization'
 
   ############################################ Monitoring #######################################################
   ### v2.36.2
@@ -55,15 +53,15 @@ services:
       - Prometheus:/etc/prometheus
       - PrometheusData:/prometheus
     command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--web.console.libraries=/etc/prometheus/console_libraries"
-      - "--web.console.templates=/etc/prometheus/consoles"
-      - "--storage.tsdb.retention.time=200h"
-      - "--web.enable-lifecycle"
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
     restart: unless-stopped
     labels:
-      org.label-schema.group: "monitoring"
+      org.label-schema.group: 'monitoring'
 
   ### v0.24.0
   alertmanager:
@@ -74,15 +72,15 @@ services:
     volumes:
       - AlertManager:/etc/alertmanager
     command:
-      - "--config.file=/etc/alertmanager/config.yml"
-      - "--storage.path=/alertmanager"
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
     restart: unless-stopped
     expose:
       - 9093
     networks:
       - dio
     labels:
-      org.label-schema.group: "monitoring"
+      org.label-schema.group: 'monitoring'
 
   ### v0.44.0
   cadvisor:
@@ -102,7 +100,7 @@ services:
     networks:
       - dio
     labels:
-      org.label-schema.group: "monitoring"
+      org.label-schema.group: 'monitoring'
 
   ### v1.4.3
   pushgateway:
@@ -114,7 +112,7 @@ services:
     networks:
       - dio
     labels:
-      org.label-schema.group: "monitoring"
+      org.label-schema.group: 'monitoring'
 
   ### v1.3.1
   nodeexporter:
@@ -127,17 +125,17 @@ services:
       - /sys:/host/sys:ro
       - /:/rootfs:ro
     command:
-      - "--path.procfs=/host/proc"
-      - "--path.rootfs=/rootfs"
-      - "--path.sysfs=/host/sys"
-      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     restart: unless-stopped
     expose:
       - 9100
     networks:
       - dio
     labels:
-      org.label-schema.group: "monitoring"
+      org.label-schema.group: 'monitoring'
 
   ### 0.10
   nginxexporter:
@@ -152,7 +150,7 @@ services:
     networks:
       - dio
     labels:
-      org.label-schema.group: "monitoring"
+      org.label-schema.group: 'monitoring'
 
   ################################################## Logging ######################################################
   ### v2.5.0
@@ -173,7 +171,7 @@ services:
     networks:
       dio:
     labels:
-      org.label-schema.group: "logging"
+      org.label-schema.group: 'logging'
 
   ### v2.5.0
   promtail:
@@ -195,7 +193,7 @@ services:
       dio:
     restart: unless-stopped
     labels:
-      org.label-schema.group: "logging"
+      org.label-schema.group: 'logging'
 
   # v3.30.1
   syslog-ng:
@@ -219,5 +217,4 @@ services:
         target: 601
     restart: always
     labels:
-      org.label-schema.group: "logging"
-
+      org.label-schema.group: 'logging'

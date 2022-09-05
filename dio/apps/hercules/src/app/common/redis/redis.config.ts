@@ -1,7 +1,7 @@
-import { RedisCoreModule } from '@dio/common';
-import { Logger } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { RedisClientType } from 'redis';
+import { RedisCoreModule } from "@dio/common";
+import { Logger } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { RedisClientType } from "redis";
 
 //TODO remove inject config
 export const RedisModuleConfig = RedisCoreModule.registerAsync({

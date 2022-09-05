@@ -31,7 +31,8 @@ services:
     env_file: ./backend/apps/hercules/.env
     container_name: hercules
     volumes:
-      - ./dio:/usr/share/app
+      - ./dio/apps/hercules:/usr/share/app/apps/hercules
+      - ./dio/libs:/usr/share/app/libs
       - /usr/share/app/node_modules
     ports:
       - '4000:4000'
@@ -43,6 +44,8 @@ services:
       org.label-schema.group: 'Backend'
     depends_on:
       - rabbitmq
+      - hercules-db
+      - redis
 
   hercules-db:
     image: postgres:14-alpine
@@ -90,10 +93,12 @@ services:
     labels:
       org.label-schema.group: 'Apollo'
     volumes:
-      - ./dio:/usr/share/app
+      - ./dio/apps/apollo:/usr/share/app/apps/apollo
+      - ./dio/libs:/usr/share/app/libs
       - /usr/share/app/node_modules
     depends_on:
       - apollo-db
+      - rabbitmq
 
   apollo-db:
     image: postgres:14-alpine
@@ -124,6 +129,8 @@ services:
     labels:
       org.label-schema.group: 'Coeus'
     volumes:
+      - ./dio/apps/coeus:/usr/share/app/apps/coeus
+      - ./dio/libs:/usr/share/app/libs
       - ./dio:/usr/share/app
       - /usr/share/app/node_modules
 
@@ -159,16 +166,17 @@ services:
       org.label-schema.group: 'Hesita'
     volumes:
       - ./dio/apps/hesita:/usr/share/app/apps/hesita
-      - /usr/share/app/node_modules
+      - ./dio/libs:/usr/share/app/libs
+      - /usr/share/app/node_moduless
 
   ############################################## Elastic ########################################################
-  zues:
+  zeus:
     build:
       context: ./server/elk/elasticsearch
       dockerfile: Dockerfile
       args:
         ELK_VERSION: ${ELK_VERSION}
-    container_name: zues
+    container_name: zeus
     restart: unless-stopped
     environment:
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
@@ -190,8 +198,8 @@ services:
         soft: -1
         hard: -1
       nofile:
-        soft: 51200
-        hard: 51200
+        soft: 100000
+        hard: 100000
     networks:
       - dio
     # healthcheck:

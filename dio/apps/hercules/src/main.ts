@@ -1,18 +1,23 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { HerculesModule } from './app/hercules.module';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import {
   DocumentBuilder,
   SwaggerDocumentOptions,
   SwaggerModule,
 } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
-import { RmqService } from '@dio/common';
+import { loggerConfig, RmqService } from '@dio/common';
 import { PrismaService } from './app/common/prisma';
+import { utilities, WinstonModule } from 'nest-winston';
+import winston = require('winston');
+import LokiTransport from 'winston-loki';
 
 async function bootstrap() {
-  const app = await NestFactory.create(HerculesModule);
+  const app = await NestFactory.create(HerculesModule, {
+    logger: WinstonModule.createLogger(loggerConfig('hercules')),
+  });
 
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);

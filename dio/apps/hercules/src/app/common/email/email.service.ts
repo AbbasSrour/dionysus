@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createTransport } from 'nodemailer';
 import { User } from '@prisma/client-hercules';
 import * as pug from 'pug';
 import { convert } from 'html-to-text';
 import * as Mail from 'nodemailer/lib/mailer';
+import rootDir from '../../../assets/root.dir';
+import { createTransport, SentMessageInfo, Transporter } from 'nodemailer';
+
+const emailTemplateDir = rootDir + '/assets/templates/email';
 
 @Injectable()
 export class EmailService {
   from = 'Dionysus Streaming';
-  private nodemailerTransport: Mail;
+  private nodemailerTransport:Transporter<SentMessageInfo>;
 
   constructor(private readonly config: ConfigService) {
     this.nodemailerTransport = createTransport({
@@ -24,14 +27,11 @@ export class EmailService {
 
   //todo
   async sendVerificationCode(user: User, token: string) {
-    const html = pug.renderFile(
-      `../../../template/email/assets/verificationCode.pug`,
-      {
-        userName: user.userName,
-        subject: 'Account Verification Code',
-        url: `${this.config.get('origin')}/verify-email/${token}`,
-      }
-    );
+    const html = pug.renderFile(`${emailTemplateDir}/verificationCode.pug`, {
+      userName: user.userName,
+      subject: 'Account Verification Code',
+      url: `${this.config.get('origin')}/verify-email/${token}`,
+    });
     await this.send({
       to: user.email,
       subject: 'Your account verification code',
@@ -42,7 +42,7 @@ export class EmailService {
 
   //todo
   async sendPasswordResetToken(user: User, token: string) {
-    const html = pug.renderFile(`../../../template/resetPassword.pug`, {
+    const html = pug.renderFile(`${emailTemplateDir}/resetPassword.pug`, {
       userName: user.userName,
       subject: 'Reset Password',
       url: `${this.config.get('origin')}/reset-password/${token}`,

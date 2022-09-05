@@ -32,11 +32,11 @@ tasks:
     desc: Start server services
     cmds:
       - docker compose up rabbitmq --build
-  zues:
-    desc: Start zues node
+  zeus:
+    desc: Start zeus node
     cmds:
-      - docker compose up zues --build
-  kibana: 
+      - docker compose up zeus --build
+  kibana:
     desc: Start kibana
     cmds:
       - docker compose up kibana --build
@@ -47,8 +47,9 @@ tasks:
       - task: hercules
       - task: hesita
       - task: coeus
-      - task: zues
+      - task: zeus
       - task: server
+      - task: kibana
     cmds:
       - echo "done"
   clean:

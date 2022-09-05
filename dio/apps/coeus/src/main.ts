@@ -3,12 +3,15 @@ import { NestFactory } from '@nestjs/core';
 
 import { CoeusModule } from './app/coeus.module';
 import { ConfigService } from '@nestjs/config';
-import { RmqService } from '@dio/common';
+import { loggerConfig, RmqService } from '@dio/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
+import { WinstonModule } from 'nest-winston'
 
 async function bootstrap() {
-  const app = await NestFactory.create(CoeusModule);
+  const app = await NestFactory.create(CoeusModule, {
+    logger: WinstonModule.createLogger(loggerConfig('coeus')),
+  });
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 
@@ -42,6 +45,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
 
+  app.startAllMicroservices();
   await app.listen(config.getOrThrow<number>('port'));
   Logger.log(
     `🚀 Application is running on: http://localhost:${config.get(

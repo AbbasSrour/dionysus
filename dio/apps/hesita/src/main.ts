@@ -8,11 +8,14 @@ import {
   SwaggerDocumentOptions,
   SwaggerModule,
 } from '@nestjs/swagger';
-import * as cookieParser from 'cookie-parser';
-import { RmqService } from '@dio/common';
+import cookieParser from 'cookie-parser';
+import { loggerConfig, RmqService } from '@dio/common';
+import { WinstonModule } from 'nest-winston';
 
 async function bootstrap() {
-  const app = await NestFactory.create(HesitaModule);
+  const app = await NestFactory.create(HesitaModule, {
+    logger: WinstonModule.createLogger(loggerConfig('hesita')),
+  });
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 

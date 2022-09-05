@@ -4,7 +4,7 @@ import got from 'got';
 
 @Injectable()
 export class ServerService {
-  constructor() {}
+  constructor() { }
 
   async membedMovieServer(imdbId: string, type: string) {
     const ENCRYPT_AJAX_ENDPOINT = 'https://membed.net/encrypt-ajax.php';
@@ -16,16 +16,20 @@ export class ServerService {
       GDriveId = Array();
       for (
         let seasonNum = 1, endOfSeries = false;
-        !endOfSeries && seasonNum < 3;
+        !endOfSeries && seasonNum < 2;
         seasonNum++
       ) {
         for (
-          let episodeNum = 1, endOfSeason = false;
+          let episodeNum = 1, endOfSeason = false && episodeNum < 10;
           !endOfSeason;
           episodeNum++
         ) {
           try {
-            const url = await GDriveShowId(imdbId, seasonNum, episodeNum);
+            let url;
+            await setTimeout(async () => {
+              url = await GDriveShowId(imdbId, seasonNum, episodeNum);
+            }, 2000)
+            console.log({ url, episodeNum, seasonNum, imdbId })
             if (!url) throw new Error();
             let episodeData = {
               season: seasonNum,

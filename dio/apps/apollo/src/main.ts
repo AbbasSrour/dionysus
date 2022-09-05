@@ -1,19 +1,23 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-
 import { ConfigService } from '@nestjs/config';
 import { ApolloModule } from './app/apollo.module';
 import {
+  loggerConfig,
   PrismaConflictInterceptor,
   PrismaNotFoundInterceptor,
   RmqService,
 } from '@dio/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { PrismaService } from './app/common/prisma';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
+import {WinstonModule} from 'nest-winston'
+
 
 async function bootstrap() {
-  const app = await NestFactory.create(ApolloModule);
+  const app = await NestFactory.create(ApolloModule, {
+    logger: WinstonModule.createLogger(loggerConfig('apollo')),
+  });
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 

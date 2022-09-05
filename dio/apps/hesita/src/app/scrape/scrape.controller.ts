@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Inject, Logger } from '@nestjs/common';
 import { ScrapeService } from './scrape.service';
 import {
   ClientProxy,
@@ -7,20 +7,25 @@ import {
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
+import { APOLLOPROXY } from '../common/constants';
+import { RmqService } from '@dio/common';
 
 @Controller('scrape')
 export class ScrapeController {
   constructor(
     private readonly scrapeService: ScrapeService,
-    private readonly clientProxy: ClientProxy
-  ) {}
+    private readonly rmqService: RmqService,
+    @Inject(APOLLOPROXY) private readonly apolloProxy: ClientProxy,
+    private readonly logger: Logger
+  ) { }
 
   @EventPattern('scrape')
-  async scrape(@Payload() query: string, @Ctx() context: RmqContext) {
-    console.log(query);
-    const showList = await this.scrapeService.searchImdb(query);
-    console.log(showList);
+  async scrape(@Payload() payload: string, @Ctx() context: RmqContext) {
+    const showList = await this.scrapeService.searchImdb(payload);
     const shows = Array();
+
+    console.log(showList);
+
     for (let i = 0; i < showList.length; i++) {
       const imdbPage = await this.scrapeService
         .getImdbShowPage(showList[i])
@@ -74,7 +79,9 @@ export class ScrapeController {
         server: await membed,
       });
     }
-    this.clientProxy.emit('insert', shows);
+    await this.apolloProxy.emit('insert', shows);
+    /* this.rmqService.ack(context); */
+
     return shows;
   }
 }

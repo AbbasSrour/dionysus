@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 
 import { ApolloController } from './apollo.controller';
 import { ApolloService } from './apollo.service';
@@ -52,6 +52,6 @@ import { RmqService } from '@dio/common';
     PrismaModule,
   ],
   controllers: [ApolloController],
-  providers: [ApolloService, RmqService],
+  providers: [ApolloService, RmqService, Logger],
 })
-export class ApolloModule {}
+export class ApolloModule { }
