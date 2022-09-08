@@ -10,19 +10,15 @@ import { CreateVideoDto } from '../video/dto';
 import { DirectorService } from '../director/director.service';
 import { EpisodeService } from '../episode/episode.service';
 import { CreateEpisodeDto } from '../episode/dto';
-import { CreateGenreDto } from '../genre/dto';
 import { GenreService } from '../genre/genre.service';
 import { CreateImageDto } from '../image/dto';
 import { CreateImdbDto } from '../imdb/dto';
 import { ImdbService } from '../imdb/imdb.service';
-import { CreateLanguageDto } from '../language/dto';
 import { LanguageService } from '../language/language.service';
 import { ServerService } from '../server/server.service';
 import { CreateServerDto } from '../server/dto';
-import { CreateStudioDto } from '../studio/dto';
 import { StudioService } from '../studio/studio.service';
 import { WriterService } from '../writer/writer.service';
-import { CreateWriterDto } from '../writer/dto';
 
 @Injectable()
 export class EventsService {
@@ -142,59 +138,6 @@ export class EventsService {
     });
   }
 
-  async insertGenre(showId: number, data: CreateGenreDto) {
-    return await this.genreService.createGenre(data).then(
-      (genre) => {
-        this.genreService
-          .createShowGenre({ genreId: genre.genreId, showId })
-          .then((showGenre) => {
-            return { genre, showGenre };
-          });
-      },
-
-      (error) => {
-        this.logger.log(error);
-        return this.genreService
-          .getGenreByName(data.name)
-          .then((genre) => {
-            if (
-              genre.createdAt !== genre.updatedAt &&
-              dateDifferenceUtil(genre.createdAt) >= 15
-            )
-              return this.genreService.updateGenre(genre.genreId, data);
-            return null;
-          })
-          .catch((error) => {
-            this.logger.error(error);
-            return null;
-          });
-      }
-    );
-  }
-
-  async insertLanguage(data: CreateLanguageDto) {
-    return await this.languageService.createLanguage(data).catch((error) => {
-      this.logger.log(error);
-      return this.languageService
-        .getLanguageByName(data.name)
-        .then((language) => {
-          if (
-            language.createdAt !== language.updatedAt &&
-            dateDifferenceUtil(language.createdAt) >= 15
-          )
-            return this.languageService.updateLanguage(
-              language.languageId,
-              data
-            );
-          return null;
-        })
-        .catch((error) => {
-          this.logger.error(error);
-          return null;
-        });
-    });
-  }
-
   async insertServer(data: CreateServerDto) {
     return await this.serverService.createServer(data).catch((error) => {
       this.logger.log(error);
@@ -206,46 +149,6 @@ export class EventsService {
             dateDifferenceUtil(server.createdAt) >= 15
           )
             return this.serverService.updateServer(server.serverId, data);
-          return null;
-        })
-        .catch((error) => {
-          this.logger.error(error);
-          return null;
-        });
-    });
-  }
-
-  async insertStudio(data: CreateStudioDto) {
-    return await this.studioService.createStudio(data).catch((error) => {
-      this.logger.log(error);
-      return this.studioService
-        .getStudioByName(data.name)
-        .then((studio) => {
-          if (
-            studio.createdAt !== studio.updatedAt &&
-            dateDifferenceUtil(studio.createdAt) >= 15
-          )
-            return this.studioService.updateStudio(studio.studioId, data);
-          return null;
-        })
-        .catch((error) => {
-          this.logger.error(error);
-          return null;
-        });
-    });
-  }
-
-  async insertWriter(data: CreateWriterDto) {
-    return await this.writerService.createWriter(data).catch((error) => {
-      this.logger.log(error);
-      return this.writerService
-        .getWriterByNameAndImage(data.name, data.image)
-        .then((writer) => {
-          if (
-            writer.createdAt !== writer.updatedAt &&
-            dateDifferenceUtil(writer.createdAt) >= 15
-          )
-            return this.writerService.updateWriter(writer.writerId, data);
           return null;
         })
         .catch((error) => {

@@ -17,7 +17,7 @@ export class EpisodeController {
   @Get()
   async getEpisodes(): Promise<Array<Episode>> {
     try {
-      const episodes = await this.episodeService.getEpisodesService();
+      const episodes = await this.episodeService.getEpisodes();
       if (!episodes || episodes.length === 0) throw new NotFoundException();
       return episodes;
     } catch (error) {
@@ -28,7 +28,7 @@ export class EpisodeController {
   @Post()
   async createEpisode(@Body() body: CreateEpisodeDto) {
     try {
-      const episode = await this.episodeService.createEpisodeService(body);
+      const episode = await this.episodeService.createEpisode(body);
       return episode;
     } catch (error) {
       throw error;
@@ -38,7 +38,7 @@ export class EpisodeController {
   @Get('/:id')
   async getEpisodeById(@Param('id') id: number) {
     try {
-      const episode = await this.episodeService.getEpisodeByIdService(id);
+      const episode = await this.episodeService.getEpisodeById(id);
       if (!episode || episode.length === 0) throw new NotFoundException();
       return episode;
     } catch (error) {

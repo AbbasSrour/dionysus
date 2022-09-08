@@ -17,56 +17,34 @@ export class StudioController {
 
   @Get()
   async getStudios(): Promise<Array<Studio>> {
-    try {
-      const studio = await this.studioService.getStudios();
-      if (!studio || studio.length === 0) throw new NotFoundException();
-      return studio;
-    } catch (error) {
-      throw error;
-    }
+    const studio = await this.studioService.getStudios();
+    if (!studio || studio.length === 0) throw new NotFoundException();
+    return studio;
   }
 
   @Post()
   async createStudios(@Body() body: CreateStudioDto): Promise<Studio> {
-    try {
-      const studio = await this.studioService.createStudioService(body);
-      return studio;
-    } catch (error) {
-      throw error;
-    }
+    return await this.studioService.createStudio(body);
   }
 
   @Get('/:id')
   async getStudioById(@Param('id') id: number): Promise<Studio> {
-    try {
-      const studio = await this.studioService.getStudioByIdService(id);
-      if (!studio) throw new NotFoundException();
-      return studio;
-    } catch (error) {
-      throw error;
-    }
+    const studio = await this.studioService.getStudioById(id);
+    if (!studio) throw new NotFoundException();
+    return studio;
   }
 
   @Get('/name/:name')
   async getStudioByName(@Param('name') name: string): Promise<Studio> {
-    try {
-      const studio = await this.studioService.getStudioByNameService(name);
-      if (!studio) throw new NotFoundException();
-      return studio;
-    } catch (error) {
-      throw error;
-    }
+    const studio = await this.studioService.getStudioByName(name);
+    if (!studio) throw new NotFoundException();
+    return studio;
   }
 
   @Post('/show')
   async createShowStudio(
     @Body() body: CreateShowStudioDto
   ): Promise<ShowStudio> {
-    try {
-      const showStudio = await this.studioService.createShowStudioService(body);
-      return showStudio;
-    } catch (error) {
-      throw error;
-    }
+    return await this.studioService.createShowStudio(body);
   }
 }

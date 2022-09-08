@@ -20,72 +20,41 @@ export class ServerController {
 
   @Get()
   async getServers(): Promise<Array<Server>> {
-    try {
-      const servers = await this.serverService.getServersService();
-      if (!servers || servers.length === 0) throw new NotFoundException();
-      return servers;
-    } catch (error) {
-      throw error;
-    }
+    const servers = await this.serverService.getServers();
+    if (!servers || servers.length === 0) throw new NotFoundException();
+    return servers;
   }
 
   @Post()
   async createServer(@Body() body: CreateServerDto): Promise<Server> {
-    try {
-      const server = await this.serverService.createServerService(body);
-      return server;
-    } catch (error) {
-      throw error;
-    }
+    return await this.serverService.createServer(body);
   }
 
   @Get('/:id')
   async getServerById(@Param('id') id: number): Promise<Server> {
-    try {
-      const server = await this.serverService.getServerByIdService(id);
-      if (!server) throw new NotFoundException();
-      return server;
-    } catch (error) {
-      throw error;
-    }
+    const server = await this.serverService.getServerById(id);
+    if (!server) throw new NotFoundException();
+    return server;
   }
 
   @Get('/name/:name')
   async getServerByName(@Param('name') name: string): Promise<Server> {
-    try {
-      const server = await this.serverService.getServerByNameService(name);
-      if (!server) throw new NotFoundException();
-      return server;
-    } catch (error) {
-      throw error;
-    }
+    const server = await this.serverService.getServerByName(name);
+    if (!server) throw new NotFoundException();
+    return server;
   }
 
   @Post('/movie')
   async createMovieServer(
     @Body() body: CreateMovieServerDto
   ): Promise<MovieServer> {
-    try {
-      const movieServer = await this.serverService.createMovieServerService(
-        body
-      );
-      return movieServer;
-    } catch (error) {
-      throw error;
-    }
+    return await this.serverService.createMovieServer(body);
   }
 
   @Post('/episode')
   async createEpisodeServer(
     @Body() body: CreateEpisodeServerDto
   ): Promise<SeriesServer> {
-    try {
-      const episodeServer = await this.serverService.createEpisodeServerService(
-        body
-      );
-      return episodeServer;
-    } catch (error) {
-      throw error;
-    }
+    return await this.serverService.createEpisodeServer(body);
   }
 }

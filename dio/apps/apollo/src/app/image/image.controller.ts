@@ -16,23 +16,15 @@ export class ImageController {
 
   @Get()
   async getImages(): Promise<Array<Image>> {
-    try {
-      const images = await this.imageService.getImagesService();
-      if (!images || images.length === 0) throw new NotFoundException();
-      return images;
-    } catch (error) {
-      throw error;
-    }
+    const images = await this.imageService.getImagesService();
+    if (!images || images.length === 0) throw new NotFoundException();
+    return images;
   }
 
   @Post()
   async createImage(@Body() imageDto: CreateImageDto): Promise<Image> {
-    try {
-      const image = await this.imageService.createImageService(imageDto);
-      return image;
-    } catch (error) {
-      throw error;
-    }
+    const image = await this.imageService.createImageService(imageDto);
+    return image;
   }
 
   @Get('/:id')

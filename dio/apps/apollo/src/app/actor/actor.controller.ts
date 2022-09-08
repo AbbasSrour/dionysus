@@ -14,18 +14,9 @@ import { CreateActorDto, CreateShowCastDto } from './dto';
 export class ActorController {
   constructor(private readonly actorService: ActorService) {}
 
-  @Get()
-  async getActors(): Promise<Array<Actor>> {
-    let actors: Array<Actor>;
-    actors = await this.actorService.getActors();
-    if (!actors || actors.length === 0) throw new NotFoundException();
-    return actors;
-  }
-
   @Post()
   async createActor(@Body() dto: CreateActorDto): Promise<Actor> {
-    const actor = await this.actorService.createActor(dto);
-    return actor;
+    return await this.actorService.createActor(dto);
   }
 
   @Get('/:id')
@@ -52,5 +43,13 @@ export class ActorController {
     let showCast: ShowCast;
     showCast = await this.actorService.createShowCastMember(body);
     return showCast;
+  }
+
+  @Get('/show/:showId')
+  async getActors(@Param('showId') showId: number): Promise<Array<Actor>> {
+    let actors: Array<Actor>;
+    actors = await this.actorService.getActors(showId);
+    if (!actors || actors.length === 0) throw new NotFoundException();
+    return actors;
   }
 }

@@ -4,6 +4,7 @@ import { Director, ShowDirector } from '@prisma/client-apollo';
 import {
   CreateDirectorDto,
   CreateShowDrirectorDto,
+  InsertDirectorDto,
   UpdateDirectorDto,
 } from './dto';
 
@@ -12,18 +13,21 @@ export class DirectorService {
   constructor(
     private readonly client: PrismaService,
     private readonly logger: Logger
-  ) {
+  ) {}
+
+  async getDirectors() {
+    return this.client.director.findMany();
   }
 
-  async getDirectors(showId: number): Promise<Array<Director>> {
+  async getShowDirectors(showId: number): Promise<Array<Director>> {
     return this.client.director.findMany({
       where: {
         ShowDirector: {
           some: {
-            showI,
-          ,
-        ,
-      ,
+            showId,
+          },
+        },
+      },
     });
   }
 
@@ -33,7 +37,7 @@ export class DirectorService {
 
   async getDirector(id: number): Promise<Director> {
     return this.client.director.findUniqueOrThrow({
-      where: { directorId: id ,
+      where: { directorId: id },
     });
   }
 
@@ -45,37 +49,37 @@ export class DirectorService {
       where: {
         name_image: {
           name,
-          imag,
-        ,
-      ,
+          image,
+        },
+      },
     });
   }
 
   async updateDirector(id: number, data: UpdateDirectorDto) {
     return this.client.director.update({
       where: {
-        directorId: i,
+        directorId: id,
       },
-      dat,
+      data,
     });
   }
 
   async deleteDirector(directorId: number) {
     return this.client.director.delete({
       where: {
-        directorI,
-      ,
+        directorId,
+      },
     });
   }
 
-  async deleteShowDirector(directorId: number, showId: number) {
-    return this.client.showDirector.delete({
+  async getShowDirector(directorId: number, showId: number) {
+    return this.client.showDirector.findUniqueOrThrow({
       where: {
         showId_directorId: {
+          showId,
           directorId,
-          showI,
-        ,
-      ,
+        },
+      },
     });
   }
 
@@ -85,53 +89,57 @@ export class DirectorService {
     return this.client.showDirector.create({ data: input });
   }
 
-  async getShowDirector(directorId: number, showId: number) {
-    return this.client.showDirector.findUniqueOrThrow({
+  async deleteShowDirector(directorId: number, showId: number) {
+    return this.client.showDirector.delete({
       where: {
         showId_directorId: {
+          directorId,
           showId,
-          directorI,
-        ,
-      ,
+        },
+      },
     });
   }
 
-  async insertDirectors(showId: number, data: Array<CreateDirectorDto>) {
+  async insertDirectors(showId: number, data: Array<InsertDirectorDto>) {
     // BUG: Idk what will happen if their exists two directors with the same name for the same show
-    let directors = new Array<Director>();
-    await this.getDirectors(showId)
-      .then((data) => (directors = data))
-      .catch((error) => this.logger.error(error));
+    const directors = await this.getShowDirectors(showId).catch((error) =>
+      this.logger.error(error)
+    );
 
     if (directors && directors.length > 0) {
       // check and remove old directors from show director list
-      if (data.length !== directors.length)
-        directors.forEach((director) => {
-          let deleteDirector: boolean = true;
-          data.forEach((scrapedDirector) => {
-            if (scrapedDirector.name === director.name) deleteDirector = false;
-          });
-          if (deleteDirector)
-            this.deleteShowDirector(director.directorId, showId);
+      directors.forEach((director) => {
+        let deleteDirector: boolean = true;
+        let index: number;
+        data.forEach((scrapedDirector, i) => {
+          if (scrapedDirector.name === director.name) {
+            deleteDirector = false;
+            index = i;
+          }
         });
+        if (deleteDirector) {
+          this.deleteShowDirector(director.directorId, showId);
+          directors.splice(index, 1);
+        }
+      });
 
       // Add new directors
-      data.forEach(async (scrapedDirector) => {
+      for (const scrapedDirector of data) {
         let createDirector: boolean = true;
-        directors.forEach((director) => {
+        for (const director of directors) {
           if (scrapedDirector.name === director.name) createDirector = false;
-        });
+        }
         if (createDirector) {
           const director = await this.createDirector(scrapedDirector).then(
             (director) =>
               this.createShowDirector({
                 showId,
-                directorId: director.directorI,
+                directorId: director.directorId,
               }),
             (error) => this.logger.error(error)
           );
         }
-      });
+      }
 
       // Update old directors
       directors.forEach((director) => {
@@ -141,7 +149,7 @@ export class DirectorService {
             director.name === scrapedDirector.name
           ) {
             this.updateDirector(director.directorId, {
-              image: scrapedDirector.imag,
+              image: scrapedDirector.image,
             });
             return;
           }
@@ -151,8 +159,25 @@ export class DirectorService {
 
     data.forEach((scrapedDirector) => {
       this.createDirector(scrapedDirector)
-        .then((director) =>
-          this.createShowDirector({ directorId: director.directorId, showId })
+        .then(
+          (director) =>
+            this.createShowDirector({
+              directorId: director.directorId,
+              showId,
+            }),
+          (error) => {
+            this.getDirectorByNameAndImage(
+              scrapedDirector.name,
+              scrapedDirector.image
+            )
+              .then((director) =>
+                this.createShowDirector({
+                  directorId: director.directorId,
+                  showId,
+                })
+              )
+              .catch((error) => this.logger.error(error));
+          }
         )
         .catch((error) => this.logger.error(error));
     });

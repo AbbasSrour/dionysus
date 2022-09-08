@@ -17,13 +17,9 @@ export class DirectorController {
   @Get()
   async getDirectors(): Promise<Array<Director>> {
     let director: Array<Director>;
-    try {
-      director = await this.directorService.getDirectors();
-      if (!director || director.length <= 0) throw new NotFoundException();
-      return director;
-    } catch (error) {
-      throw error;
-    }
+    director = await this.directorService.getDirectors();
+    if (!director || director.length <= 0) throw new NotFoundException();
+    return director;
   }
 
   @Post()
@@ -39,13 +35,9 @@ export class DirectorController {
 
   @Get('/:id')
   async getDirectorById(@Param('id') id: number): Promise<Director> {
-    try {
-      const director = await this.directorService.getDirector(id);
-      if (!director) throw new NotFoundException();
-      return director;
-    } catch (error) {
-      throw error;
-    }
+    const director = await this.directorService.getDirector(id);
+    if (!director) throw new NotFoundException();
+    return director;
   }
 
   @Get('/name/:name/image/:image')

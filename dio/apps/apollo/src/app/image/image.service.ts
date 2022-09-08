@@ -11,8 +11,8 @@ export class ImageService {
     return this.client.image.create({ data: input });
   }
 
-  async getImagesService(showId: number): Promise<Array<Image>> {
-    return this.client.image.findMany({ where: { showId } });
+  async getImagesService(): Promise<Array<Image>> {
+    return this.client.image.findMany();
   }
 
   async getImageByIdService(id: number): Promise<Image> {
