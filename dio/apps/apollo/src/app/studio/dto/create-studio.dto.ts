@@ -1,10 +1,10 @@
-import { IsNotEmpty, IsString, Max, Min } from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class CreateStudioDto {
   @IsString()
   @IsNotEmpty()
-  @Min(3)
-  @Max(40)
+  @MinLength(3)
+  @MaxLength(40)
   name: string;
 
   @IsString()

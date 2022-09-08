@@ -17,7 +17,7 @@ export class ImdbController {
   @Post()
   async createImdb(@Body() imdbDto: CreateImdbDto): Promise<Imdb> {
     try {
-      const imdb = this.imdbService.createImdbService(imdbDto);
+      const imdb = this.imdbService.createImdb(imdbDto);
       return imdb;
     } catch (error) {
       throw error;
@@ -27,7 +27,7 @@ export class ImdbController {
   @Get('/:id')
   async getImdbById(@Param('id') id: string): Promise<Imdb> {
     try {
-      const imdb = this.imdbService.getImdbByIdService(id);
+      const imdb = this.imdbService.getImdbById(id);
       if (!imdb) throw new NotFoundException();
       return imdb;
     } catch (error) {

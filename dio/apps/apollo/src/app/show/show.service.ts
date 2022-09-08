@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../common/prisma/prisma.service';
+import { PrismaService } from '../common/prisma';
 import { Image, Show } from '@prisma/client-apollo';
 import { CreateShowDto } from './dto';
+import { UpdateShowDto } from './dto/update-show.dto';
 
 @Injectable()
 export class ShowService {
@@ -72,5 +73,16 @@ export class ShowService {
         isDefault: isDefault,
       },
     });
+  }
+
+  async updateShow(id: number, data: UpdateShowDto): Promise<Show> {
+    return this.client.show.update({
+      where: { showId: id },
+      data,
+    });
+  }
+
+  async deleteShow(id: number): Promise<Show> {
+    return this.client.show.delete({ where: { showId: id } });
   }
 }

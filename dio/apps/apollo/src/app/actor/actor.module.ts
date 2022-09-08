@@ -3,8 +3,8 @@ import { ActorService } from './actor.service';
 import { ActorController } from './actor.controller';
 
 @Module({
-  imports: [],
   providers: [ActorService],
   controllers: [ActorController],
+  exports: [ActorService],
 })
 export class ActorModule {}

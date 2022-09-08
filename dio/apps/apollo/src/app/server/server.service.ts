@@ -6,20 +6,21 @@ import {
   CreateServerDto,
 } from './dto';
 import { MovieServer, SeriesServer, Server } from '@prisma/client-apollo';
+import { UpdateServerDto } from './dto/update-language.dto';
 
 @Injectable()
 export class ServerService {
   constructor(private readonly client: PrismaService) {}
 
-  async getServersService(): Promise<Array<Server>> {
+  async getServers(): Promise<Array<Server>> {
     return this.client.server.findMany();
   }
 
-  async createServerService(input: CreateServerDto): Promise<Server> {
+  async createServer(input: CreateServerDto): Promise<Server> {
     return this.client.server.create({ data: input });
   }
 
-  async getServerByIdService(serverId: number): Promise<Server> {
+  async getServerById(serverId: number): Promise<Server> {
     return this.client.server.findUniqueOrThrow({
       where: {
         serverId,
@@ -27,19 +28,24 @@ export class ServerService {
     });
   }
 
-  async getServerByNameService(serverName: string): Promise<Server> {
+  async getServerByName(serverName: string): Promise<Server> {
     return this.client.server.findUniqueOrThrow({
       where: { name: serverName },
     });
   }
 
-  async createMovieServerService(
-    input: CreateMovieServerDto
-  ): Promise<MovieServer> {
+  async updateServer(serverId: number, data: UpdateServerDto) {
+    return this.client.server.update({
+      where: { serverId },
+      data,
+    });
+  }
+
+  async createMovieServer(input: CreateMovieServerDto): Promise<MovieServer> {
     return this.client.movieServer.create({ data: input });
   }
 
-  async createEpisodeServerService(
+  async createEpisodeServer(
     input: CreateEpisodeServerDto
   ): Promise<SeriesServer> {
     return this.client.seriesServer.create({ data: input });

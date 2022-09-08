@@ -1,4 +1,4 @@
-import { Module, Logger } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
 import { ApolloController } from './apollo.controller';
 import { ApolloService } from './apollo.service';
@@ -19,7 +19,7 @@ import { ImdbModule } from './imdb/imdb.module';
 import { GenreModule } from './genre/genre.module';
 import { WriterModule } from './writer/writer.module';
 import { EpisodeModule } from './episode/episode.module';
-import { RmqService } from '@dio/common';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -50,8 +50,9 @@ import { RmqService } from '@dio/common';
       expandVariables: true,
     }),
     PrismaModule,
+    EventsModule,
   ],
   controllers: [ApolloController],
-  providers: [ApolloService, RmqService, Logger],
+  providers: [ApolloService],
 })
-export class ApolloModule { }
+export class ApolloModule {}

@@ -5,6 +5,13 @@ import { TmdbService } from '../tmdb/tmbd.service';
 import { ServerService } from '../server/server.service';
 import { ImageInput } from './schemas/image.schema';
 import { ConfigService } from '@nestjs/config';
+import { VideoInput } from './schemas/video.schema';
+import { ActorInput } from './schemas/actor.schema';
+import { DirectorInput } from './schemas/director.schema';
+import { GenreInput } from './schemas/genre.schema';
+import { LanguageInput } from './schemas/language.schema';
+import { StudioInput } from './schemas/studio.schema';
+import { WriterInput } from './schemas/writer.schema';
 
 @Injectable()
 export class ScrapeService {
@@ -75,7 +82,7 @@ export class ScrapeService {
     imdbPage: cheerio.CheerioAPI,
     tmdbId: number,
     type: string
-  ) {
+  ): Promise<Array<ImageInput>> {
     const imdbPosterLink = await this.imdbService.getPoster(imdbPage);
     const tmdbImages = await this.tmdbService.scrapeImagesFromTmdb(
       tmdbId,
@@ -84,8 +91,7 @@ export class ScrapeService {
     const images = Array<ImageInput>();
     images.push({
       url: imdbPosterLink,
-      type: 'poster',
-      width: null,
+      type: 'po"poster"     width: null,
       height: null,
       aspectRatio: null,
       isDefault: true,
@@ -133,7 +139,7 @@ export class ScrapeService {
     return images;
   }
 
-  async scrapeVideos(tmdbId: number, type: string) {
+  async scrapeVideos(tmdbId: number, type: string): Promise<Array<VideoInput>> {
     let path: string;
     const videos = Array();
     const tmdbVideos = await this.tmdbService.scrapeVideosFromTmdb(
@@ -141,8 +147,8 @@ export class ScrapeService {
       type
     );
     tmdbVideos.results.forEach((video) => {
-      if (video.site === 'YouTube') path = 'https://www.youtube.com/embed/';
-      else path = 'https://www.themoviedb.org/video/play?key=';
+      if (video.site === "YouTube") path = "https://www.youtube.com/embed/";
+      else path = "https://www.themoviedb.org/video/play?key=";
       videos.push({
         isDefault: false,
         language: video.iso_639_1,
@@ -152,31 +158,41 @@ export class ScrapeService {
         quality: video.size,
         site: video.site,
         type: video.type,
-        url: `${path}${video.key}`,
+        url: `${path}${video.key}`
       });
     });
     return videos;
   }
 
-  async scrapeActors(imdbPage: cheerio.CheerioAPI) {
+  async scrapeActors(imdbPage: cheerio.CheerioAPI): Promise<Array<ActorInput>> {
     return await this.imdbService.getActors(imdbPage);
   }
 
-  async scrapeDirectors(imdbPage: cheerio.CheerioAPI) {}
+  async scrapeDirectors(
+    imdbPage: cheerio.CheerioAPI
+  ): Promise<Array<DirectorInput>> {
+    return await this.imdbService.getDirectors(imdbPage);
+  }
 
-  async scrapeGenres(imdbPage: cheerio.CheerioAPI) {
+  async scrapeGenres(imdbPage: cheerio.CheerioAPI): Promise<Array<GenreInput>> {
     return await this.imdbService.getGenres(imdbPage);
   }
 
-  async scrapeLanguages(imdbPage: cheerio.CheerioAPI) {
+  async scrapeLanguages(
+    imdbPage: cheerio.CheerioAPI
+  ): Promise<Array<LanguageInput>> {
     return await this.imdbService.getLanguages(imdbPage);
   }
 
-  async scrapeStudios(imdbPage: cheerio.CheerioAPI) {
+  async scrapeStudios(
+    imdbPage: cheerio.CheerioAPI
+  ): Promise<Array<StudioInput>> {
     return await this.imdbService.getStudios(imdbPage);
   }
 
-  async scrapeWriters(imdbPage: cheerio.CheerioAPI) {
+  async scrapeWriters(
+    imdbPage: cheerio.CheerioAPI
+  ): Promise<Array<WriterInput>> {
     return await this.imdbService.getWriters(imdbPage);
   }
 }

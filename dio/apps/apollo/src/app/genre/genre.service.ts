@@ -2,32 +2,40 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma';
 import { CreateGenreDto, CreateShowGenreDto } from './dto';
 import { Genre, ShowGenre } from '@prisma/client-apollo';
+import { UpdateGenreDto } from './dto/update-genre.dto';
 
 @Injectable()
 export class GenreService {
   constructor(private readonly client: PrismaService) {}
 
-  async createGenreService(genre: CreateGenreDto): Promise<Genre> {
+  async createGenre(genre: CreateGenreDto): Promise<Genre> {
     return this.client.genre.create({ data: genre });
   }
 
-  async getGenresService(): Promise<Array<Genre>> {
+  async getGenres(): Promise<Array<Genre>> {
     return this.client.genre.findMany();
   }
 
-  async getGenreByIdService(genreId: number): Promise<Genre> {
+  async getGenreById(genreId: number): Promise<Genre> {
     return this.client.genre.findUniqueOrThrow({ where: { genreId } });
   }
 
-  async getGenreByNameService(genreName: string): Promise<Genre> {
+  async getGenreByName(genreName: string): Promise<Genre> {
     return this.client.genre.findUniqueOrThrow({ where: { name: genreName } });
   }
 
-  async createShowGenreService(input: CreateShowGenreDto): Promise<ShowGenre> {
+  async createShowGenre(input: CreateShowGenreDto): Promise<ShowGenre> {
     return this.client.showGenre.create({ data: input });
   }
 
-  async getShowGenresService(showId: number): Promise<Array<ShowGenre>> {
+  async getShowGenres(showId: number): Promise<Array<ShowGenre>> {
     return this.client.showGenre.findMany({ where: { showId: showId } });
+  }
+
+  async updateGenre(genreId: number, data: UpdateGenreDto) {
+    return this.client.genre.update({
+      where: { genreId },
+      data,
+    });
   }
 }

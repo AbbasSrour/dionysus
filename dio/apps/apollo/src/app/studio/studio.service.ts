@@ -3,6 +3,7 @@ import { PrismaService } from '../common/prisma/prisma.service';
 import { CreateStudioDto } from './dto';
 import { CreateShowStudioDto } from './dto/create-show-studio.dto';
 import { ShowStudio, Studio } from '@prisma/client-apollo';
+import { UpdateStudioDto } from './dto/update-studio.dto';
 
 @Injectable()
 export class StudioService {
@@ -12,21 +13,26 @@ export class StudioService {
     return this.client.studio.findMany();
   }
 
-  async createStudioService(input: CreateStudioDto): Promise<Studio> {
+  async createStudio(input: CreateStudioDto): Promise<Studio> {
     return this.client.studio.create({ data: input });
   }
 
-  async getStudioByIdService(id: number): Promise<Studio> {
+  async getStudioById(id: number): Promise<Studio> {
     return this.client.studio.findUniqueOrThrow({ where: { studioId: id } });
   }
 
-  async getStudioByNameService(name: string): Promise<Studio> {
+  async getStudioByName(name: string): Promise<Studio> {
     return this.client.studio.findUniqueOrThrow({ where: { name } });
   }
 
-  async createShowStudioService(
-    input: CreateShowStudioDto
-  ): Promise<ShowStudio> {
-    return this.client.showStudio.create({ data: input });
+  async createShowStudio(data: CreateShowStudioDto): Promise<ShowStudio> {
+    return this.client.showStudio.create({ data });
+  }
+
+  async updateStudio(studioId: number, data: UpdateStudioDto) {
+    return this.client.studio.update({
+      where: { studioId },
+      data,
+    });
   }
 }

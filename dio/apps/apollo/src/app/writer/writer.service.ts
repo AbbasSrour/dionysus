@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { CreateShowWriterDto, CreateWriterDto } from './dto';
+import { CreateShowWriterDto, CreateWriterDto, UpdateWriterDto } from './dto';
 import { ShowWriter, Writer } from '@prisma/client-apollo';
 
 @Injectable()
 export class WriterService {
   constructor(private readonly client: PrismaService) {}
 
-  async getWritersService(): Promise<Array<Writer>> {
+  async getWriters(): Promise<Array<Writer>> {
     return this.client.writer.findMany();
   }
 
-  async createWriterService(input: CreateWriterDto): Promise<Writer> {
+  async createWriter(input: CreateWriterDto): Promise<Writer> {
     return this.client.writer.create({ data: input });
   }
 
-  async getWriterByIdService(writerId: number): Promise<Writer> {
+  async getWriterById(writerId: number): Promise<Writer> {
     return this.client.writer.findUniqueOrThrow({
       where: {
         writerId,
@@ -23,18 +23,17 @@ export class WriterService {
     });
   }
 
-  async getWriterByNameAndImageService(
-    name: string,
-    image: string
-  ): Promise<Writer> {
+  async getWriterByNameAndImage(name: string, image: string): Promise<Writer> {
     return this.client.writer.findUniqueOrThrow({
       where: { name_image: { name, image } },
     });
   }
 
-  async createShowWriterService(
-    input: CreateShowWriterDto
-  ): Promise<ShowWriter> {
+  async updateWriter(writerId: number, data: UpdateWriterDto) {
+    return this.client.writer.update({ where: { writerId }, data });
+  }
+
+  async createShowWriter(input: CreateShowWriterDto): Promise<ShowWriter> {
     return this.client.showWriter.create({ data: input });
   }
 }

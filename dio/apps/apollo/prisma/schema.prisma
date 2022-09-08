@@ -2,6 +2,7 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../../../node_modules/@prisma/client-apollo"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 //TODO Change This
@@ -14,11 +15,11 @@ datasource db {
 model Show {
   showId      Int      @id @default(autoincrement()) @map("show_id")
   name        String   @db.VarChar(100)
+  type        String   @db.VarChar(20)
   releaseYear Int
   summary     String?  @db.VarChar(480)
-  pgRating    String?  @map("pg_rating") @db.VarChar(50)
-  budget      Int?
-  revenue     Int?
+  length      Int?     @map("length")
+  pgRating    String?  @map("pg_rating") @db.VarChar(20)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
@@ -54,7 +55,8 @@ model Movie {
   movieId   Int      @id @default(autoincrement()) @map("movie_id")
   show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
   showId    Int      @unique @map("show_id")
-  length    Int?     @map("movie_length")
+  budget      Int?
+  revenue     Int?
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -103,7 +105,7 @@ model Actor {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt
 
-  MovieCast ShowCast[]
+  ShowCast ShowCast[]
 
   @@unique([name, image])
   @@map("actor")
@@ -243,7 +245,7 @@ model ShowCast {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@id([showId, actorId])
+  @@id([showId, actorId, role])
   @@map("show_cast")
 }
 

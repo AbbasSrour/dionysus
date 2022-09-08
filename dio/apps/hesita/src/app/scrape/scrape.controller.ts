@@ -9,6 +9,7 @@ import {
 } from '@nestjs/microservices';
 import { APOLLOPROXY } from '../common/constants';
 import { RmqService } from '@dio/common';
+import { InsertDto } from './dto/insert.dto';
 
 @Controller('scrape')
 export class ScrapeController {
@@ -17,12 +18,12 @@ export class ScrapeController {
     private readonly rmqService: RmqService,
     @Inject(APOLLOPROXY) private readonly apolloProxy: ClientProxy,
     private readonly logger: Logger
-  ) { }
+  ) {}
 
   @EventPattern('scrape')
   async scrape(@Payload() payload: string, @Ctx() context: RmqContext) {
     const showList = await this.scrapeService.searchImdb(payload);
-    const shows = Array();
+    const shows = Array<InsertDto>();
 
     console.log(showList);
 
@@ -57,27 +58,35 @@ export class ScrapeController {
         .catch((error) => console.log({ where: 'tmdbId', error }));
       if (!tmdbId) continue;
 
-      shows.push({
-        type: await this.scrapeService.scrapeType(imdbPage),
+      const entry: InsertDto = {
         name: await this.scrapeService.scrapeName(imdbPage),
+        type: await this.scrapeService.scrapeType(imdbPage),
+        releaseYear: await this.scrapeService.scrapeReleaseYear(imdbPage),
         length: await this.scrapeService.scrapeLength(imdbPage),
         pgRating: await this.scrapeService.scrapePgRating(imdbPage),
-        releaseYear: await this.scrapeService.scrapeReleaseYear(imdbPage),
         summary: await this.scrapeService.scrapeSummary(imdbPage),
-        budget: await this.scrapeService.scrapeBudget(imdbPage),
-        revenue: await this.scrapeService.scrapeRevenue(imdbPage),
-        rating: await this.scrapeService.scrapeRating(imdbPage),
-        voteCount: await this.scrapeService.scrapeVoteCount(imdbPage),
+        imdb: {
+          imdbId: showList[i],
+          rating: await this.scrapeService.scrapeRating(imdbPage),
+          voteCount: await this.scrapeService.scrapeVoteCount(imdbPage),
+        },
         images: await this.scrapeService.scrapeImages(imdbPage, tmdbId, type),
         videos: await this.scrapeService.scrapeVideos(tmdbId, type),
-        actors: await this.scrapeService.scrapeActors(imdbPage),
+        cast: await this.scrapeService.scrapeActors(imdbPage),
         directors: await this.scrapeService.scrapeDirectors(imdbPage),
         genres: await this.scrapeService.scrapeGenres(imdbPage),
         languages: await this.scrapeService.scrapeLanguages(imdbPage),
         studios: await this.scrapeService.scrapeStudios(imdbPage),
+        servers: membed,
         writers: await this.scrapeService.scrapeWriters(imdbPage),
-        server: await membed,
-      });
+      };
+
+      if (type === 'Movie')
+        entry.movie = {
+          budget: await this.scrapeService.scrapeBudget(imdbPage),
+          revenue: await this.scrapeService.scrapeRevenue(imdbPage),
+        };
+      shows.push(entry);
     }
     await this.apolloProxy.emit('insert', shows);
     /* this.rmqService.ack(context); */

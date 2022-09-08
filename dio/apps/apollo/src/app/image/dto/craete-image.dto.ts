@@ -6,8 +6,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-
-const types = { poster: 'poster', logo: 'logo', backdrop: 'backdrop' };
+import { types } from './types.enum';
 
 export class CreateImageDto {
   @IsNumber()

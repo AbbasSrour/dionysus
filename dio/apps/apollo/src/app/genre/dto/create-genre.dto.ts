@@ -1,8 +1,8 @@
-import { IsString, Max, Min } from 'class-validator';
+import { IsString, MaxLength, MinLength } from 'class-validator';
 
 export class CreateGenreDto {
   @IsString()
-  @Min(3)
-  @Max(20)
+  @MinLength(3)
+  @MaxLength(20)
   name: string;
 }

@@ -18,7 +18,7 @@ export class DirectorController {
   async getDirectors(): Promise<Array<Director>> {
     let director: Array<Director>;
     try {
-      director = await this.directorService.getDirectorsService();
+      director = await this.directorService.getDirectors();
       if (!director || director.length <= 0) throw new NotFoundException();
       return director;
     } catch (error) {
@@ -30,7 +30,7 @@ export class DirectorController {
   async createDirector(@Body() body: CreateDirectorDto): Promise<Director> {
     let director: Director;
     try {
-      director = await this.directorService.createDirectorService(body);
+      director = await this.directorService.createDirector(body);
       return director;
     } catch (error) {
       throw error;
@@ -40,7 +40,7 @@ export class DirectorController {
   @Get('/:id')
   async getDirectorById(@Param('id') id: number): Promise<Director> {
     try {
-      const director = await this.directorService.getDirectorService(id);
+      const director = await this.directorService.getDirector(id);
       if (!director) throw new NotFoundException();
       return director;
     } catch (error) {
@@ -54,11 +54,10 @@ export class DirectorController {
     @Param('image') image: string
   ): Promise<Director> {
     try {
-      const director =
-        await this.directorService.getDirectorByNameAndImageService(
-          name,
-          image
-        );
+      const director = await this.directorService.getDirectorByNameAndImage(
+        name,
+        image
+      );
       if (!director) throw new NotFoundException();
       return director;
     } catch (error) {
@@ -69,9 +68,7 @@ export class DirectorController {
   @Post('/show')
   async createShowDirectors(@Body() body: CreateShowDrirectorDto) {
     try {
-      const director = await this.directorService.createShowDirectorService(
-        body
-      );
+      const director = await this.directorService.createShowDirector(body);
       return director;
     } catch (error) {
       throw error;

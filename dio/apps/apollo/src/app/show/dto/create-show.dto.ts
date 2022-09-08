@@ -6,6 +6,6 @@ export class CreateShowDto {
   releaseYear: number;
   summary: string;
   pgRating: string;
-  budget: number;
-  revenue: number;
+  length?: number;
+  type: string;
 }

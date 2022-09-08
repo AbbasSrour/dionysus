@@ -1,31 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { Language, ShowLanguage } from '@prisma/client-apollo';
-import { CreateLanguageDto, CreateShowLanguageDto } from './dto';
+import {
+  CreateLanguageDto,
+  CreateShowLanguageDto,
+  UpdateLanguageDto,
+} from './dto';
 
 @Injectable()
 export class LanguageService {
   constructor(private readonly client: PrismaService) {}
 
-  async getLanguagesService(): Promise<Array<Language>> {
+  async getLanguages(): Promise<Array<Language>> {
     return this.client.language.findMany();
   }
 
-  async getLanguageByIdService(id: number): Promise<Language> {
+  async getLanguageById(languageId: number): Promise<Language> {
     return this.client.language.findUniqueOrThrow({
-      where: { languageId: id },
+      where: { languageId },
     });
   }
 
-  async getLanguageByNameService(name: string): Promise<Language> {
+  async getLanguageByName(name: string): Promise<Language> {
     return this.client.language.findUniqueOrThrow({ where: { name } });
   }
 
-  async createLanguageService(input: CreateLanguageDto): Promise<Language> {
+  async createLanguage(input: CreateLanguageDto): Promise<Language> {
     return this.client.language.create({ data: input });
   }
 
-  async createShowLanguageService(
+  async updateLanguage(
+    languageId: number,
+    data: UpdateLanguageDto
+  ): Promise<Language> {
+    return this.client.language.update({ where: { languageId }, data });
+  }
+
+  async createShowLanguage(
     input: CreateShowLanguageDto
   ): Promise<ShowLanguage> {
     return this.client.showLanguage.create({ data: input });

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../common/prisma/prisma.service';
+import { PrismaService } from '../common/prisma';
 import { Image } from '@prisma/client-apollo';
-import { CreateImageDto } from './dto';
+import { CreateImageDto, UpdateImageDto } from './dto';
 
 @Injectable()
 export class ImageService {
@@ -11,11 +11,19 @@ export class ImageService {
     return this.client.image.create({ data: input });
   }
 
-  async getImagesService(): Promise<Array<Image>> {
-    return this.client.image.findMany();
+  async getImagesService(showId: number): Promise<Array<Image>> {
+    return this.client.image.findMany({ where: { showId } });
   }
 
   async getImageByIdService(id: number): Promise<Image> {
     return this.client.image.findUniqueOrThrow({ where: { imageId: id } });
+  }
+
+  async getImageByUrlService(url: string): Promise<Image> {
+    return this.client.image.findUniqueOrThrow({ where: { url } });
+  }
+
+  async updateImageService(imageId: number, data: UpdateImageDto) {
+    return this.client.image.update({ data, where: { imageId } });
   }
 }

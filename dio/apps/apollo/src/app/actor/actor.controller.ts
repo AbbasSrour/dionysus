@@ -50,7 +50,7 @@ export class ActorController {
   @Post('/show')
   async createShowCast(@Body() body: CreateShowCastDto) {
     let showCast: ShowCast;
-    showCast = await this.actorService.createShowCast(body);
+    showCast = await this.actorService.createShowCastMember(body);
     return showCast;
   }
 }

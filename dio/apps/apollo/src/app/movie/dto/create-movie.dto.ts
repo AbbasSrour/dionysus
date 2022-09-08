@@ -7,5 +7,9 @@ export class CreateMovieDto {
 
   @IsNumber()
   @IsNotEmpty()
-  length: number;
+  budget: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  revenue: number;
 }
