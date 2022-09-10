@@ -1,0 +1,77 @@
+.slider {
+  position: relative;
+  overflow: visible;
+
+  &__name {
+    color: white;
+    font-size: 2rem;
+
+  }
+
+  /* ======================================== Show Box ========================================= */
+  &__content {
+    white-space: nowrap;
+
+    margin-top: 1rem !important;
+
+    // TODO: Move this to Show Box SCSS File
+
+    .show-box {
+      transition-duration: 0.5s;
+    }
+
+    &:hover .show-box {
+      transform: translate(-25%);
+    }
+
+    .show-box:hover ~ .show-box {
+      transform: translate(25%);
+    }
+
+    .show-box:hover {
+      transform: scale(1.5) !important;
+    }
+  }
+
+  // Till here
+
+  /* ======================================== Arrows ========================================= */
+  &__arrow {
+    //display: none;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 4%;
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    font-size: 3rem;
+    color: #ffffff;
+    background-color: rgba(20, 20, 20, 0.7);
+    transition-duration: 0.4s;
+
+    &:hover,
+    &:active {
+      background-color: rgba(20, 20, 20, 0.9);
+
+      & > * {
+        transform: scale(1.5);
+      }
+    }
+  }
+
+  &:hover,
+  &:active {
+    .show-list__arrow {
+      display: flex;
+    }
+  }
+
+  .left {
+    left: 0;
+  }
+
+  .right {
+    right: 0;
+  }
+}
