@@ -1,14 +1,15 @@
 import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateMovieDto {
-  @IsNumber()
   @IsNotEmpty()
-  showId: number;
-
+  name: string;
+  releaseYear: number;
+  summary: string;
+  pgRating: string;
+  length?: number;
   @IsNumber()
   @IsNotEmpty()
   budget: number;
-
   @IsNumber()
   @IsNotEmpty()
   revenue: number;

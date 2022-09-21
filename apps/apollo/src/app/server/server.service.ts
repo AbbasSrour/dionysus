@@ -1,16 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/prisma';
 import {
   CreateEpisodeServerDto,
   CreateMovieServerDto,
   CreateServerDto,
 } from './dto';
-import { MovieServer, SeriesServer, Server } from '@prisma/client-apollo';
+import { EpisodeServer, MovieServer, Server } from '@prisma/client-apollo';
 import { UpdateServerDto } from './dto/update-language.dto';
+import { dateDifferenceUtil } from '../events/utilities/date-difference.util';
 
 @Injectable()
 export class ServerService {
-  constructor(private readonly client: PrismaService) {}
+  constructor(
+    private readonly client: PrismaService,
+    private readonly logger: Logger,
+  ) {}
 
   async getServers(): Promise<Array<Server>> {
     return this.client.server.findMany();
@@ -46,8 +50,27 @@ export class ServerService {
   }
 
   async createEpisodeServer(
-    input: CreateEpisodeServerDto
-  ): Promise<SeriesServer> {
-    return this.client.seriesServer.create({ data: input });
+    input: CreateEpisodeServerDto,
+  ): Promise<EpisodeServer> {
+    return this.client.episodeServer.create({ data: input });
+  }
+
+  async insertServer(data: CreateServerDto) {
+    return await this.createServer(data).catch((error) => {
+      this.logger.log(error);
+      return this.getServerByName(data.name)
+        .then((server) => {
+          if (
+            server.createdAt !== server.updatedAt &&
+            dateDifferenceUtil(server.createdAt) >= 15
+          )
+            return this.updateServer(server.serverId, data);
+          return null;
+        })
+        .catch((error) => {
+          this.logger.error(error);
+          return null;
+        });
+    });
   }
 }

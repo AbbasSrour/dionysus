@@ -1,10 +1,10 @@
-export const ratingCount = (ratingString: string): number => {
+export const convertRatingCount = (ratingString: string): number => {
   let rating = 0;
   let aux = 1;
   let multiplier = 't';
   let float = false;
   for (let i = 0; i < ratingString.length; i++) {
-    let x = ratingString.charAt(ratingString.length - (i + 1));
+    const x = ratingString.charAt(ratingString.length - (i + 1));
     if (x === 'M' || x === 'K') {
       multiplier = x;
       continue;

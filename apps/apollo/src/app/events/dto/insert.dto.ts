@@ -1,34 +1,28 @@
-import { ShowInput } from '../schemas/show.schema';
-import { ActorInput } from '../schemas/actor.schema';
-import { DirectorInput } from '../schemas/director.schema';
-import { GenreInput } from '../schemas/genre.schema';
-import { ImdbInput } from '../schemas/imdb.schema';
-import { LanguageInput } from '../schemas/language.schema';
 import { EpisodeServerInput, MovieServerInput } from '../schemas/server.schema';
-import { ImageInput } from '../schemas/image.schema';
-import { VideoInput } from '../schemas/video.schema';
-import { StudioInput } from '../schemas/studio.schema';
-import { WriterInput } from '../schemas/writer.schema';
-import { MovieInput } from '../schemas/movie.schema';
+import { CreateMovieDto } from '../../movie/dto';
+import { CreateSeriesDto } from '../../series/dto';
+import { CreateEpisodeDto } from '../../episode/dto';
+import { CreateImdbDto } from '../../imdb/dto';
+import { CreateImageDto } from '../../image/dto';
+import { CreateVideoDto } from '../../video/dto';
+import { CreateActorDto } from '../../actor/dto';
+import { CreateDirectorDto } from '../../director/dto';
+import { CreateGenreDto } from '../../genre/dto';
+import { CreateLanguageDto } from '../../language/dto';
+import { CreateStudioDto } from '../../studio/dto';
+import { CreateWriterDto } from '../../writer/dto';
 
-export class InsertDto implements ShowInput {
-  name: string;
-  type: string;
-  releaseYear: number;
-  length: number;
-  pgRating: string;
-  summary: string;
-  movie?: MovieInput;
-  //todo
-  episodes?: Array<string>;
-  imdb: ImdbInput;
-  images: Array<ImageInput>;
-  videos: Array<VideoInput>;
-  cast: Array<ActorInput>;
-  directors: Array<DirectorInput>;
-  genres: Array<GenreInput>;
-  languages: Array<LanguageInput>;
-  studios: Array<StudioInput>;
+export class InsertDto {
+  show: CreateMovieDto | CreateSeriesDto;
+  episodes?: Array<CreateEpisodeDto>;
+  imdb: CreateImdbDto;
+  images: Array<CreateImageDto>;
+  videos: Array<CreateVideoDto>;
+  cast: Array<CreateActorDto & { role: string }>;
+  directors: Array<CreateDirectorDto>;
+  genres: Array<CreateGenreDto>;
+  languages: Array<CreateLanguageDto>;
+  studios: Array<CreateStudioDto>;
   servers: MovieServerInput | Array<EpisodeServerInput>;
-  writers: Array<WriterInput>;
+  writers: Array<CreateWriterDto>;
 }

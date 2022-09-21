@@ -16,6 +16,7 @@ async function bootstrap() {
   const app = await NestFactory.create(HesitaModule, {
     logger: WinstonModule.createLogger(loggerConfig('hesita')),
   });
+
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 
@@ -26,7 +27,7 @@ async function bootstrap() {
   const config = app.get(ConfigService);
   const rmqService = app.get<RmqService>(RmqService);
   app.connectMicroservice(
-    rmqService.getOptions('hesita', config.get('rmqUrl'))
+    rmqService.getOptions('hesita', config.get('rmqUrl')),
   );
 
   // Pipes
@@ -36,7 +37,7 @@ async function bootstrap() {
       transform: true,
       forbidNonWhitelisted: true,
       disableErrorMessages: config.get<string>('environment') === 'production',
-    })
+    }),
   );
 
   // Interceptors
@@ -61,21 +62,21 @@ async function bootstrap() {
   await app.listen(config.getOrThrow('port'));
   Logger.log(
     `🚀 Application is running on: http://localhost:${config.getOrThrow(
-      'port'
-    )}/${globalPrefix}`
+      'port',
+    )}/${globalPrefix}`,
   );
   Logger.log(
     `⚡️[server]: Server running at https://localhost:${config.get<number>(
-      'port'
-    )}`
+      'port',
+    )}`,
   );
   Logger.log(
     `🌱[environment]: Server running on ${config.get(
-      'environment'
-    )} environment`
+      'environment',
+    )} environment`,
   );
   Logger.log(
-    `🗄️[Database]: Psql db ${process.env.APOLLO_DB_NAME} running on port ${process.env.APOLLO_DB_PORT}`
+    `🗄️[Database]: Psql db ${process.env.APOLLO_DB_NAME} running on port ${process.env.APOLLO_DB_PORT}`,
   );
 }
 

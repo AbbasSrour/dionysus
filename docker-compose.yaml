@@ -19,7 +19,7 @@ services:
   ################################################ Hercules #######################################################
   hercules:
     build:
-      context: ./dio
+      context: .
       dockerfile: ./apps/hercules/Dockerfile
       target: development
     command:
@@ -28,11 +28,11 @@ services:
         '-c',
         'pnpm prisma generate --schema="./apps/hercules/prisma/schema.prisma" && pnpm prisma migrate dev --schema="./apps/hercules/prisma/schema.prisma" && pnpm start hercules',
       ]
-    env_file: ./backend/apps/hercules/.env
+    env_file: ./apps/hercules/.env
     container_name: hercules
     volumes:
-      - ./dio/apps/hercules:/usr/share/app/apps/hercules
-      - ./dio/libs:/usr/share/app/libs
+      - ./apps/hercules:/usr/share/app/apps/hercules
+      - ./libs:/usr/share/app/libs
       - /usr/share/app/node_modules
     ports:
       - '4000:4000'
@@ -51,7 +51,7 @@ services:
     image: postgres:14-alpine
     container_name: hercules-db
     ports:
-      - 5433:5432
+      - "5433:5432"
     networks:
       - dio
     environment:
@@ -74,27 +74,30 @@ services:
   ################################################ Apollo #######################################################
   apollo:
     build:
-      context: ./dio
+      context: .
       dockerfile: ./apps/apollo/Dockerfile
       target: development
+    #      args:
+    #        - ${APOLLO_DATABASE_URL}
     command:
       [
         'sh',
         '-c',
         'pnpm prisma generate --schema="./apps/apollo/prisma/schema.prisma" && pnpm prisma migrate dev --schema="./apps/apollo/prisma/schema.prisma" && pnpm run start apollo',
       ]
-    env_file: ./dio/apps/apollo/.env
+    env_file: ./apps/apollo/.env
     container_name: apollo
     ports:
       - '4001:4001'
+      - '5555:5555'
     networks:
       - dio
     restart: unless-stopped
     labels:
       org.label-schema.group: 'Apollo'
     volumes:
-      - ./dio/apps/apollo:/usr/share/app/apps/apollo
-      - ./dio/libs:/usr/share/app/libs
+      - ./apps/apollo:/usr/share/app/apps/apollo
+      - ./libs:/usr/share/app/libs
       - /usr/share/app/node_modules
     depends_on:
       - apollo-db
@@ -104,7 +107,7 @@ services:
     image: postgres:14-alpine
     container_name: apollo-db
     ports:
-      - 5434:5432
+      - "5434:5432"
     networks:
       - dio
     environment:
@@ -115,11 +118,11 @@ services:
   ################################################ Coeus #######################################################
   coeus:
     build:
-      context: ./dio
+      context: .
       dockerfile: ./apps/coeus/Dockerfile
       target: development
     command: [ 'sh', '-c', 'pnpm run start coeus' ]
-    env_file: ./dio/apps/coeus/.env
+    env_file: ./apps/coeus/.env
     container_name: coeus
     ports:
       - '4002:4002'
@@ -129,15 +132,17 @@ services:
     labels:
       org.label-schema.group: 'Coeus'
     volumes:
-      - ./dio/apps/coeus:/usr/share/app/apps/coeus
-      - ./dio/libs:/usr/share/app/libs
-      - ./dio:/usr/share/app
+      - ./apps/coeus:/usr/share/app/apps/coeus
+      - ./libs:/usr/share/app/libs
       - /usr/share/app/node_modules
+    depends_on:
+      - rabbitmq
+      - zeus
 
   ############################################## Athena ########################################################
   athena:
     build:
-      context: ./backend/athena
+      context: ./athena
       dockerfile: Dockerfile
     container_name: athena
     expose:
@@ -151,11 +156,11 @@ services:
   ############################################## Hesita ########################################################
   hesita:
     build:
-      context: ./dio
+      context: .
       dockerfile: ./apps/hesita/Dockerfile
       target: development
     command: [ 'sh', '-c', 'pnpm run start hesita' ]
-    env_file: ./dio/apps/hesita/.env
+    env_file: ./apps/hesita/.env
     container_name: hesita
     ports:
       - '4004:4004'
@@ -165,14 +170,16 @@ services:
     labels:
       org.label-schema.group: 'Hesita'
     volumes:
-      - ./dio/apps/hesita:/usr/share/app/apps/hesita
-      - ./dio/libs:/usr/share/app/libs
-      - /usr/share/app/node_moduless
+      - ./apps/hesita:/usr/share/app/apps/hesita
+      - ./libs:/usr/share/app/libs
+      - /usr/share/app/node_modules
+    depends_on:
+      - rabbitmq
 
   ############################################## Elastic ########################################################
   zeus:
     build:
-      context: ./server/elk/elasticsearch
+      context: ./elk/elasticsearch
       dockerfile: Dockerfile
       args:
         ELK_VERSION: ${ELK_VERSION}
@@ -210,10 +217,10 @@ services:
     #       '-c',
     #       "curl -sf --insecure https://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@localhost:9200/_cat/health | grep -ioE 'green|yellow' || echo 'not green/yellow cluster status'",
     #     ]
-    #
+
   kibana:
     build:
-      context: ./server/elk/kibana
+      context: ./elk/kibana
       args:
         ELK_VERSION: $ELK_VERSION
     container_name: kibana
@@ -233,7 +240,7 @@ services:
   ### v1.23.0-alpine
   nginx:
     build:
-      context: ./server/nginx
+      context: ./nginx
       dockerfile: Dockerfile
     container_name: nginx
     ports:
@@ -255,8 +262,8 @@ services:
     image: rabbitmq:3.9.22-management-alpine
     container_name: rabbitmq
     ports:
-      - 5672:5672
-      - 15672:15672
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - RabbitmqLib:/var/lib/rabbitmq/
       - RabbitmqLog:/var/log/rabbitmq

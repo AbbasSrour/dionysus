@@ -5,17 +5,15 @@ generator client {
   previewFeatures = ["interactiveTransactions"]
 }
 
-//TODO Change This
 datasource db {
   provider = "postgresql"
-  url      = env("APOLLO_DATABASE_URL")
+  url      = env("APOLLO_DB_URL")
 }
 
 //--------------------------------------------------------- Base Tables ------------------------------------------------------------//
 model Show {
   showId      Int      @id @default(autoincrement()) @map("show_id")
   name        String   @db.VarChar(100)
-  type        String   @db.VarChar(20)
   releaseYear Int
   summary     String?  @db.VarChar(480)
   length      Int?     @map("length")
@@ -25,7 +23,7 @@ model Show {
 
   Imdb         Imdb?
   Movie        Movie?
-  Episode      Episode[]
+  Series       Series?
   Image        Image[]
   Video        Video[]
   ShowCast     ShowCast[]
@@ -39,16 +37,37 @@ model Show {
   @@map("show")
 }
 
-model Imdb {
-  imdbId    String   @id @map("imdb_id")
-  show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
-  showId    Int      @unique @map("show_id")
-  rating    Float?
-  voteCount Int?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+model Series {
+  seriesId          Int      @id @default(autoincrement()) @map("series_id")
+  show              Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId            Int      @map("show_id") @unique
+  avgEpisodeLength  Int?     @map("avg_episode_length")
+  type              String
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
-  @@map("imdb")
+  Episodes Episode[]
+  @@map("series")
+}
+
+model Episode {
+  episodeId   Int      @id @default(autoincrement()) @map("episode_id")
+  series      Series     @relation(fields: [seriesId], references: [seriesId], onDelete: Cascade, onUpdate: Cascade)
+  seriesId    Int      @map("series_id")
+  season      Int
+  number      Int
+  name        String?  @db.VarChar(100)
+  poster      String?  @db.VarChar(480)
+  summary     String?  @db.VarChar(480)
+  releaseYear Int?     @map("release_year")
+  length      Int?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt
+
+  EpisodeServer  EpisodeServer[]
+
+  @@unique([number, season, seriesId])
+  @@map("episode")
 }
 
 model Movie {
@@ -65,25 +84,19 @@ model Movie {
   @@map("movie")
 }
 
-model Episode {
-  episodeId   Int      @id @default(autoincrement()) @map("episode_id")
-  show        Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
-  showId      Int      @map("show_id")
-  season      Int      @map("season")
-  number      Int
-  name        String?  @db.VarChar(100)
-  poster      String?  @db.VarChar(480)
-  summary     String?  @db.VarChar(480)
-  releaseYear Int?     @map("release_year")
-  length      Int?
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt
 
-  SeriesServer  SeriesServer[]
+model Imdb {
+  imdbId    String   @id @map("imdb_id")
+  show      Show     @relation(fields: [showId], references: [showId], onDelete: Cascade, onUpdate: Cascade)
+  showId    Int      @unique @map("show_id")
+  rating    Float?
+  voteCount Int?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@unique([number, season, showId])
-  @@map("episode")
+  @@map("imdb")
 }
+
 
 model Server {
   serverId  Int      @id @default(autoincrement()) @map("server_id")
@@ -93,7 +106,7 @@ model Server {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   MovieServer  MovieServer[]
-  SeriesServer SeriesServer[]
+  EpisodeServer EpisodeServer[]
 
   @@map("server")
 }
@@ -223,7 +236,7 @@ model MovieServer {
   @@map("movie_server")
 }
 
-model SeriesServer {
+model EpisodeServer {
   episode   Episode  @relation(fields: [episodeId], references: [episodeId], onDelete: Cascade, onUpdate: Cascade)
   episodeId Int      @map("episode_id")
   server    Server   @relation(fields: [serverId], references: [serverId], onDelete: Cascade, onUpdate: Cascade)
@@ -233,7 +246,7 @@ model SeriesServer {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@id([serverId, episodeId])
-  @@map("series_server")
+  @@map("episode_server")
 }
 
 model ShowCast {

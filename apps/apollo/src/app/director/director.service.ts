@@ -12,7 +12,7 @@ import {
 export class DirectorService {
   constructor(
     private readonly client: PrismaService,
-    private readonly logger: Logger
+    private readonly logger: Logger,
   ) {}
 
   async getDirectors() {
@@ -41,10 +41,7 @@ export class DirectorService {
     });
   }
 
-  async getDirectorByNameAndImage(
-    name: string,
-    image: string
-  ): Promise<Director> {
+  async findDirector(name: string, image: string): Promise<Director> {
     return this.client.director.findUniqueOrThrow({
       where: {
         name_image: {
@@ -84,7 +81,7 @@ export class DirectorService {
   }
 
   async createShowDirector(
-    input: CreateShowDrirectorDto
+    input: CreateShowDrirectorDto,
   ): Promise<ShowDirector> {
     return this.client.showDirector.create({ data: input });
   }
@@ -103,13 +100,13 @@ export class DirectorService {
   async insertDirectors(showId: number, data: Array<InsertDirectorDto>) {
     // BUG: Idk what will happen if their exists two directors with the same name for the same show
     const directors = await this.getShowDirectors(showId).catch((error) =>
-      this.logger.error(error)
+      this.logger.error(error),
     );
 
     if (directors && directors.length > 0) {
       // check and remove old directors from show director list
       directors.forEach((director) => {
-        let deleteDirector: boolean = true;
+        let deleteDirector = true;
         let index: number;
         data.forEach((scrapedDirector, i) => {
           if (scrapedDirector.name === director.name) {
@@ -125,18 +122,18 @@ export class DirectorService {
 
       // Add new directors
       for (const scrapedDirector of data) {
-        let createDirector: boolean = true;
+        let createDirector = true;
         for (const director of directors) {
           if (scrapedDirector.name === director.name) createDirector = false;
         }
         if (createDirector) {
-          const director = await this.createDirector(scrapedDirector).then(
+          await this.createDirector(scrapedDirector).then(
             (director) =>
               this.createShowDirector({
                 showId,
                 directorId: director.directorId,
               }),
-            (error) => this.logger.error(error)
+            (error) => this.logger.error(error),
           );
         }
       }
@@ -165,19 +162,16 @@ export class DirectorService {
               directorId: director.directorId,
               showId,
             }),
-          (error) => {
-            this.getDirectorByNameAndImage(
-              scrapedDirector.name,
-              scrapedDirector.image
-            )
+          () => {
+            this.findDirector(scrapedDirector.name, scrapedDirector.image)
               .then((director) =>
                 this.createShowDirector({
                   directorId: director.directorId,
                   showId,
-                })
+                }),
               )
               .catch((error) => this.logger.error(error));
-          }
+          },
         )
         .catch((error) => this.logger.error(error));
     });

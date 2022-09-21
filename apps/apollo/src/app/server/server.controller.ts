@@ -6,7 +6,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import { MovieServer, SeriesServer, Server } from '@prisma/client-apollo';
+import { EpisodeServer, MovieServer, Server } from '@prisma/client-apollo';
 import { ServerService } from './server.service';
 import {
   CreateEpisodeServerDto,
@@ -46,15 +46,15 @@ export class ServerController {
 
   @Post('/movie')
   async createMovieServer(
-    @Body() body: CreateMovieServerDto
+    @Body() body: CreateMovieServerDto,
   ): Promise<MovieServer> {
     return await this.serverService.createMovieServer(body);
   }
 
   @Post('/episode')
   async createEpisodeServer(
-    @Body() body: CreateEpisodeServerDto
-  ): Promise<SeriesServer> {
+    @Body() body: CreateEpisodeServerDto,
+  ): Promise<EpisodeServer> {
     return await this.serverService.createEpisodeServer(body);
   }
 }

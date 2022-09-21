@@ -7,7 +7,7 @@ export class CreateEpisodeDto {
 
   @IsNotEmpty()
   @IsNumber()
-  showId: number;
+  seriesId: number;
 
   @IsNotEmpty()
   @IsNumber()

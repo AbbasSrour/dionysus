@@ -105,6 +105,6 @@
     "webpack-clear-console": "^1.0.3"
   },
   "volta": {
-    "node": "18.8.0"
+    "node": "18.9.0"
   }
 }

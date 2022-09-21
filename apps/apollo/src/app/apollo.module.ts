@@ -1,8 +1,7 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 
 import { ApolloController } from './apollo.controller';
 import { ApolloService } from './apollo.service';
-import { ShowModule } from './show/show.module';
 import configuration from './common/config/configuration';
 import { ConfigModule } from '@nestjs/config';
 import { DirectorModule } from './director/director.module';
@@ -20,6 +19,7 @@ import { GenreModule } from './genre/genre.module';
 import { WriterModule } from './writer/writer.module';
 import { EpisodeModule } from './episode/episode.module';
 import { EventsModule } from './events/events.module';
+import { RmqService } from '@dio/common';
 
 @Module({
   imports: [
@@ -32,7 +32,6 @@ import { EventsModule } from './events/events.module';
     LanguageModule,
     MovieModule,
     ServerModule,
-    ShowModule,
     StudioModule,
     VideoModule,
     WriterModule,
@@ -53,6 +52,6 @@ import { EventsModule } from './events/events.module';
     EventsModule,
   ],
   controllers: [ApolloController],
-  providers: [ApolloService],
+  providers: [ApolloService, Logger, RmqService],
 })
 export class ApolloModule {}

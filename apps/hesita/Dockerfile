@@ -8,9 +8,9 @@ RUN apk add --no-cache curl \
 
 WORKDIR /usr/share/app
 
-COPY ["package.json","./"]
+COPY ["package.json", ".npmrc" ,"./"]
 
-RUN ["pnpm", "install"]
+#RUN ["pnpm", "install"]
 
 COPY [".", "."]
 

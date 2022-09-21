@@ -1,4 +1,4 @@
-import { Controller, Inject, Logger } from '@nestjs/common';
+import { Controller, Get, Inject, Logger, Param } from '@nestjs/common';
 import { ScrapeService } from './scrape.service';
 import {
   ClientProxy,
@@ -17,80 +17,67 @@ export class ScrapeController {
     private readonly scrapeService: ScrapeService,
     private readonly rmqService: RmqService,
     @Inject(APOLLOPROXY) private readonly apolloProxy: ClientProxy,
-    private readonly logger: Logger
+    private readonly logger: Logger,
   ) {}
+
+  @Get('/:searchTerm')
+  async testScrape(@Param('searchTerm') searchTerm: string) {
+    const shows = this.ScrapeMethod(searchTerm);
+    await this.apolloProxy.emit('insert', shows);
+    return shows;
+  }
 
   @EventPattern('scrape')
   async scrape(@Payload() payload: string, @Ctx() context: RmqContext) {
-    const showList = await this.scrapeService.searchImdb(payload);
+    const shows = this.ScrapeMethod(payload);
+    await this.apolloProxy.emit('insert', shows);
+    /* this.rmqService.ack(context); */
+    return shows;
+  }
+
+  async ScrapeMethod(searchTerm: string) {
+    const showList = await this.scrapeService.searchImdb(searchTerm);
     const shows = Array<InsertDto>();
 
     console.log(showList);
 
-    for (let i = 0; i < showList.length; i++) {
-      const imdbPage = await this.scrapeService
-        .getImdbShowPage(showList[i])
-        .catch((error) =>
-          console.log({
-            where: 'imdbPage',
-            error,
-          })
-        );
+    for (const imdbId of showList) {
+      const imdbPage = await this.scrapeService.getImdbShowPage(imdbId);
       if (!imdbPage) continue;
 
-      const type = await this.scrapeService
-        .scrapeType(imdbPage)
-        .catch((error) =>
-          console.log({
-            where: 'type',
-            error,
-          })
-        );
+      const type = await this.scrapeService.scrapeType(imdbPage);
       if (!type) continue;
 
-      const membed = await this.scrapeService
-        .membedServer(showList[i], type)
-        .catch((error) => console.log({ where: 'membed', error }));
+      let membed = null;
+      if (type === 'Movie')
+        membed = await this.scrapeService.getMembedUrl(imdbId);
+      else membed = await this.scrapeService.seriesExist(imdbId);
       if (!membed) continue;
 
-      const tmdbId = await this.scrapeService
-        .getTmdbId(showList[i], type)
-        .catch((error) => console.log({ where: 'tmdbId', error }));
+      const tmdbId = await this.scrapeService.getTmdbId(imdbId, type);
       if (!tmdbId) continue;
 
-      const entry: InsertDto = {
-        name: await this.scrapeService.scrapeName(imdbPage),
-        type: await this.scrapeService.scrapeType(imdbPage),
-        releaseYear: await this.scrapeService.scrapeReleaseYear(imdbPage),
-        length: await this.scrapeService.scrapeLength(imdbPage),
-        pgRating: await this.scrapeService.scrapePgRating(imdbPage),
-        summary: await this.scrapeService.scrapeSummary(imdbPage),
-        imdb: {
-          imdbId: showList[i],
-          rating: await this.scrapeService.scrapeRating(imdbPage),
-          voteCount: await this.scrapeService.scrapeVoteCount(imdbPage),
-        },
-        images: await this.scrapeService.scrapeImages(imdbPage, tmdbId, type),
-        videos: await this.scrapeService.scrapeVideos(tmdbId, type),
-        cast: await this.scrapeService.scrapeActors(imdbPage),
-        directors: await this.scrapeService.scrapeDirectors(imdbPage),
-        genres: await this.scrapeService.scrapeGenres(imdbPage),
-        languages: await this.scrapeService.scrapeLanguages(imdbPage),
-        studios: await this.scrapeService.scrapeStudios(imdbPage),
-        servers: membed,
-        writers: await this.scrapeService.scrapeWriters(imdbPage),
+      const show: InsertDto = {
+        name: '',
+        releaseYear: 0,
+        length: 0,
+        pgRating: '',
+        summary: '',
+        type: '',
+        movie: { budget: 0, revenue: 0, urls: undefined },
+        series: { avgEpisodeLength: 0, episodes: undefined, type: '' },
+        images: undefined,
+        videos: undefined,
+        imdb: { imdbId: '', rating: 0, voteCount: 0 },
+        actors: undefined,
+        directors: undefined,
+        genres: undefined,
+        languages: undefined,
+        servers: undefined,
+        studios: undefined,
+        writers: undefined,
       };
-
-      if (type === 'Movie')
-        entry.movie = {
-          budget: await this.scrapeService.scrapeBudget(imdbPage),
-          revenue: await this.scrapeService.scrapeRevenue(imdbPage),
-        };
-      shows.push(entry);
     }
-    await this.apolloProxy.emit('insert', shows);
-    /* this.rmqService.ack(context); */
-
     return shows;
   }
 }

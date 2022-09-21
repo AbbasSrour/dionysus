@@ -43,12 +43,9 @@ export class DirectorController {
   @Get('/name/:name/image/:image')
   async DirectorByNameAndImage(
     @Param('name') name: string,
-    @Param('image') image: string
+    @Param('image') image: string,
   ): Promise<Director> {
-    const director = await this.directorService.getDirectorByNameAndImage(
-      name,
-      image
-    );
+    const director = await this.directorService.findDirector(name, image);
     if (!director) throw new NotFoundException();
     return director;
   }

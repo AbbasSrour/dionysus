@@ -1,9 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { DirectorService } from './director.service';
 import { DirectorController } from './director.controller';
 
 @Module({
-  providers: [DirectorService],
+  imports: [],
+  exports: [],
   controllers: [DirectorController],
+  providers: [DirectorService, Logger],
 })
 export class DirectorModule {}

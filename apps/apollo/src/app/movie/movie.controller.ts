@@ -5,29 +5,30 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
-import { Movie } from '@prisma/client-apollo';
 import { CreateMovieDto } from './dto';
+import { MovieEntity } from './movie.entity';
 
 @Controller('movie')
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
   @Get()
-  async getMovies(): Promise<Array<Movie>> {
-    const movies = await this.movieService.getMoviesService();
+  async getMovies(@Query('page') page: number): Promise<Array<MovieEntity>> {
+    const movies = await this.movieService.getMovies(page);
     if (!movies || movies.length === 0) throw new NotFoundException();
     return movies;
   }
 
   @Post()
-  async createMovie(@Body() body: CreateMovieDto): Promise<Movie> {
-    return await this.movieService.createMovieService(body);
+  async createMovie(@Body() body: CreateMovieDto): Promise<MovieEntity> {
+    return await this.movieService.createMovie(body);
   }
 
   @Get('/:id')
-  async getMovieById(@Param('id') id: number): Promise<Movie> {
+  async getMovieById(@Param('id') id: number): Promise<MovieEntity> {
     const movie = await this.movieService.getMovieById(id);
     if (!movie) throw new NotFoundException();
     return movie;

@@ -1,3 +1,5 @@
+#ARG APOLLO_DATABASE_URL
+
 FROM node:alpine AS development
 
 LABEL org.opencontainers.image.vendor=dionysus-apollo
@@ -8,11 +10,13 @@ RUN apk add --no-cache curl \
 
 WORKDIR /usr/share/app
 
-COPY ["package.json","./"]
+COPY ["package.json", ".npmrc","./"]
 
-RUN ["pnpm", "install"]
+#RUN ["pnpm", "install"]
 
 COPY [".", "."]
+
+#RUN pnpm prisma generate --schema="./apps/apollo/prisma/schema.prisma"
 
 RUN ["pnpm","run","build", "apollo"]
 
