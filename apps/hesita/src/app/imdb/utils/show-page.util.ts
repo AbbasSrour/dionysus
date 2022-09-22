@@ -1,8 +1,6 @@
 import * as cheerio from 'cheerio';
 import { convertRatingCount } from './rating.util';
-import { GenreInput } from '../../scrape/schemas/genre.schema';
-import { LanguageInput } from '../../scrape/schemas/language.schema';
-import { StudioInput } from '../../scrape/schemas/studio.schema';
+import { GenreType, LanguageType, StudioType } from '../../scrape/type/insert.types';
 
 export class ShowPageUtil {
   async getName($: cheerio.CheerioAPI): Promise<string> {
@@ -32,9 +30,7 @@ export class ShowPageUtil {
 
   async getVoteCount($: cheerio.CheerioAPI): Promise<number> {
     return convertRatingCount(
-      $(
-        'div[data-testid="hero-rating-bar__aggregate-rating"] > a > div > div > div',
-      )
+      $('div[data-testid="hero-rating-bar__aggregate-rating"] > a > div > div > div')
         .find('div:nth-child(3)')
         .html(),
     );
@@ -59,11 +55,9 @@ export class ShowPageUtil {
         } catch (e) {
           image = '';
         }
-        const name = $(elem).find('div > a').text();
+        const name = $(elem).find('div > a:first-of-type').text();
         const role = $(elem)
-          .find(
-            'div > ul > li > a[data-testid="cast-item-characters-link"] > span',
-          )
+          .find('div > ul > li > a[data-testid="cast-item-characters-link"] > span')
           .text();
         const actor = { name, image, role };
         actors.push(actor);
@@ -71,12 +65,12 @@ export class ShowPageUtil {
     return actors;
   }
 
-  async getGenres($: cheerio.CheerioAPI): Promise<Array<GenreInput>> {
-    const genres = new Array<GenreInput>();
+  async getGenres($: cheerio.CheerioAPI): Promise<Array<GenreType>> {
+    const genres = new Array<GenreType>();
     $('div[data-testid="genres"]:nth-child(1) > div')
       .find('a')
       .each((i, elem) => {
-        const genre: GenreInput = {
+        const genre: GenreType = {
           name: $(elem).text(),
         };
         genres.push(genre);
@@ -84,12 +78,12 @@ export class ShowPageUtil {
     return genres;
   }
 
-  async getLanguages($: cheerio.CheerioAPI): Promise<Array<LanguageInput>> {
-    const languages = new Array<LanguageInput>();
+  async getLanguages($: cheerio.CheerioAPI): Promise<Array<LanguageType>> {
+    const languages = new Array<LanguageType>();
     $('li[data-testid="title-details-languages"] > div > ul')
       .find('li')
       .each((i, elem) => {
-        const language: LanguageInput = {
+        const language: LanguageType = {
           name: $(elem).find('a').text(),
         };
         languages.push(language);
@@ -98,20 +92,18 @@ export class ShowPageUtil {
   }
 
   async getStudios($: cheerio.CheerioAPI) {
-    const StudioArray = new Array<StudioInput>();
+    const StudioArray = new Array<StudioType>();
     let name: string;
     const image = '';
-    $('li[data-testid="title-details-companies"] > div > ul > li').each(
-      (i, elem) => {
-        try {
-          name = $(elem).find('a').text();
-        } catch (error) {
-          name = '';
-        }
-        const studio: StudioInput = { name, image };
-        StudioArray.push(studio);
-      },
-    );
+    $('li[data-testid="title-details-companies"] > div > ul > li').each((i, elem) => {
+      try {
+        name = $(elem).find('a').text();
+      } catch (error) {
+        name = '';
+      }
+      const studio: StudioType = { name, image };
+      StudioArray.push(studio);
+    });
     return StudioArray;
   }
 }

@@ -10,10 +10,7 @@ import { Genre, ShowGenre } from '@prisma/client-apollo';
 
 @Injectable()
 export class GenreService {
-  constructor(
-    private readonly client: PrismaService,
-    private readonly logger: Logger
-  ) {}
+  constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
 
   async createGenre(genre: CreateGenreDto): Promise<Genre> {
     return this.client.genre.create({ data: genre });
@@ -68,13 +65,13 @@ export class GenreService {
   async insertGenres(showId: number, data: Array<InsertGenreDto>) {
     // BUG: Idk what will happen if their exists two genres with the same name for the same show
     const genres = await this.getShowGenres(showId).catch((error) =>
-      this.logger.error(error)
+      this.logger.error(error),
     );
 
     if (genres && genres.length > 0) {
       // check and remove old genres from show genre list
       genres.forEach((genre) => {
-        let deleteGenre: boolean = true;
+        let deleteGenre = true;
         let index: number;
         data.forEach((scrapedGenre, i) => {
           if (scrapedGenre.name === genre.name) {
@@ -90,7 +87,7 @@ export class GenreService {
 
       // Add new genres
       for (const scrapedGenre of data) {
-        let createGenre: boolean = true;
+        let createGenre = true;
         for (const genre of genres) {
           if (scrapedGenre.name === genre.name) createGenre = false;
         }
@@ -101,10 +98,12 @@ export class GenreService {
                 showId,
                 genreId: genre.genreId,
               }),
-            (error) => this.logger.error(error)
+            (error) => this.logger.error(error),
           );
         }
       }
+
+      return;
     }
 
     data.forEach((scrapedGenre) => {
@@ -115,17 +114,16 @@ export class GenreService {
               genreId: genre.genreId,
               showId,
             }),
-          (error) => {
-            this.logger.error(error);
+          () => {
             this.getGenreByName(scrapedGenre.name)
               .then((genre) =>
                 this.createShowGenre({
                   genreId: genre.genreId,
                   showId,
-                })
+                }),
               )
               .catch((error) => this.logger.error(error));
-          }
+          },
         )
         .catch((error) => this.logger.error(error));
     });

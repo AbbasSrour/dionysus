@@ -6,10 +6,7 @@ import { dateDifferenceUtil } from '../events/utilities/date-difference.util';
 
 @Injectable()
 export class ImageService {
-  constructor(
-    private readonly client: PrismaService,
-    private readonly logger: Logger,
-  ) {}
+  constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
 
   async createImageService(input: CreateImageDto): Promise<Image> {
     return this.client.image.create({ data: input });
@@ -32,8 +29,7 @@ export class ImageService {
   }
 
   async insertImage(data: CreateImageDto) {
-    return await this.createImageService(data).catch((error) => {
-      this.logger.log(error);
+    return await this.createImageService(data).catch(() => {
       return this.getImageByUrlService(data.url)
         .then((image) => {
           if (
@@ -43,8 +39,7 @@ export class ImageService {
             return this.updateImageService(image.imageId, data);
           return null;
         })
-        .catch((error) => {
-          this.logger.error(error);
+        .catch(() => {
           return null;
         });
     });

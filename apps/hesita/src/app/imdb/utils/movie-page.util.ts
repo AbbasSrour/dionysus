@@ -1,23 +1,18 @@
 import { ShowPageUtil } from './show-page.util';
 import * as cheerio from 'cheerio';
 import { convertTimeInt } from './length.util';
-import { DirectorInput } from '../../scrape/schemas/director.schema';
-import { WriterInput } from '../../scrape/schemas/writer.schema';
+import { DirectorType, WriterType } from '../../scrape/type/insert.types';
 
 export class MoviePageUtil extends ShowPageUtil {
   async getReleaseYear($: cheerio.CheerioAPI): Promise<number> {
     return parseInt(
-      $('ul[data-testid="hero-title-block__metadata"]')
-        .find('li:first-child > a')
-        .text(),
+      $('ul[data-testid="hero-title-block__metadata"]').find('li:first-child > a').text(),
     );
   }
 
   async getLength($: cheerio.CheerioAPI): Promise<number> {
     return convertTimeInt(
-      $('ul[data-testid="hero-title-block__metadata"]')
-        .find('li:nth-child(3)')
-        .text(),
+      $('ul[data-testid="hero-title-block__metadata"]').find('li:nth-child(3)').text(),
     );
   }
 
@@ -51,8 +46,8 @@ export class MoviePageUtil extends ShowPageUtil {
     );
   }
 
-  async getDirectors($: cheerio.CheerioAPI): Promise<Array<DirectorInput>> {
-    const directors = new Array<DirectorInput>();
+  async getDirectors($: cheerio.CheerioAPI): Promise<Array<DirectorType>> {
+    const directors = new Array<DirectorType>();
     await $('li[data-testid="title-pc-principal-credit"]')
       .first()
       .find('div > ul > li ')
@@ -62,8 +57,8 @@ export class MoviePageUtil extends ShowPageUtil {
     return directors;
   }
 
-  async getWriters($: cheerio.CheerioAPI): Promise<Array<WriterInput>> {
-    const writers = new Array<WriterInput>();
+  async getWriters($: cheerio.CheerioAPI): Promise<Array<WriterType>> {
+    const writers = new Array<WriterType>();
     $('li[data-testid="title-pc-principal-credit"]:nth-of-type(2)')
       .first()
       .find('div > ul > li > a')

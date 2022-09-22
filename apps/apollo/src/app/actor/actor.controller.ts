@@ -1,12 +1,5 @@
-import {
-  Body,
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  Post,
-} from '@nestjs/common';
-import { Actor, ShowCast } from '@prisma/client-apollo';
+import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import { Actor } from '@prisma/client-apollo';
 import { ActorService } from './actor.service';
 import { CreateActorDto, CreateShowCastDto } from './dto';
 
@@ -21,34 +14,26 @@ export class ActorController {
 
   @Get('/:id')
   async getActor(@Param('id') id: number) {
-    let actor: Actor;
-    actor = await this.actorService.getActor(id);
+    const actor = await this.actorService.getActor(id);
     if (!actor) throw new NotFoundException();
     return actor;
   }
 
   @Get('/name/:name/image/:image')
-  async getActorNameImage(
-    @Param('name') name: string,
-    @Param('image') image: string
-  ) {
-    let actor: Actor;
-    actor = await this.actorService.getActorByNameAndImage(name, image);
+  async getActorNameImage(@Param('name') name: string, @Param('image') image: string) {
+    const actor = await this.actorService.getActorByNameAndImage(name, image);
     if (!actor) throw new NotFoundException();
     return actor;
   }
 
   @Post('/show')
   async createShowCast(@Body() body: CreateShowCastDto) {
-    let showCast: ShowCast;
-    showCast = await this.actorService.createShowCastMember(body);
-    return showCast;
+    return await this.actorService.createShowCastMember(body);
   }
 
   @Get('/show/:showId')
   async getActors(@Param('showId') showId: number): Promise<Array<Actor>> {
-    let actors: Array<Actor>;
-    actors = await this.actorService.getActors(showId);
+    const actors = await this.actorService.getActors(showId);
     if (!actors || actors.length === 0) throw new NotFoundException();
     return actors;
   }

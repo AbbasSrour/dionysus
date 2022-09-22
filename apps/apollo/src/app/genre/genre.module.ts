@@ -4,7 +4,7 @@ import { GenreService } from './genre.service';
 
 @Module({
   imports: [],
-  exports: [],
+  exports: [GenreService],
   controllers: [GenreController],
   providers: [GenreService, Logger],
 })

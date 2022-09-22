@@ -7,10 +7,7 @@ import { dateDifferenceUtil } from '../events/utilities/date-difference.util';
 
 @Injectable()
 export class VideoService {
-  constructor(
-    private readonly client: PrismaService,
-    private readonly logger: Logger,
-  ) {}
+  constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
 
   async getVideosService(): Promise<Array<Video>> {
     return this.client.video.findMany();
@@ -33,8 +30,7 @@ export class VideoService {
   }
 
   async insertVideo(data: CreateVideoDto) {
-    return await this.createVideoService(data).catch((error) => {
-      this.logger.log(error);
+    return await this.createVideoService(data).catch(() => {
       return this.getVideoByUrlService(data.url)
         .then((video) => {
           if (
@@ -44,8 +40,7 @@ export class VideoService {
             return this.updateVideoService(video.videoId, data);
           return null;
         })
-        .catch((error) => {
-          this.logger.error(error);
+        .catch(() => {
           return null;
         });
     });

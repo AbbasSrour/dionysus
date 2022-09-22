@@ -1,12 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/prisma';
 import { Actor, ShowCast } from '@prisma/client-apollo';
-import {
-  CreateActorDto,
-  CreateShowCastDto,
-  InsertActorDto,
-  updateActorDto,
-} from './dto';
+import { CreateActorDto, CreateShowCastDto, InsertActorDto, updateActorDto } from './dto';
 
 @Injectable()
 export class ActorService {
@@ -32,7 +27,7 @@ export class ActorService {
         },
       },
     });
-    let aux = Array<Actor & { role: string }>();
+    const aux = Array<Actor & { role: string }>();
     actors.forEach((actor) => {
       actor.ShowCast.forEach((cast) => {
         aux.push({
@@ -93,6 +88,18 @@ export class ActorService {
     });
   }
 
+  // todo
+  // async updateShowCast(actorId: number, showId: number) {
+  //   return this.client.showCast.update({
+  //     where: {
+  //       showId_actorId_role: {
+  //         showId,
+  //         actorId,
+  //       },
+  //     },
+  //   });
+  // }
+
   async deleteShowCastMember(actorId: number, showId: number, role: string) {
     this.client.showCast.delete({
       where: {
@@ -108,18 +115,15 @@ export class ActorService {
   async insertActors(showId: number, data: Array<InsertActorDto>) {
     // BUG: Idk what will happen if their exists two actors with the same name for the same show
     const cast = await this.getActors(showId).catch((error) =>
-      this.logger.error(error)
+      this.logger.error({ error, message: 'No cast' }),
     );
 
     if (cast && cast.length > 0) {
       // check and remove old cast members from cast list
       cast.forEach((actor) => {
-        let deleteCastMember: boolean = true;
+        let deleteCastMember = true;
         data.forEach((scrapedActor) => {
-          if (
-            scrapedActor.name === actor.name &&
-            scrapedActor.role === actor.role
-          )
+          if (scrapedActor.name === actor.name && scrapedActor.role === actor.role)
             deleteCastMember = false;
           if (deleteCastMember)
             this.deleteShowCastMember(actor.actorId, showId, actor.role);
@@ -130,13 +134,12 @@ export class ActorService {
       //TODO Update roles
       cast.forEach((actor) => {
         data.forEach((scrapedActor) => {
-          if (
-            actor.image !== scrapedActor.image &&
-            actor.name === scrapedActor.name
-          ) {
+          if (actor.image !== scrapedActor.image && actor.name === scrapedActor.name) {
             this.updateActor(actor.actorId, {
               image: scrapedActor.image,
             });
+            // todo update actor role
+            // .then((actor) => this.getShowCast(actor.actorId, showId)).then(()=>this.updateActor());
             return;
           }
         });
@@ -144,25 +147,32 @@ export class ActorService {
 
       // Add new actors
       for (const scrapedActor of data) {
-        let createActor: boolean = true;
+        let createActor = true;
         cast.forEach((actor) => {
-          if (
-            actor.role === scrapedActor.role &&
-            actor.name === scrapedActor.name
-          )
+          if (actor.role === scrapedActor.role && actor.name === scrapedActor.name)
             createActor = false;
         });
         const check = await this.getActorByNameAndImage(
           scrapedActor.name,
-          scrapedActor.image
+          scrapedActor.image,
         ).catch((error) => null);
-        if (createActor && !check) await this.createActor(scrapedActor);
+        if (createActor && !check)
+          await this.createActor(scrapedActor).then((actor) =>
+            this.createShowCastMember({
+              actorId: actor.actorId,
+              role: scrapedActor.role,
+              showId,
+            }),
+          );
       }
+
+      return;
     }
 
     // If the show is created for the first time
-    data.forEach((scrapedActor) => {
-      this.createActor(scrapedActor)
+    for (const scrapedActor of data) {
+      const { name, role, image } = scrapedActor;
+      await this.createActor({ name, image })
         .then(
           (actor) =>
             this.createShowCastMember({
@@ -177,12 +187,12 @@ export class ActorService {
                   showId,
                   actorId: actor.actorId,
                   role: scrapedActor.role,
-                })
+                }),
               )
               .catch((error) => this.logger.error(error));
-          }
+          },
         )
         .catch((error) => this.logger.error(error));
-    });
+    }
   }
 }

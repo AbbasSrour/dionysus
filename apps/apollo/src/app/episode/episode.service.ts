@@ -7,10 +7,7 @@ import { dateDifferenceUtil } from '../events/utilities/date-difference.util';
 
 @Injectable()
 export class EpisodeService {
-  constructor(
-    private readonly client: PrismaService,
-    private readonly logger: Logger,
-  ) {}
+  constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
 
   async getEpisodes(): Promise<Array<Episode>> {
     return this.client.episode.findMany();
@@ -26,8 +23,8 @@ export class EpisodeService {
 
   async getEpisode(
     episodeNumber: number,
-    seriesId: number,
     season: number,
+    seriesId: number,
   ): Promise<Episode> {
     return this.client.episode.findUniqueOrThrow({
       where: {
@@ -49,7 +46,6 @@ export class EpisodeService {
 
   async insertEpisode(data: CreateEpisodeDto) {
     return await this.createEpisode(data).catch((error) => {
-      this.logger.log(error);
       return this.getEpisode(data.number, data.season, data.seriesId)
         .then((episode) => {
           if (

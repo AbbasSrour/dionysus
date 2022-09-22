@@ -10,10 +10,7 @@ import {
 
 @Injectable()
 export class DirectorService {
-  constructor(
-    private readonly client: PrismaService,
-    private readonly logger: Logger,
-  ) {}
+  constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
 
   async getDirectors() {
     return this.client.director.findMany();
@@ -80,9 +77,7 @@ export class DirectorService {
     });
   }
 
-  async createShowDirector(
-    input: CreateShowDrirectorDto,
-  ): Promise<ShowDirector> {
+  async createShowDirector(input: CreateShowDrirectorDto): Promise<ShowDirector> {
     return this.client.showDirector.create({ data: input });
   }
 
@@ -152,6 +147,8 @@ export class DirectorService {
           }
         });
       });
+
+      return;
     }
 
     data.forEach((scrapedDirector) => {

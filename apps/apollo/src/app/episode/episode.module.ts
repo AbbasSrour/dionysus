@@ -4,7 +4,7 @@ import { EpisodeController } from './episode.controller';
 
 @Module({
   imports: [],
-  exports: [],
+  exports: [EpisodeService],
   providers: [EpisodeService, Logger],
   controllers: [EpisodeController],
 })

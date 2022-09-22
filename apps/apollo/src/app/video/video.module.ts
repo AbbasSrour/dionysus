@@ -3,6 +3,8 @@ import { VideoService } from './video.service';
 import { VideoController } from './video.controller';
 
 @Module({
+  imports: [],
+  exports: [VideoService],
   providers: [VideoService, Logger],
   controllers: [VideoController],
 })

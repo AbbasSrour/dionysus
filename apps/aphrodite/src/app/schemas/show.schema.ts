@@ -1,7 +1,7 @@
-import { Api } from "../api/ApiConfig";
-import { BaseSchema } from "./base.schema";
-import { ImageSchema } from "./image.schema";
-import { Genre } from "./genre.schema";
+import { Api } from '../api/ApiConfig';
+import { BaseSchema } from './base.schema';
+import { ImageSchema } from './image.schema';
+import { Genre } from './genre.schema';
 
 export interface ShowInput {
   showId?: number;
@@ -16,7 +16,7 @@ export interface ShowInput {
 export interface ShowSchema extends ShowInput, BaseSchema {}
 
 export class Show implements ShowSchema {
-  object: string = "/shows";
+  object = '/shows';
   api = new Api();
 
   showId?: number;
@@ -34,8 +34,7 @@ export class Show implements ShowSchema {
   constructor() {}
 
   async init(input: ShowInput) {
-    const { showId, budget, pgRating, revenue, summary, releaseYear, name } =
-      input;
+    const { showId, budget, pgRating, revenue, summary, releaseYear, name } = input;
     this.showId = showId;
     this.name = name;
     this.releaseYear = releaseYear;
@@ -77,6 +76,6 @@ export class Show implements ShowSchema {
 
   async getGenres() {
     const url = `${this.object}/${this.showId}/genres`;
-    const response: Genre= (await this.api.get(url)).genres;
-
+    const response: Genre = (await this.api.get(url)).genres;
+  }
 }

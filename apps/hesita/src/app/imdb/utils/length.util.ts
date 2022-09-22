@@ -5,7 +5,7 @@ export const convertTimeInt = (timeString: string): number => {
   let minMulti = 1;
   let hourMulti = 60;
   for (let i = 0; i < timeString.length; i++) {
-    let x = timeString.charAt(timeString.length - i - 1);
+    const x = timeString.charAt(timeString.length - i - 1);
     if (x === ' ') continue;
     if (x === 'm') {
       m = true;

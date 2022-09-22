@@ -59,7 +59,7 @@ model Episode {
   name        String?  @db.VarChar(100)
   poster      String?  @db.VarChar(480)
   summary     String?  @db.VarChar(480)
-  releaseYear Int?     @map("release_year")
+  releaseDate String?     @map("release_date")
   length      Int?
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt

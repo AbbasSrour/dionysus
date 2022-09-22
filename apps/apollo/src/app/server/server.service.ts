@@ -1,20 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/prisma';
-import {
-  CreateEpisodeServerDto,
-  CreateMovieServerDto,
-  CreateServerDto,
-} from './dto';
+import { CreateEpisodeServerDto, CreateMovieServerDto, CreateServerDto } from './dto';
 import { EpisodeServer, MovieServer, Server } from '@prisma/client-apollo';
 import { UpdateServerDto } from './dto/update-language.dto';
 import { dateDifferenceUtil } from '../events/utilities/date-difference.util';
 
 @Injectable()
 export class ServerService {
-  constructor(
-    private readonly client: PrismaService,
-    private readonly logger: Logger,
-  ) {}
+  constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
 
   async getServers(): Promise<Array<Server>> {
     return this.client.server.findMany();
@@ -32,7 +25,7 @@ export class ServerService {
     });
   }
 
-  async getServerByName(serverName: string): Promise<Server> {
+  async findServer(serverName: string): Promise<Server> {
     return this.client.server.findUniqueOrThrow({
       where: { name: serverName },
     });
@@ -49,16 +42,35 @@ export class ServerService {
     return this.client.movieServer.create({ data: input });
   }
 
-  async createEpisodeServer(
-    input: CreateEpisodeServerDto,
-  ): Promise<EpisodeServer> {
+  async getMovieServer(movieId: number, serverId: number) {
+    return this.client.movieServer.findUniqueOrThrow({
+      where: {
+        movieId_serverId: {
+          movieId,
+          serverId,
+        },
+      },
+    });
+  }
+
+  async createEpisodeServer(input: CreateEpisodeServerDto): Promise<EpisodeServer> {
     return this.client.episodeServer.create({ data: input });
   }
 
+  async getEpisodeServer(episodeId: number, serverId: number) {
+    return this.client.episodeServer.findUniqueOrThrow({
+      where: {
+        serverId_episodeId: {
+          episodeId,
+          serverId,
+        },
+      },
+    });
+  }
+
   async insertServer(data: CreateServerDto) {
-    return await this.createServer(data).catch((error) => {
-      this.logger.log(error);
-      return this.getServerByName(data.name)
+    return await this.createServer(data).catch(() => {
+      return this.findServer(data.name)
         .then((server) => {
           if (
             server.createdAt !== server.updatedAt &&
@@ -67,10 +79,21 @@ export class ServerService {
             return this.updateServer(server.serverId, data);
           return null;
         })
-        .catch((error) => {
-          this.logger.error(error);
+        .catch(() => {
           return null;
         });
     });
+  }
+
+  async insertEpisodeServer(input: CreateEpisodeServerDto) {
+    return this.createEpisodeServer(input).catch(() =>
+      this.getEpisodeServer(input.episodeId, input.serverId),
+    );
+  }
+
+  async insertMovieServer(input: CreateMovieServerDto) {
+    return this.createMovieServer(input).catch(() =>
+      this.getEpisodeServer(input.movieId, input.serverId),
+    );
   }
 }

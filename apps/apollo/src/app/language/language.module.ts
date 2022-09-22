@@ -4,7 +4,7 @@ import { LanguageController } from './language.controller';
 
 @Module({
   imports: [],
-  exports: [],
+  exports: [LanguageService],
   controllers: [LanguageController],
   providers: [LanguageService, Logger],
 })

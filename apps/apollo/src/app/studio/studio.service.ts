@@ -6,10 +6,7 @@ import { ShowStudio, Studio } from '@prisma/client-apollo';
 
 @Injectable()
 export class StudioService {
-  constructor(
-    private readonly client: PrismaService,
-    private readonly logger: Logger
-  ) {}
+  constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
 
   async getStudios(): Promise<Array<Studio>> {
     return this.client.studio.findMany();
@@ -50,10 +47,7 @@ export class StudioService {
     });
   }
 
-  async deleteShowStudio(
-    studioId: number,
-    showId: number
-  ): Promise<ShowStudio> {
+  async deleteShowStudio(studioId: number, showId: number): Promise<ShowStudio> {
     return this.client.showStudio.delete({
       where: {
         showId_studioId: {
@@ -67,13 +61,13 @@ export class StudioService {
   async insertStudios(showId: number, data: Array<InsertStudioDto>) {
     // BUG: Idk what will happen if their exists two studios with the same name for the same show
     const studios = await this.getShowStudios(showId).catch((error) =>
-      this.logger.error(error)
+      this.logger.error(error),
     );
 
     if (studios && studios.length > 0) {
       // check and remove old studios from show studio list
       studios.forEach((studio) => {
-        let deleteStudio: boolean = true;
+        let deleteStudio = true;
         let index: number;
         data.forEach((scrapedStudio, i) => {
           if (scrapedStudio.name === studio.name) {
@@ -89,7 +83,7 @@ export class StudioService {
 
       // Add new studios
       for (const scrapedStudio of data) {
-        let createStudio: boolean = true;
+        let createStudio = true;
         for (const studio of studios) {
           if (scrapedStudio.name === studio.name) createStudio = false;
         }
@@ -100,7 +94,7 @@ export class StudioService {
                 showId,
                 studioId: studio.studioId,
               }),
-            (error) => this.logger.error(error)
+            (error) => this.logger.error(error),
           );
         }
       }
@@ -119,6 +113,8 @@ export class StudioService {
           }
         });
       });
+
+      return;
     }
 
     data.forEach((scrapedStudio) => {
@@ -135,10 +131,10 @@ export class StudioService {
                 this.createShowStudio({
                   studioId: studio.studioId,
                   showId,
-                })
+                }),
               )
               .catch((error) => this.logger.error(error));
-          }
+          },
         )
         .catch((error) => this.logger.error(error));
     });

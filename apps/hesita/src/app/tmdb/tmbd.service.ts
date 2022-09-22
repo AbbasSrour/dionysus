@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import got from 'got';
 
+//todo fix this
 export interface tmdbImageObject {
   aspect_ratio: number | null;
   height: number | null;
@@ -12,6 +13,7 @@ export interface tmdbImageObject {
   width: number | null;
 }
 
+//todo fix this
 export interface tmdbImageResponse {
   id: number;
   backdrops: Array<tmdbImageObject>;
@@ -19,6 +21,7 @@ export interface tmdbImageResponse {
   posters: Array<tmdbImageObject>;
 }
 
+//todo fix this
 export interface tmdbVideoResponse {
   id: number;
   results: Array<{
@@ -37,7 +40,7 @@ export interface tmdbVideoResponse {
 
 @Injectable()
 export class TmdbService {
-  constructor(private readonly config: ConfigService) {}
+  constructor(private readonly config: ConfigService, private readonly logger: Logger) {}
 
   async getTmdbIdUsingImdbId(imdbId: string, type: string) {
     const res = await got.get(
@@ -50,23 +53,19 @@ export class TmdbService {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
     const resBody = await JSON.parse(res.body);
-    if (type === 'TV Series' || type === 'TV Mini Series')
-      return parseInt(resBody.tv_results[0].id);
-    return parseInt(resBody.movie_results[0].id);
+
+    if (type === 'Movie') return parseInt(resBody.movie_results[0].id);
+    return parseInt(resBody.tv_results[0].id);
   }
 
-  async scrapeImagesFromTmdb(
-    tmdbId: number,
-    type: string
-  ): Promise<tmdbImageResponse> {
+  async scrapeImagesFromTmdb(tmdbId: number, type: string): Promise<tmdbImageResponse> {
     let url: string;
     if (type === 'TV Series' || type === 'TV Mini Series')
       url = `${this.config.get<string>('tmdb.address')}/tv/${tmdbId}/images`;
-    else
-      url = `${this.config.get<string>('tmdb.address')}/movie/${tmdbId}/images`;
+    else url = `${this.config.get<string>('tmdb.address')}/movie/${tmdbId}/images`;
     const show = await got.get(url, {
       searchParams: {
         api_key: this.config.get('tmdb.apiKey'),
@@ -79,15 +78,11 @@ export class TmdbService {
     return await JSON.parse(show.body);
   }
 
-  async scrapeVideosFromTmdb(
-    tmdbId: number,
-    type: string
-  ): Promise<tmdbVideoResponse> {
+  async scrapeVideosFromTmdb(tmdbId: number, type: string): Promise<tmdbVideoResponse> {
     let url: string;
     if (type === 'TV Series' || type === 'TV Mini Series')
       url = `${this.config.get<string>('tmdb.address')}/tv/${tmdbId}/videos`;
-    else
-      url = `${this.config.get<string>('tmdb.address')}/movie/${tmdbId}/videos`;
+    else url = `${this.config.get<string>('tmdb.address')}/movie/${tmdbId}/videos`;
     const videos = await got.get(url, {
       searchParams: {
         api_key: this.config.get('tmdb.apiKey'),

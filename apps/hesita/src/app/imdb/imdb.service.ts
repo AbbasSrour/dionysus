@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import got from 'got';
 import * as cheerio from 'cheerio';
-import { ShowPageUtil } from './utils/show-page.util';
 import { MoviePageUtil } from './utils/movie-page.util';
 import { SeriesPageUtil } from './utils/series-page.util';
 import { FullCastPageUtil } from './utils/fullcast-page.util';
@@ -9,7 +8,6 @@ import { SeasonPageUtil } from './utils/season-page.util';
 
 @Injectable()
 export class ImdbService {
-  public ShowPage = new ShowPageUtil();
   public MoviePage = new MoviePageUtil();
   public SeriesPage = new SeriesPageUtil();
   public FullCastPage = new FullCastPageUtil();
@@ -30,10 +28,8 @@ export class ImdbService {
     $('.result_text').each(function (i: number, elem: cheerio.Element) {
       td[i] = $(elem).html();
     });
-    const regex =
-      /<a href="\/title\/([a-z0-9]{8,})\/\?ref_=fn_al_tt_[0-9]{1,}"(.*)/;
-    const idRegex =
-      /( <a href="\/title\/)|(\/\?ref_=fn_al_tt_[0-9]{1,}"(.*)) /g;
+    const regex = /<a href="\/title\/([a-z0-9]{8,})\/\?ref_=fn_al_tt_[0-9]{1,}"(.*)/;
+    const idRegex = /( <a href="\/title\/)|(\/\?ref_=fn_al_tt_[0-9]{1,}"(.*)) /g;
     const titleRegex =
       /(<a href="\/title\/([a-z0-9]{8,})\/\?ref_=fn_al_tt_[0-9]{1,}">)|(<\/a>)/g;
     const shows = new Array<string>();
@@ -61,10 +57,7 @@ export class ImdbService {
     return cheerio.load(response.body);
   }
 
-  async getSeasonPage(
-    imdbId: string,
-    season: number,
-  ): Promise<cheerio.CheerioAPI> {
+  async getSeasonPage(imdbId: string, season: number): Promise<cheerio.CheerioAPI> {
     const res = await got(`https://www.imdb.com/title/${imdbId}/episodes`, {
       method: 'GET',
       followRedirect: true,
@@ -92,13 +85,12 @@ export class ImdbService {
   }
 
   async getType($: cheerio.CheerioAPI): Promise<string> {
-    const count: number = $(
-      'ul[data-testid="hero-title-block__metadata"]',
-    ).children().length;
+    const count: number = $('ul[data-testid="hero-title-block__metadata"]').children()
+      .length;
     if (count === 4)
-      return $(
-        'ul[data-testid="hero-title-block__metadata"] :nth-child(4)',
-      ).text();
+      return $('ul[data-testid="hero-title-block__metadata"]')
+        .find('li:first-of-type')
+        .text();
     else return 'Movie';
   }
 }

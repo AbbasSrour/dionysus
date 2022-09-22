@@ -6,10 +6,7 @@ import { dateDifferenceUtil } from '../events/utilities/date-difference.util';
 
 @Injectable()
 export class ImdbService {
-  constructor(
-    private readonly client: PrismaService,
-    private readonly logger: Logger,
-  ) {}
+  constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
 
   async createImdb(input: CreateImdbDto): Promise<Imdb> {
     return this.client.imdb.create({ data: input });
@@ -27,8 +24,7 @@ export class ImdbService {
   }
 
   async insertImdb(data: CreateImdbDto) {
-    return await this.createImdb(data).catch((error) => {
-      this.logger.log(error);
+    return await this.createImdb(data).catch(() => {
       return this.getImdbById(data.imdbId)
         .then((imdb) => {
           if (
@@ -36,10 +32,9 @@ export class ImdbService {
             dateDifferenceUtil(imdb.createdAt) >= 15
           )
             return this.updateImdb(imdb.imdbId, data);
-          return null;
+          return imdb;
         })
-        .catch((error) => {
-          this.logger.error(error);
+        .catch(() => {
           return null;
         });
     });

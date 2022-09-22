@@ -1,21 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ImdbService } from '../imdb/imdb.service';
 import * as cheerio from 'cheerio';
 import { TmdbService } from '../tmdb/tmbd.service';
 import { ServerService } from '../server/server.service';
-import { ImageInput } from './schemas/image.schema';
 import { ConfigService } from '@nestjs/config';
-import { VideoInput } from './schemas/video.schema';
-import { ActorInput } from './schemas/actor.schema';
-import { DirectorInput } from './schemas/director.schema';
-import { GenreInput } from './schemas/genre.schema';
-import { LanguageInput } from './schemas/language.schema';
-import { StudioInput } from './schemas/studio.schema';
-import { WriterInput } from './schemas/writer.schema';
+import {
+  ActorType,
+  DirectorType,
+  EpisodeType,
+  GenreType,
+  ImageType,
+  ImdbType,
+  LanguageType,
+  MovieType,
+  SeriesType,
+  ShowType,
+  StudioType,
+  VideoType,
+  WriterType,
+} from './type/insert.types';
 
 @Injectable()
 export class ScrapeService {
   constructor(
+    private readonly logger: Logger,
     private imdbService: ImdbService,
     private tmdbService: TmdbService,
     private serverService: ServerService,
@@ -44,67 +52,141 @@ export class ScrapeService {
       .catch((error) => console.log({ where: 'type', error }));
   }
 
-  async seriesExist(imdbId: string): Promise<boolean> {
-    return !!(await this.serverService.membedSeriesServer(imdbId, 1, 1));
+  async getMembedServer() {
+    return this.serverService.membedServer();
   }
 
-  async getMembedUrl(imdbId: string, season?: number, episode?: number) {
-    if (season && episode)
-      return this.serverService.membedSeriesServer(imdbId, season, episode);
-    return this.serverService.membedMovieServer(imdbId);
+  async showExists(imdbId: string, type: string): Promise<boolean> {
+    return await this.serverService.membedShowExists(imdbId, type);
   }
 
-  getShow(showPage: cheerio.CheerioAPI) {
-    return { name: this.imdbService.ShowPage.g.getName(showPage), this. };
+  async getMovie(
+    showPage: cheerio.CheerioAPI,
+    type: string,
+    imdbId: string,
+  ): Promise<ShowType> {
+    const name = await this.imdbService.MoviePage.getName(showPage);
+    const summary = await this.imdbService.MoviePage.getSummary(showPage);
+    const releaseYear = await this.imdbService.MoviePage.getReleaseYear(showPage);
+    const pgRating = await this.imdbService.MoviePage.getPGRating(showPage);
+    const length = await this.imdbService.MoviePage.getLength(showPage);
+
+    const movie: MovieType = {
+      budget: await this.imdbService.MoviePage.getBudget(showPage),
+      revenue: await this.imdbService.MoviePage.getRevenue(showPage),
+      urls: [
+        {
+          serverName: 'membed',
+          url: await this.serverService.membedMovieServer(imdbId),
+        },
+      ],
+    };
+
+    return {
+      type,
+      name,
+      releaseYear,
+      length,
+      summary,
+      pgRating,
+      movie,
+    };
   }
 
-  async scrapeName(imdbPage: cheerio.CheerioAPI): Promise<string> {
-    return await this.imdbService.getName(imdbPage);
+  async getSeries(
+    showPage: cheerio.CheerioAPI,
+    type: string,
+    imdbId: string,
+  ): Promise<ShowType> {
+    const name = await this.imdbService.SeriesPage.getName(showPage);
+    const summary = await this.imdbService.SeriesPage.getSummary(showPage);
+    const releaseYear = await this.imdbService.SeriesPage.getReleaseYear(showPage);
+    const pgRating = await this.imdbService.SeriesPage.getPGRating(showPage);
+    const length = await this.imdbService.SeriesPage.getLength(showPage);
+
+    const series: SeriesType = {
+      avgEpisodeLength: 0,
+      type,
+      episodes: await this.getEpisodes(imdbId),
+    };
+
+    return {
+      type,
+      name,
+      releaseYear,
+      length,
+      summary,
+      pgRating,
+      series,
+    };
   }
 
-  async scrapePgRating(imdbPage: cheerio.CheerioAPI): Promise<string> {
-    return await this.imdbService.getPGRating(imdbPage);
+  async getEpisodes(imdbId: string): Promise<Array<EpisodeType>> {
+    const episodes = new Array<EpisodeType>();
+    let seasonPage = await this.imdbService.getSeasonPage(imdbId, 1);
+    const numberOfSeasons = await this.imdbService.SeasonPage.getNumberOfSeasons(
+      seasonPage,
+    );
+
+    for (let season = 1, noError = true; season <= numberOfSeasons && noError; season++) {
+      try {
+        if (season > 1) seasonPage = await this.imdbService.getSeasonPage(imdbId, season);
+
+        const numberOfEpisodes = await this.imdbService.SeasonPage.getNumberOfEpisodes(
+          seasonPage,
+        );
+
+        for (let episode = 1; episode < numberOfEpisodes; episode++) {
+          const episodeData: EpisodeType = {
+            name: await this.imdbService.SeasonPage.getEpisodeName(seasonPage, episode),
+            number: episode,
+            season: season,
+            releaseDate: await this.imdbService.SeasonPage.getEpisodeReleaseDate(
+              seasonPage,
+              episode,
+            ),
+            length: 0,
+            poster: await this.imdbService.SeasonPage.getEpisodePoster(
+              seasonPage,
+              episode,
+            ),
+            summary: await this.imdbService.SeasonPage.getEpisodeSummery(
+              seasonPage,
+              episode,
+            ),
+            urls: [
+              {
+                serverName: 'membed',
+                url: await this.serverService.membedSeriesServer(imdbId, season, episode),
+              },
+            ],
+          };
+
+          episodes.push(episodeData);
+        }
+      } catch (error) {
+        noError = false;
+      }
+    }
+    return episodes;
   }
 
-  async scrapeLength(imdbPage: cheerio.CheerioAPI): Promise<number> {
-    return await this.imdbService.getLength(imdbPage);
-  }
-
-  async scrapeReleaseYear(imdbPage: cheerio.CheerioAPI): Promise<number> {
-    return await this.imdbService.getReleaseYear(imdbPage);
-  }
-
-  async scrapeSummary(imdbPage: cheerio.CheerioAPI): Promise<string> {
-    return await this.imdbService.getSummary(imdbPage);
-  }
-
-  async scrapeBudget(imdbPage: cheerio.CheerioAPI): Promise<number> {
-    return await this.imdbService.getBudget(imdbPage);
-  }
-
-  async scrapeRevenue(imdbPage: cheerio.CheerioAPI): Promise<number> {
-    return await this.imdbService.getRevenue(imdbPage);
-  }
-
-  async scrapeVoteCount(imdbPage: cheerio.CheerioAPI): Promise<number> {
-    return await this.imdbService.getVoteCount(imdbPage);
-  }
-
-  async scrapeRating(imdbPage: cheerio.CheerioAPI): Promise<number> {
-    return await this.imdbService.getRating(imdbPage);
+  async scrapeImdb(showPage: cheerio.CheerioAPI, imdbId: string): Promise<ImdbType> {
+    return {
+      imdbId,
+      rating: await this.imdbService.MoviePage.getRating(showPage),
+      voteCount: await this.imdbService.MoviePage.getVoteCount(showPage),
+    };
   }
 
   async scrapeImages(
     imdbPage: cheerio.CheerioAPI,
     tmdbId: number,
     type: string,
-  ): Promise<Array<ImageInput>> {
-    const imdbPosterLink = await this.imdbService.getPoster(imdbPage);
-    const tmdbImages = await this.tmdbService.scrapeImagesFromTmdb(
-      tmdbId,
-      type,
-    );
-    const images = Array<ImageInput>();
+  ): Promise<Array<ImageType>> {
+    const imdbPosterLink = await this.imdbService.MoviePage.getPoster(imdbPage);
+    const tmdbImages = await this.tmdbService.scrapeImagesFromTmdb(tmdbId, type);
+    const images = Array<ImageType>();
     images.push({
       url: imdbPosterLink,
       type: 'poster',
@@ -116,9 +198,7 @@ export class ScrapeService {
     });
     tmdbImages.backdrops.forEach((image) => {
       images.push({
-        url: `${this.config.get<string>('tmdb.address')}/original/${
-          image.file_path
-        }`,
+        url: `${this.config.get<string>('tmdb.address')}/original/${image.file_path}`,
         type: 'backdrop',
         width: image.width,
         height: image.height,
@@ -129,9 +209,7 @@ export class ScrapeService {
     });
     tmdbImages.logos.forEach((image) => {
       images.push({
-        url: `${this.config.get<string>('tmdb.address')}/original/${
-          image.file_path
-        }`,
+        url: `${this.config.get<string>('tmdb.address')}/original/${image.file_path}`,
         type: 'logo',
         width: image.width,
         height: image.height,
@@ -142,9 +220,7 @@ export class ScrapeService {
     });
     tmdbImages.posters.forEach((image) => {
       images.push({
-        url: `${this.config.get<string>('tmdb.address')}/original/${
-          image.file_path
-        }`,
+        url: `${this.config.get<string>('tmdb.address')}/original/${image.file_path}`,
         type: 'poster',
         width: image.width,
         height: image.height,
@@ -156,13 +232,10 @@ export class ScrapeService {
     return images;
   }
 
-  async scrapeVideos(tmdbId: number, type: string): Promise<Array<VideoInput>> {
+  async scrapeVideos(tmdbId: number, type: string): Promise<Array<VideoType>> {
     let path: string;
     const videos = [];
-    const tmdbVideos = await this.tmdbService.scrapeVideosFromTmdb(
-      tmdbId,
-      type,
-    );
+    const tmdbVideos = await this.tmdbService.scrapeVideosFromTmdb(tmdbId, type);
     tmdbVideos.results.forEach((video) => {
       if (video.site === 'YouTube') path = 'https://www.youtube.com/embed/';
       else path = 'https://www.themoviedb.org/video/play?key=';
@@ -181,35 +254,35 @@ export class ScrapeService {
     return videos;
   }
 
-  async scrapeActors(imdbPage: cheerio.CheerioAPI): Promise<Array<ActorInput>> {
-    return await this.imdbService.getActors(imdbPage);
+  async scrapeActors(imdbPage: cheerio.CheerioAPI): Promise<Array<ActorType>> {
+    return await this.imdbService.MoviePage.getActors(imdbPage);
   }
 
   async scrapeDirectors(
     imdbPage: cheerio.CheerioAPI,
-  ): Promise<Array<DirectorInput>> {
-    return await this.imdbService.getDirectors(imdbPage);
+    type: string,
+    imdbId: string,
+  ): Promise<Array<DirectorType>> {
+    if (type === 'Movie') return await this.imdbService.MoviePage.getDirectors(imdbPage);
+    else
+      return await this.imdbService.FullCastPage.getDirectors(
+        await this.imdbService.getFullCastPage(imdbId),
+      );
   }
 
-  async scrapeGenres(imdbPage: cheerio.CheerioAPI): Promise<Array<GenreInput>> {
-    return await this.imdbService.getGenres(imdbPage);
+  async scrapeGenres(imdbPage: cheerio.CheerioAPI): Promise<Array<GenreType>> {
+    return await this.imdbService.MoviePage.getGenres(imdbPage);
   }
 
-  async scrapeLanguages(
-    imdbPage: cheerio.CheerioAPI,
-  ): Promise<Array<LanguageInput>> {
-    return await this.imdbService.getLanguages(imdbPage);
+  async scrapeLanguages(imdbPage: cheerio.CheerioAPI): Promise<Array<LanguageType>> {
+    return await this.imdbService.MoviePage.getLanguages(imdbPage);
   }
 
-  async scrapeStudios(
-    imdbPage: cheerio.CheerioAPI,
-  ): Promise<Array<StudioInput>> {
-    return await this.imdbService.getStudios(imdbPage);
+  async scrapeStudios(imdbPage: cheerio.CheerioAPI): Promise<Array<StudioType>> {
+    return await this.imdbService.MoviePage.getStudios(imdbPage);
   }
 
-  async scrapeWriters(
-    imdbPage: cheerio.CheerioAPI,
-  ): Promise<Array<WriterInput>> {
-    return await this.imdbService.getWriters(imdbPage);
+  async scrapeWriters(imdbPage: cheerio.CheerioAPI): Promise<Array<WriterType>> {
+    return await this.imdbService.MoviePage.getWriters(imdbPage);
   }
 }

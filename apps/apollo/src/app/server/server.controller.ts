@@ -1,18 +1,7 @@
-import {
-  Body,
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
 import { EpisodeServer, MovieServer, Server } from '@prisma/client-apollo';
 import { ServerService } from './server.service';
-import {
-  CreateEpisodeServerDto,
-  CreateMovieServerDto,
-  CreateServerDto,
-} from './dto';
+import { CreateEpisodeServerDto, CreateMovieServerDto, CreateServerDto } from './dto';
 
 @Controller('server')
 export class ServerController {
@@ -39,15 +28,13 @@ export class ServerController {
 
   @Get('/name/:name')
   async getServerByName(@Param('name') name: string): Promise<Server> {
-    const server = await this.serverService.getServerByName(name);
+    const server = await this.serverService.findServer(name);
     if (!server) throw new NotFoundException();
     return server;
   }
 
   @Post('/movie')
-  async createMovieServer(
-    @Body() body: CreateMovieServerDto,
-  ): Promise<MovieServer> {
+  async createMovieServer(@Body() body: CreateMovieServerDto): Promise<MovieServer> {
     return await this.serverService.createMovieServer(body);
   }
 

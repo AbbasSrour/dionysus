@@ -27,7 +27,7 @@ export class UpdateEpisodeDto {
 
   @IsNotEmpty()
   @IsNumber()
-  releaseYear?: number;
+  releaseDate?: string;
 
   @IsNotEmpty()
   @IsNumber()

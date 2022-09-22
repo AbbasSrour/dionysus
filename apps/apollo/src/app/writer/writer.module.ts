@@ -3,6 +3,8 @@ import { WriterService } from './writer.service';
 import { WriterController } from './writer.controller';
 
 @Module({
+  imports: [],
+  exports: [WriterService],
   providers: [WriterService, Logger],
   controllers: [WriterController],
 })

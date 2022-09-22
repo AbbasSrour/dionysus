@@ -1,6 +1,8 @@
-import { Controller, Logger } from '@nestjs/common';
+import { Controller, Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { RmqService } from '@dio/common';
+import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
+import { InsertDto } from './dto/insert.dto';
 
 @Controller('events')
 export class EventsController {
@@ -10,29 +12,11 @@ export class EventsController {
     private readonly rmqService: RmqService,
   ) {}
 
-  // @EventPattern('insert')
-  // async Insert(@Payload() payload: Array<InsertDto>, @Ctx() ctx: RmqContext) {
-  //   for (const entry of payload) {
-  //     try {
-  //       // Show Entry
-  //       // const { name, type, releaseYear, summary, length, pgRating } = entry;
-  //       // const show = await this.eventService.insertShow({
-  //       //   name,
-  //       //   type,
-  //       //   releaseYear,
-  //       //   summary,
-  //       //   length,
-  //       //   pgRating,
-  //       // });
-  //       // this.logger.log(show);
-  //       // if (!show) continue;
-  //       // Movie Or Episode Entry
-  //       // Image Entry
-  //       /* this.showService.deleteShow(show.showId); */
-  //       /* this.rmqService.ack(ctx); */
-  //     } catch (error) {
-  //       this.logger.error(error);
-  //     }
-  //   }
-  // }
+  @EventPattern('insert')
+  @UsePipes(new ValidationPipe())
+  async Insert(@Payload() payload: InsertDto, @Ctx() ctx: RmqContext) {
+    await this.eventService.insert(payload);
+    // await this.rmqService.ack(ctx);
+    return;
+  }
 }

@@ -4,8 +4,8 @@ import { DirectorController } from './director.controller';
 
 @Module({
   imports: [],
-  exports: [],
-  controllers: [DirectorController],
   providers: [DirectorService, Logger],
+  controllers: [DirectorController],
+  exports: [DirectorService],
 })
 export class DirectorModule {}

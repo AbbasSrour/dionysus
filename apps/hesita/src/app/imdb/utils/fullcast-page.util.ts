@@ -1,10 +1,9 @@
 import * as cheerio from 'cheerio';
-import { DirectorInput } from '../../scrape/schemas/director.schema';
-import { WriterInput } from '../../scrape/schemas/writer.schema';
+import { DirectorType, WriterType } from '../../scrape/type/insert.types';
 
 export class FullCastPageUtil {
   async getDirectors($: cheerio.CheerioAPI) {
-    const directors = new Array<DirectorInput>();
+    const directors = new Array<DirectorType>();
     await $('div#fullcredits_content > table:first-of-type > tbody > tr').each(
       (i, elem) => {
         directors[i] = {
@@ -17,7 +16,7 @@ export class FullCastPageUtil {
   }
 
   async getWriters($: cheerio.CheerioAPI) {
-    const writers = new Array<WriterInput>();
+    const writers = new Array<WriterType>();
     await $('div#fullcredits_content > table:nth-of-type(2) > tbody > tr').each(
       (i, elem) => {
         writers[i] = {

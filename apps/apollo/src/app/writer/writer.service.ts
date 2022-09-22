@@ -10,10 +10,7 @@ import { ShowWriter, Writer } from '@prisma/client-apollo';
 
 @Injectable()
 export class WriterService {
-  constructor(
-    private readonly client: PrismaService,
-    private readonly logger: Logger
-  ) {}
+  constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
 
   async getWriters(): Promise<Array<Writer>> {
     return this.client.writer.findMany();
@@ -57,10 +54,7 @@ export class WriterService {
     });
   }
 
-  async deleteShowWriter(
-    showId: number,
-    writerId: number
-  ): Promise<ShowWriter> {
+  async deleteShowWriter(showId: number, writerId: number): Promise<ShowWriter> {
     return this.client.showWriter.delete({
       where: {
         showId_writerId: {
@@ -74,13 +68,13 @@ export class WriterService {
   async insertWriters(showId: number, data: Array<InsertWriterDto>) {
     // BUG: Idk what will happen if their exists two writers with the same name for the same show
     const writers = await this.getShowWriters(showId).catch((error) =>
-      this.logger.error(error)
+      this.logger.error(error),
     );
 
     if (writers && writers.length > 0) {
       // check and remove old writers from show studio list
       writers.forEach((writer) => {
-        let deleteWriter: boolean = true;
+        let deleteWriter = true;
         let index: number;
         data.forEach((scrapedWriter, i) => {
           if (scrapedWriter.name === writer.name) {
@@ -96,7 +90,7 @@ export class WriterService {
 
       // Add new writers
       for (const scrapedWriter of data) {
-        let createWriter: boolean = true;
+        let createWriter = true;
         for (const writer of writers) {
           if (scrapedWriter.name === writer.name) createWriter = false;
         }
@@ -107,7 +101,7 @@ export class WriterService {
                 showId,
                 writerId: writer.writerId,
               }),
-            (error) => this.logger.error(error)
+            (error) => this.logger.error(error),
           );
         }
       }
@@ -126,6 +120,8 @@ export class WriterService {
           }
         });
       });
+
+      return;
     }
 
     data.forEach((scrapedWriter) => {
@@ -137,18 +133,15 @@ export class WriterService {
               showId,
             }),
           (error) => {
-            this.getWriterByNameAndImage(
-              scrapedWriter.name,
-              scrapedWriter.image
-            )
+            this.getWriterByNameAndImage(scrapedWriter.name, scrapedWriter.image)
               .then((writer) =>
                 this.createShowWriter({
                   writerId: writer.writerId,
                   showId,
-                })
+                }),
               )
               .catch((error) => this.logger.error(error));
-          }
+          },
         )
         .catch((error) => this.logger.error(error));
     });

@@ -1,37 +1,39 @@
 export class InsertDto {
-  type: string;
-
-  name: string;
-  releaseYear: number;
-  summary: string;
-  pgRating: string;
-  length?: number;
-
-  movie?: {
-    budget: number;
-    revenue: number;
-    urls: Array<{
-      serverName: string;
-      url: string;
-    }>;
-  };
-
-  series?: {
-    avgEpisodeLength: number;
+  show: {
     type: string;
-    episodes: Array<{
-      season: number;
-      number: number;
-      name?: string;
-      poster?: string;
-      summary?: string;
-      releaseYear?: number;
-      length?: number;
+
+    name: string;
+    releaseYear: number;
+    summary: string;
+    pgRating: string;
+    length?: number;
+
+    movie?: {
+      budget: number;
+      revenue: number;
       urls: Array<{
-        name: string;
+        serverName: string;
         url: string;
       }>;
-    }>;
+    };
+
+    series?: {
+      avgEpisodeLength: number;
+      type: string;
+      episodes: Array<{
+        season: number;
+        number: number;
+        name?: string;
+        poster?: string;
+        summary?: string;
+        releaseDate?: string;
+        length?: number;
+        urls: Array<{
+          serverName: string;
+          url: string;
+        }>;
+      }>;
+    };
   };
 
   servers: Array<{

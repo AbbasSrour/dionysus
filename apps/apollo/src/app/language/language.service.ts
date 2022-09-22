@@ -10,10 +10,7 @@ import {
 
 @Injectable()
 export class LanguageService {
-  constructor(
-    private readonly client: PrismaService,
-    private readonly logger: Logger
-  ) {}
+  constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
 
   async getLanguages(): Promise<Array<Language>> {
     return this.client.language.findMany();
@@ -33,16 +30,11 @@ export class LanguageService {
     return this.client.language.create({ data: input });
   }
 
-  async updateLanguage(
-    languageId: number,
-    data: UpdateLanguageDto
-  ): Promise<Language> {
+  async updateLanguage(languageId: number, data: UpdateLanguageDto): Promise<Language> {
     return this.client.language.update({ where: { languageId }, data });
   }
 
-  async createShowLanguage(
-    input: CreateShowLanguageDto
-  ): Promise<ShowLanguage> {
+  async createShowLanguage(input: CreateShowLanguageDto): Promise<ShowLanguage> {
     return this.client.showLanguage.create({ data: input });
   }
 
@@ -72,13 +64,13 @@ export class LanguageService {
   async insertLanguages(showId: number, data: Array<InsertLanguagesDto>) {
     // BUG: Idk what will happen if their exists two languages with the same name for the same show
     const languages = await this.getShowLanguages(showId).catch((error) =>
-      this.logger.error(error)
+      this.logger.error(error),
     );
 
     if (languages && languages.length > 0) {
       // check and remove old languages from show language list
       languages.forEach((language) => {
-        let deleteLanguage: boolean = true;
+        let deleteLanguage = true;
         let index: number;
         data.forEach((scrapedLanguage, i) => {
           if (scrapedLanguage.name === language.name) {
@@ -94,7 +86,7 @@ export class LanguageService {
 
       // Add new languages
       for (const scrapedLanguage of data) {
-        let createLanguage: boolean = true;
+        let createLanguage = true;
         for (const language of languages) {
           if (scrapedLanguage.name === language.name) createLanguage = false;
         }
@@ -105,10 +97,12 @@ export class LanguageService {
                 showId,
                 languageId: language.languageId,
               }),
-            (error) => this.logger.error(error)
+            (error) => this.logger.error(error),
           );
         }
       }
+
+      return;
     }
 
     data.forEach((scrapedLanguage) => {
@@ -125,10 +119,10 @@ export class LanguageService {
                 this.createShowLanguage({
                   languageId: language.languageId,
                   showId,
-                })
+                }),
               )
               .catch((error) => this.logger.error(error));
-          }
+          },
         )
         .catch((error) => this.logger.error(error));
     });

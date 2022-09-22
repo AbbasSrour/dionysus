@@ -6,10 +6,7 @@ import { dateDifferenceUtil } from '../events/utilities/date-difference.util';
 
 @Injectable()
 export class MovieService {
-  constructor(
-    private readonly client: PrismaService,
-    private readonly logger: Logger,
-  ) {}
+  constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
 
   async getMovies(page: number): Promise<Array<MovieEntity>> {
     const take = page * 10;
@@ -62,7 +59,12 @@ export class MovieService {
         },
       },
     });
-    return await this.getMovieById(show.showId);
+    const movie = await this.client.movie.findUniqueOrThrow({
+      where: {
+        showId: show.showId,
+      },
+    });
+    return await this.getMovieById(movie.movieId);
   }
 
   async createMovie(input: CreateMovieDto): Promise<MovieEntity> {
@@ -138,16 +140,14 @@ export class MovieService {
   }
 
   async insertMovie(data: CreateMovieDto): Promise<MovieEntity> {
-    return await this.createMovie(data).catch((error) => {
-      this.logger.log(error);
+    return await this.createMovie(data).catch(() => {
       return this.findMovie(data.name, data.releaseYear)
         .then((movie) => {
           if (this.shouldUpdate(movie.movieId))
             return this.updateMovie(data && { movieId: movie.movieId });
-          return null;
+          return movie;
         })
-        .catch((error) => {
-          this.logger.error(error);
+        .catch(() => {
           return null;
         });
     });

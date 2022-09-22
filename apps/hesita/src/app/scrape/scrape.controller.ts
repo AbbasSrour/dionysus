@@ -38,45 +38,37 @@ export class ScrapeController {
   async ScrapeMethod(searchTerm: string) {
     const showList = await this.scrapeService.searchImdb(searchTerm);
     const shows = Array<InsertDto>();
-
-    console.log(showList);
-
     for (const imdbId of showList) {
-      const imdbPage = await this.scrapeService.getImdbShowPage(imdbId);
-      if (!imdbPage) continue;
+      const showPage = await this.scrapeService.getImdbShowPage(imdbId);
+      if (!showPage) continue;
 
-      const type = await this.scrapeService.scrapeType(imdbPage);
+      const type = await this.scrapeService.scrapeType(showPage);
       if (!type) continue;
 
-      let membed = null;
-      if (type === 'Movie')
-        membed = await this.scrapeService.getMembedUrl(imdbId);
-      else membed = await this.scrapeService.seriesExist(imdbId);
-      if (!membed) continue;
+      if (!(await this.scrapeService.showExists(imdbId, type))) continue;
 
       const tmdbId = await this.scrapeService.getTmdbId(imdbId, type);
       if (!tmdbId) continue;
 
       const show: InsertDto = {
-        name: '',
-        releaseYear: 0,
-        length: 0,
-        pgRating: '',
-        summary: '',
-        type: '',
-        movie: { budget: 0, revenue: 0, urls: undefined },
-        series: { avgEpisodeLength: 0, episodes: undefined, type: '' },
-        images: undefined,
-        videos: undefined,
-        imdb: { imdbId: '', rating: 0, voteCount: 0 },
-        actors: undefined,
-        directors: undefined,
-        genres: undefined,
-        languages: undefined,
-        servers: undefined,
-        studios: undefined,
-        writers: undefined,
+        show:
+          type === 'Movie'
+            ? await this.scrapeService.getMovie(showPage, type, imdbId)
+            : await this.scrapeService.getSeries(showPage, type, imdbId),
+        servers: [await this.scrapeService.getMembedServer()],
+        imdb: await this.scrapeService.scrapeImdb(showPage, imdbId),
+        images: await this.scrapeService.scrapeImages(showPage, tmdbId, type),
+        videos: await this.scrapeService.scrapeVideos(tmdbId, type),
+        actors: await this.scrapeService.scrapeActors(showPage),
+        directors: await this.scrapeService.scrapeDirectors(showPage, type, imdbId),
+        genres: await this.scrapeService.scrapeGenres(showPage),
+        languages: await this.scrapeService.scrapeLanguages(showPage),
+        studios: await this.scrapeService.scrapeStudios(showPage),
+        writers: await this.scrapeService.scrapeWriters(showPage),
       };
+
+      this.apolloProxy.emit('insert', show);
+      shows.push(show);
     }
     return shows;
   }

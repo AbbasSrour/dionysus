@@ -12,42 +12,37 @@ export class SeasonPageUtil {
   }
 
   async getEpisodePoster($: cheerio.CheerioAPI, episode: number) {
-    return $('div#episode_content')
-      .find('div[itemtype="http://schema.org/TVSeason"]')
-      .find(`div.list.detail.eplist > div:nth-of-type(${episode})`)
+    return $(`div#episodes_content > div[itemtype="http://schema.org/TVSeason"]`)
+      .find('div.list.detail.eplist')
+      .find(`div:nth-of-type(${episode})`)
       .find('div.image > a > div > img')
       .attr('src');
   }
 
   async getEpisodeName($: cheerio.CheerioAPI, episode: number) {
-    return $('div#episode_content')
-      .find('div[itemtype="http://schema.org/TVSeason"]')
-      .find(`div.list.detail.eplist > div:nth-of-type(${episode})`)
+    return $(`div#episodes_content > div[itemtype="http://schema.org/TVSeason"]`)
+      .find('div.list.detail.eplist')
+      .find(`div:nth-of-type(${episode})`)
       .find('div[itemtype="http://schema.org/TVEpisode"]')
       .find('strong > a')
       .text();
   }
 
-  async getEpisodeReleaseDate(
-    $: cheerio.CheerioAPI,
-    episode: number,
-  ): Promise<string> {
-    return $('div#episode_content')
-      .find('div[itemtype="http://schema.org/TVSeason"]')
-      .find(`div.list.detail.eplist > div:nth-of-type(${episode})`)
+  async getEpisodeReleaseDate($: cheerio.CheerioAPI, episode: number): Promise<string> {
+    return $(`div#episodes_content > div[itemtype="http://schema.org/TVSeason"]`)
+      .find('div.list.detail.eplist')
+      .find(`div:nth-of-type(${episode})`)
       .find('div[itemtype="http://schema.org/TVEpisode"]')
       .find('div.airdate')
-      .text();
+      .text()
+      .replace(/^\s+|\s+$/g, '');
   }
 
-  async getEpisodeRating(
-    $: cheerio.CheerioAPI,
-    episode: number,
-  ): Promise<number> {
+  async getEpisodeRating($: cheerio.CheerioAPI, episode: number): Promise<number> {
     return parseInt(
-      $('div#episode_content')
-        .find('div[itemtype="http://schema.org/TVSeason"]')
-        .find(`div.list.detail.eplist > div:nth-of-type(${episode})`)
+      $(`div#episodes_content > div[itemtype="http://schema.org/TVSeason"]`)
+        .find('div.list.detail.eplist')
+        .find(`div:nth-of-type(${episode})`)
         .find('div[itemtype="http://schema.org/TVEpisode"]')
         .find('div.ipl-rating-widget > div.ipl-rating-star.small:first-of-type')
         .find('span.ipl-rating-star__rating')
@@ -55,14 +50,11 @@ export class SeasonPageUtil {
     );
   }
 
-  async getEpisodeVoteCount(
-    $: cheerio.CheerioAPI,
-    episode: number,
-  ): Promise<number> {
+  async getEpisodeVoteCount($: cheerio.CheerioAPI, episode: number): Promise<number> {
     return parseInt(
-      $('div#episode_content')
-        .find('div[itemtype="http://schema.org/TVSeason"]')
-        .find(`div.list.detail.eplist > div:nth-of-type(${episode})`)
+      $(`div#episodes_content > div[itemtype="http://schema.org/TVSeason"]`)
+        .find('div.list.detail.eplist')
+        .find(`div:nth-of-type(${episode})`)
         .find('div[itemtype="http://schema.org/TVEpisode"]')
         .find('div.ipl-rating-widget > div.ipl-rating-star.small:first-of-type')
         .find('span.ipl-rating-star__total-votes')
@@ -72,11 +64,12 @@ export class SeasonPageUtil {
   }
 
   async getEpisodeSummery($: cheerio.CheerioAPI, episode: number) {
-    return $('div#episode_content')
-      .find('div[itemtype="http://schema.org/TVSeason"]')
-      .find(`div.list.detail.eplist > div:nth-of-type(${episode})`)
+    return $(`div#episodes_content > div[itemtype="http://schema.org/TVSeason"]`)
+      .find('div.list.detail.eplist')
+      .find(`div:nth-of-type(${episode})`)
       .find('div[itemtype="http://schema.org/TVEpisode"]')
       .find('div[itemprop="description"]')
-      .text();
+      .text()
+      .replace(/^\s+|\s+$/g, '');
   }
 }

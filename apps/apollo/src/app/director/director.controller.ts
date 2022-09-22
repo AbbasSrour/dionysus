@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
 import { DirectorService } from './director.service';
 import { Director } from '@prisma/client-apollo';
 import { CreateDirectorDto, CreateShowDrirectorDto } from './dto';
@@ -16,21 +9,14 @@ export class DirectorController {
 
   @Get()
   async getDirectors(): Promise<Array<Director>> {
-    let director: Array<Director>;
-    director = await this.directorService.getDirectors();
+    const director = await this.directorService.getDirectors();
     if (!director || director.length <= 0) throw new NotFoundException();
     return director;
   }
 
   @Post()
   async createDirector(@Body() body: CreateDirectorDto): Promise<Director> {
-    let director: Director;
-    try {
-      director = await this.directorService.createDirector(body);
-      return director;
-    } catch (error) {
-      throw error;
-    }
+    return await this.directorService.createDirector(body);
   }
 
   @Get('/:id')

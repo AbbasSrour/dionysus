@@ -6,6 +6,6 @@ import { MovieController } from './movie.controller';
   imports: [],
   providers: [MovieService, Logger],
   controllers: [MovieController],
-  exports: [],
+  exports: [MovieService],
 })
 export class MovieModule {}

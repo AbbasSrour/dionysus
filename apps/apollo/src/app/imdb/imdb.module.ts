@@ -4,7 +4,7 @@ import { ImdbController } from './imdb.controller';
 
 @Module({
   imports: [],
-  exports: [],
+  exports: [ImdbService],
   controllers: [ImdbController],
   providers: [ImdbService, Logger],
 })

@@ -3,10 +3,6 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 export class CreateEpisodeDto {
   @IsNotEmpty()
   @IsNumber()
-  episodeId: number;
-
-  @IsNotEmpty()
-  @IsNumber()
   seriesId: number;
 
   @IsNotEmpty()
@@ -31,7 +27,7 @@ export class CreateEpisodeDto {
 
   @IsNotEmpty()
   @IsNumber()
-  releaseYear: number;
+  releaseDate: string;
 
   @IsNotEmpty()
   @IsNumber()
