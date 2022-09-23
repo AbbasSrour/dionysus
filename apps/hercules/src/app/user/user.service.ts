@@ -26,10 +26,9 @@ export class UserService {
     return this.client.user.findUniqueOrThrow({ where: { userId: id } });
   }
 
-  // TODO find out way update doesn't take email
-  async updatePassword(userId: number, password: string) {
+  async updatePassword(email: string, password: string) {
     return this.client.user.update({
-      where: { userId },
+      where: { email },
       data: { password },
     });
   }

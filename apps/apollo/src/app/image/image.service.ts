@@ -8,15 +8,16 @@ import { dateDifferenceUtil } from '../events/utilities/date-difference.util';
 export class ImageService {
   constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
 
-  async createImageService(input: CreateImageDto): Promise<Image> {
+  async createImage(input: CreateImageDto): Promise<Image> {
     return this.client.image.create({ data: input });
   }
 
-  async getImagesService(): Promise<Array<Image>> {
-    return this.client.image.findMany();
+  async getImages(page: number): Promise<Array<Image>> {
+    const take = page * 10;
+    return this.client.image.findMany({ take });
   }
 
-  async getImageByIdService(id: number): Promise<Image> {
+  async getImageById(id: number): Promise<Image> {
     return this.client.image.findUniqueOrThrow({ where: { imageId: id } });
   }
 
@@ -29,7 +30,7 @@ export class ImageService {
   }
 
   async insertImage(data: CreateImageDto) {
-    return await this.createImageService(data).catch(() => {
+    return await this.createImage(data).catch(() => {
       return this.getImageByUrlService(data.url)
         .then((image) => {
           if (
