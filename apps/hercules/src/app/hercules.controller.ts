@@ -1,20 +1,20 @@
-import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
+import { Controller, Get, Inject } from '@nestjs/common';
 
 import { HerculesService } from './hercules.service';
 import { ClientProxy } from '@nestjs/microservices';
-import { AccessTokenGuard } from './common/guards';
 import { lastValueFrom } from 'rxjs';
 
 @Controller()
 export class HerculesController {
   constructor(
     private readonly herculesService: HerculesService,
-    @Inject('APOLLO') private apolloClient: ClientProxy
+    @Inject('APOLLO') private apolloClient: ClientProxy,
   ) {}
 
   @Get()
-  @UseGuards(AccessTokenGuard)
+  // @UseGuards(AccessTokenGuard)
   getHello(): { message: string } {
+    console.log('hello world');
     return this.herculesService.getData();
   }
 
@@ -22,9 +22,7 @@ export class HerculesController {
   async testRmq() {
     try {
       console.log(
-        await lastValueFrom(
-          this.apolloClient.emit('test', { message: 'hello world' })
-        )
+        await lastValueFrom(this.apolloClient.emit('test', { message: 'hello world' })),
       );
     } catch (error) {
       console.log(error);

@@ -4,7 +4,7 @@ import { PrismaModule } from './common/prisma';
 
 import { HerculesController } from './hercules.controller';
 import { HerculesService } from './hercules.service';
-import { configuration, validateEnv } from './common/config';
+import { configuration } from './common/config';
 import { AuthModule } from './auth';
 import { RmqModule } from '@dio/common';
 import { UserModule } from './user';
@@ -18,7 +18,8 @@ import { UserModule } from './user';
       isGlobal: true,
       load: [configuration],
       cache: true,
-      validationSchema: validateEnv,
+      // todo fix the environment variables
+      // validationSchema: validateEnv,
       validationOptions: {
         allowUnknown: true,
         abortEarly: false,

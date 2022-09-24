@@ -50,18 +50,20 @@ services:
       - ./apps/hercules:/usr/share/app/apps/hercules
       - ./libs:/usr/share/app/libs
       - /usr/share/app/node_modules
+    expose:
+      - 4000
     ports:
-      - '4000:4000'
-      - '5555:5555'
+      - "12000:12000"
     networks:
       - dio
     restart: unless-stopped
-    labels:
-      org.label-schema.group: 'Backend'
     depends_on:
       - rabbitmq
       - hercules-db
       - redis
+      - nginx
+    labels:
+      org.label-schema.group: 'Backend'
 
   hercules-db:
     image: postgres:14-alpine
@@ -619,7 +621,8 @@ services:
       - '5601:5601'
       - '8081:8081'
     volumes:
-      - Nginx:/etc/nginx
+      #      - Nginx:/etc/nginx
+      - ./nginx:/etc/nginx
     networks:
       - dio
     restart: unless-stopped

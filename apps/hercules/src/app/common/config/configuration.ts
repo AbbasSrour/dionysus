@@ -3,7 +3,7 @@ import * as process from 'process';
 export const configuration = () => ({
   environment: process.env.NODE_ENV,
   port: parseInt(process.env.PORT || '3000', 10),
-  database: process.env.HERCULES_DATABASE_URL,
+  database: process.env.HERCULES_DB_URL,
   redis: {
     secret: process.env.REDIS_STORE_SECRET,
     host: process.env.REDIS_HOST,
