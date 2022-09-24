@@ -1,6 +1,6 @@
 # Dionysus:
 
-![stack](https://github.com/AbbasSrour/dionysus/blob/main/assets/Dionysus.Stack.png)
+![stack](https://github.com/AbbasSrour/dionysus/blob/dev/assets/Dionysus.Stack.png)
 
 Dionysus is a Movie and TV-Series streaming website, with all the features expected from modern streaming services
 mainly user accounts that hold user watch history, recommendation system based on this history, slick UI, and fast search using

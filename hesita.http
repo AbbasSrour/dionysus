@@ -1,0 +1,26 @@
+GET http://localhost:4004/api/scrape/loki
+Accept: application/json
+
+###
+GET http://localhost:4004/api/scrape/Dr.Strange Into The Multiverse
+Accept: application/json
+
+###
+GET http://localhost:4004/api/scrape/Iron Man
+Accept: application/json
+
+###
+GET http://localhost:4004/api/scrape/WandaVision
+Accept: application/json
+
+###
+GET http://localhost:4004/api/scrape/dismissed
+Accept: application/json
+
+###
+GET http://localhost:4004/api/scrape/uncharted
+Accept: application/json
+
+###
+GET http://localhost:4004/api/scrape/dr.strange
+Accept: application/json

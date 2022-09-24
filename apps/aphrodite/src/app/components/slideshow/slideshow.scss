@@ -1,0 +1,26 @@
+@use "apps/aphrodite/src/app/styles/Mixin" as *;
+
+.slide-show {
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -48.5%);
+  height: fit-content;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+
+  &__ {
+    height: fit-content;
+  }
+}
+
+.marquee-elem {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  margin-left: 20px;
+  border-radius: 1rem;
+}
+

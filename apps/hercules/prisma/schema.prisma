@@ -1,0 +1,76 @@
+//--------------------------------------------------------- --Setup --------------------------------------------------------------------//
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/@prisma/client-hercules"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("HERCULES_DB_URL")
+}
+
+//--------------------------------------------------------- Base Tables ------------------------------------------------------------//
+model User {
+  userId           Int      @id @default(autoincrement()) @map("user_id")
+  email            String   @unique @db.VarChar(480)
+  password         String   @db.VarChar(400)
+  userName         String
+  verified         Boolean  @default(false)
+  verificationCode String?  @map("verification_code") @db.VarChar(100)
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  GenreRating   GenreRating[]
+  MovieHistory  MovieHistory[]
+  SeriesHistory SeriesHistory[]
+  ShowRating    ShowRating[]
+
+  @@map("users")
+}
+
+//----------------------------------------------------- Many To Many Tables ----------------------------------------------------//
+model GenreRating {
+  user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  userId    Int      @map("user_id")
+  genreId   Int      @map("genre_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([genreId, userId])
+  @@map("genre_rating")
+}
+
+model ShowRating {
+  user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  userId    Int      @map("user_id")
+  showId    Int      @map("show_id")
+  rating    Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([userId, showId])
+  @@map("show_rating")
+}
+
+model MovieHistory {
+  user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  userId    Int      @map("user_id")
+  movieId   Int      @map("movie_id")
+  watchTime Int      @default(0) @map("watch_time")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([movieId, userId])
+  @@map("movie_history")
+}
+
+model SeriesHistory {
+  user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  userId    Int      @map("user_id")
+  episodeId Int      @map("episode_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([episodeId, userId])
+  @@map("series_history")
+}

@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 
 vars:
   SERVICE:
@@ -12,4 +12,47 @@ tasks:
     desc: Clear all docker data
     cmds:
       - docker system prune -a
-
+  apollo:
+    desc: Start apollo
+    cmds:
+      - docker compose up apollo apollo-db --build
+  coeus:
+    desc: Start coeus
+    cmds:
+      - docker compose up coeus --build
+  hercules:
+    desc: Start hercules
+    cmds:
+      - docker compose up hercules hercules-db redis --build
+  hesita:
+    desc: Start hesita
+    cmds:
+      - docker compose up hesita --build
+  server:
+    desc: Start server services
+    cmds:
+      - docker compose up rabbitmq --build
+  zeus:
+    desc: Start zeus node
+    cmds:
+      - docker compose up zeus --build
+  kibana:
+    desc: Start kibana
+    cmds:
+      - docker compose up kibana --build
+  all:
+    desc: start all services
+    deps:
+      - task: apollo
+      - task: hercules
+      - task: hesita
+      - task: coeus
+      - task: zeus
+      - task: server
+      - task: kibana
+    cmds:
+      - echo "done"
+  clean:
+    desc: Volume prune and remove containers
+    cmds:
+      - docker compose down && docker volume prune
