@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Prisma } from 'prisma';
+import { Prisma } from '@prisma/client-hercules';
 
 @Injectable()
 export class PrismaNotFoundInterceptor implements NestInterceptor {
@@ -19,7 +19,7 @@ export class PrismaNotFoundInterceptor implements NestInterceptor {
         } else {
           throw error;
         }
-      })
+      }),
     );
   }
 }

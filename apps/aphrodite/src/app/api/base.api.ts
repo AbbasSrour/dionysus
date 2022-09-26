@@ -1,30 +1,23 @@
-import ky from 'ky';
+import ky, { KyResponse } from 'ky';
 
 export class BaseApi {
-  baseUrl = 'http://localhost:4000/api/v1';
+  baseUrl = 'https://localhost:2000/api';
 
   async get(url: string, searchParams?: object) {
-    let response: any;
-    if (searchParams)
-      response = await ky
-        .get(`${this.baseUrl}${url}`, {
-          searchParams: { ...searchParams },
-        })
-        .json();
-    else response = await ky.get(`${this.baseUrl}${url}`).json();
-    return (await response).data;
+    return ky.get(`${this.baseUrl}${url}`, {
+      searchParams: { ...searchParams },
+      credentials: 'include',
+    });
   }
 
   async post(
     url: string,
     { searchParams, body }: { searchParams?: object; body?: object },
-  ) {
-    const response: any = await ky
-      .post(`${this.baseUrl}${url}`, {
-        searchParams: { ...searchParams },
-        json: { ...body },
-      })
-      .json();
-    return (await response).data;
+  ): Promise<KyResponse> {
+    return ky.post(`${this.baseUrl}${url}`, {
+      searchParams: { ...searchParams },
+      json: { ...body },
+      credentials: 'include',
+    });
   }
 }

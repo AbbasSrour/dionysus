@@ -21,15 +21,19 @@ async function bootstrap() {
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 
-  // Middleware
-  app.use(cookieParser());
-
   //Services
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
   const config = app.get(ConfigService);
   const rmqService = app.get<RmqService>(RmqService);
   app.connectMicroservice(rmqService.getOptions('hercules', config.get('rmqUrl')));
+
+  // Middleware
+  app.use(cookieParser());
+  app.enableCors({
+    // origin: config.getOrThrow<string>('origin'),
+    credentials: true,
+  });
 
   // Pipes
   app.useGlobalPipes(
@@ -56,7 +60,7 @@ async function bootstrap() {
     deepScanRoutes: true,
   };
   const document = SwaggerModule.createDocument(app, swaggerConfig, options);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('/hercules/docs', app, document);
 
   await app.startAllMicroservices();
 

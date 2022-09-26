@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './account.scss';
 import { FormikHelpers, FormikValues, useFormik } from 'formik';
 import { motion } from 'framer-motion';
@@ -12,21 +12,48 @@ import {
 } from '../../schema/auth.schema';
 import { AuthApi } from '../../api/auth.api';
 import SlideShow from '../../components/slideshow/slide-show.component';
+import { useNavigate } from 'react-router-dom';
+import { UserApi } from '../../api/user.api';
 
 const AccountPage = () => {
+  // if the response of login or register is an error
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [register, setRegister] = useState(false);
-  const api = new AuthApi();
+
+  const authApi = new AuthApi();
+  const userApi = new UserApi();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const check = async () => {
+      const res = await userApi.getCurrentUser().catch((error) => null);
+      // if (res && (await res.json()).userId) setLoggedIn(true);
+    };
+    check();
+    console.log(loggedIn);
+
+    if (loggedIn) navigate('/');
+  }, [loggedIn]);
 
   const loginOnSubmitHandler = async (
     values: FormikValues,
     actions: FormikHelpers<LoginInput>,
   ) => {
     try {
+      setError(null);
       const { email, password } = values;
-      await api.login({ email, password });
-      actions.resetForm();
+
+      const res = await authApi
+        .login({ email, password })
+        .catch(async (error) => setError((await error.response.json()).message));
+      if (res && res.status === 200) {
+        navigate('/');
+        actions.resetForm();
+      }
     } catch (error: any) {
-      console.log(error.response.statusCode);
+      console.log(error);
     }
   };
   const loginFormik = useFormik({
@@ -47,10 +74,20 @@ const AccountPage = () => {
   ) => {
     try {
       const { email, password, userName, confirmPassword } = values;
-      await api.register({ email, password, userName, confirmPassword });
+
+      const res = await authApi
+        .register({
+          email,
+          password,
+          userName,
+          confirmPassword,
+        })
+        .catch((error) => setError(error.response.message));
+      if (res && res.status === 201) setRegister(false);
+
       actions.resetForm();
     } catch (error: any) {
-      console.log(error.response.statusCode);
+      console.log(error);
     }
   };
   const registerFormik = useFormik({
@@ -93,6 +130,10 @@ const AccountPage = () => {
             Register
           </button>
         </div>
+        <div className={'AccountPage__message'}>
+          {error ? <span className={'error'}>{error}</span> : null}
+          {message ? <span className={'info'}>{message}</span> : null}
+        </div>
         <form
           onSubmit={register ? registerFormik.handleSubmit : loginFormik.handleSubmit}
         >
@@ -111,6 +152,7 @@ const AccountPage = () => {
                     ? null
                     : loginFormik.errors.email
                 }
+                autoComplete={'email'}
               />
               <Input
                 type="text"
@@ -125,6 +167,7 @@ const AccountPage = () => {
                     ? null
                     : loginFormik.errors.password
                 }
+                autoComplete={'current-password'}
               />
               <a>Forget Password?</a>
             </>
@@ -145,6 +188,7 @@ const AccountPage = () => {
                     ? null
                     : registerFormik.errors.userName
                 }
+                autoComplete={'username'}
               />
               <Input
                 type="text"
@@ -159,9 +203,10 @@ const AccountPage = () => {
                     ? null
                     : registerFormik.errors.email
                 }
+                autoComplete={'email'}
               />
               <Input
-                type="text"
+                type="password"
                 nameID="password"
                 label="Password"
                 value={registerFormik.values.password}
@@ -175,9 +220,10 @@ const AccountPage = () => {
                     ? null
                     : registerFormik.errors.password
                 }
+                autoComplete={'new-password'}
               />
               <Input
-                type="text"
+                type="password"
                 nameID="confirmPassword"
                 label="Verify Password"
                 value={registerFormik.values.confirmPassword}
@@ -193,11 +239,21 @@ const AccountPage = () => {
                     ? null
                     : registerFormik.errors.confirmPassword
                 }
+                autoComplete={'new-password'}
               />
               <CheckBox boxId={'TermsAndConditions'} />
             </>
           )}
-          <button className="Form__button" type={'submit'}>
+          <button
+            className={
+              (register && registerFormik.isSubmitting) ||
+              (!register && loginFormik.isSubmitting)
+                ? 'Form__button submitting'
+                : 'Form__button'
+            }
+            type={'submit'}
+            disabled={register ? registerFormik.isSubmitting : loginFormik.isSubmitting}
+          >
             {register ? 'Register' : 'Login'}
           </button>
         </form>

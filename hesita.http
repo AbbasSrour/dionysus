@@ -24,3 +24,36 @@ Accept: application/json
 ###
 GET http://localhost:4004/api/scrape/dr.strange
 Accept: application/json
+
+###
+GET https://localhost:2000/api/user/email/abbas.mj.srour@gmail.com/available
+Accept: application/json
+
+###
+POST https://localhost:2000/api/auth/register/local
+Accept: application/json
+Content-Type: application/json
+
+{
+  "email": "abbas.mj.srour@gmail.com",
+  "password": "NewDay12345$",
+  "userName": "abbassrour",
+  "confirmPassword": "NewDay12345$"
+}
+
+###
+POST https://localhost:2000/api/auth/login/local
+Accept: application/json
+Content-Type: application/json
+
+{
+  "email": "abbas.mj.srour@gmail.com",
+  "password": "NewDay12345$"
+}
+
+
+###
+GET https://localhost:2000/api/user
+Accept: application/json
+
+
