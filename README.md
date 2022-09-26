@@ -194,9 +194,19 @@ deployment of the application.
       <td> Aphrodite</td>
       <td> React Webapp</td>
       <td>
-        Aphrodite is the ancient Greek goddess of sexual love and beauty, identified with Venus by the Romans. She was known primarily as a goddess of love and fertility and occasionally presided over marriage.
+        Aphrodite is the ancient Greek goddess of sexual love and beauty, identified with Venus by the Romans. She was 
+        known primarily as a goddess of love and fertility and occasionally presided over marriage.
       </td>
     </tr>
+  <tr>
+    <td>Cerberus</td>
+    <td> Authentication gRpc Api For Server Management</td>
+    <td>
+      Cerberus, in Greek mythology, the monstrous watchdog of the underworld. He was usually said to have three heads, 
+      though the poet Hesiod (flourished 7th century bce) said he had 50. Heads of snakes grew from his back, and he 
+      had a serpent's tail.
+    </td>
+</tr>
 </table>
 
 ## Apis
