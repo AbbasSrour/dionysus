@@ -133,5 +133,10 @@ Postgres database that at is designed from the get go to have every possible fea
 project, with extra
 future proofing to make sure that the database will not need any drastic changes in the future.
 
+### Hercules Database
+
+![hercules_db](https://github.com/AbbasSrour/dionysus/blob/dev/assets/dionysus.hercules.rm.png)
+
 ### Apollo Database
 
+![apollo_db](https://github.com/AbbasSrour/dionysus/blob/dev/assets/dionysus.apollo.rm.png)
