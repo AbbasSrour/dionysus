@@ -52,8 +52,6 @@ services:
       - /usr/share/app/node_modules
     expose:
       - 4000
-    ports:
-      - "12000:12000"
     networks:
       - dio
     restart: unless-stopped
@@ -105,9 +103,8 @@ services:
       ]
     env_file: ./apps/apollo/.env
     container_name: apollo
-    ports:
-      - '4001:4001'
-      - '5555:5555'
+    expose:
+      - 4001
     networks:
       - dio
     restart: unless-stopped
@@ -120,6 +117,7 @@ services:
     depends_on:
       - apollo-db
       - rabbitmq
+      - nginx
 
   apollo-db:
     image: postgres:14-alpine
@@ -142,8 +140,8 @@ services:
     command: [ 'sh', '-c', 'pnpm run start coeus' ]
     env_file: ./apps/coeus/.env
     container_name: coeus
-    ports:
-      - '4002:4002'
+    expose:
+      - 4002
     networks:
       - dio
     restart: unless-stopped
@@ -180,8 +178,8 @@ services:
     command: [ 'sh', '-c', 'pnpm run start hesita' ]
     env_file: ./apps/hesita/.env
     container_name: hesita
-    ports:
-      - '4004:4004'
+    expose:
+      - 4004
     networks:
       - dio
     restart: unless-stopped
@@ -313,8 +311,8 @@ services:
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
       ELASTICSEARCH_HOST_PORT: https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
-    ports:
-      - '5601:5601'
+    expose:
+      - 5601
     networks:
       - dio
 
@@ -420,8 +418,8 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
       - GF_USERS_ALLOW_SIGN_UP=false
     restart: unless-stopped
-    ports:
-      - '3000:3000'
+    expose:
+      - 3000
     networks:
       - dio
     labels:
@@ -615,11 +613,12 @@ services:
       dockerfile: Dockerfile
     container_name: nginx
     ports:
+      #      - '2000:443'
+      - '2000:443'
       - '3000:3000'
-      - '3100:3100'
-      - '4000:4000'
       - '5601:5601'
       - '8081:8081'
+      - '15672:15672'
     volumes:
       #      - Nginx:/etc/nginx
       - ./nginx:/etc/nginx
@@ -632,9 +631,9 @@ services:
   rabbitmq:
     image: rabbitmq:3.9.22-management-alpine
     container_name: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
+    expose:
+      - 5672
+      - 15672
     volumes:
       - RabbitmqLib:/var/lib/rabbitmq/
       - RabbitmqLog:/var/log/rabbitmq

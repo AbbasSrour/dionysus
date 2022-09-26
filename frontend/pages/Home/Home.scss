@@ -1,0 +1,24 @@
+.home-page {
+  padding: 0 0 4rem 0;
+
+  &__studios {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    justify-items: center;
+    width: 100%;
+    height: fit-content;
+    margin: 4rem 0 4rem 0;
+
+    .studio-box {
+      margin: 0 1rem 0 1rem;
+      width: 17.5rem;
+      height: 9rem;
+    }
+  }
+
+  .slider {
+    margin: 3rem 0 3rem 0;
+  }
+}

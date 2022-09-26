@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   HttpException,
   InternalServerErrorException,
   Param,
@@ -80,6 +81,7 @@ export class AuthController {
   }
 
   @Post('/login/local')
+  @HttpCode(200)
   async loginUser(@Body() body: LoginUserDto, @Res({ passthrough: true }) res: Response) {
     const { email, password } = body;
     const user = await this.userService.findUserByEmail({ email });

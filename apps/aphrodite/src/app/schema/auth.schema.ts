@@ -12,11 +12,14 @@ export const RegisterSchema = yup.object().shape({
   email: yup
     .string()
     .email('Please enter a valid email')
-    .required('Required')
+    .required('Email Required')
     .test(
       'Unique Email',
       'Email already in use', // <- key, message
-      (value) => api.emailExists(value || ''),
+      (value) => {
+        if (value) return api.emailExists(value);
+        return true;
+      },
     ),
 
   userName: yup
@@ -43,15 +46,7 @@ export const RegisterSchema = yup.object().shape({
 
 export const LoginSchema = yup.object().shape({
   email: yup.string().email('Please enter a valid email').required('Required'),
-  password: yup
-    .string()
-    .min(8)
-    .max(32)
-    .matches(
-      passwordRegex,
-      'Password must contain at least one lowercase, one uppercase, one number, and one special character.',
-    )
-    .required('Required'),
+  password: yup.string().required('Required'),
 });
 
 //todo

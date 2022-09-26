@@ -30,6 +30,7 @@ interface Props {
   onBlur: FocusEventHandler<HTMLInputElement>;
   valid: boolean;
   error: string | null;
+  autoComplete?: string;
 }
 
 export const Input: React.FC<Props> = ({
@@ -41,6 +42,7 @@ export const Input: React.FC<Props> = ({
   onChange,
   onBlur,
   error,
+  autoComplete,
 }) => {
   return (
     <motion.fieldset
@@ -62,6 +64,7 @@ export const Input: React.FC<Props> = ({
         onChange={onChange}
         value={value}
         onBlur={onBlur}
+        autoComplete={autoComplete}
       />
       <label htmlFor={nameID}>{label}</label>
       <p>{error}</p>

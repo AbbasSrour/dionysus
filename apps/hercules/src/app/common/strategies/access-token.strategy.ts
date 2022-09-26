@@ -7,14 +7,11 @@ import { UserService } from '../../user';
 import { RedisService } from '../redis';
 
 @Injectable()
-export class AccessTokenStrategy extends PassportStrategy(
-  Strategy,
-  'jwt-access'
-) {
+export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt-access') {
   constructor(
     private readonly config: ConfigService,
     private readonly redis: RedisService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -29,6 +26,7 @@ export class AccessTokenStrategy extends PassportStrategy(
   }
 
   public static extractJwtCookie(req: Request): string | null {
+    console.log(req.get('origin'));
     if (
       req.cookies &&
       'access_token' in req.cookies &&
@@ -41,22 +39,18 @@ export class AccessTokenStrategy extends PassportStrategy(
   async validate(req: Request, payload: any) {
     // Check if the user has a valid session
     const session = await this.redis.client.get(`${payload.sub}`);
-    if (!session)
-      throw new HttpException('Invalid token, or session has expired', 401);
+    if (!session) throw new HttpException('Invalid token, or session has expired', 401);
 
     // TODO remove this for performance reasons, we are calling the psql database on every call while we can easily use the data in the redis cache, we just need to make sure to update them when user data changes
     // Check if user still exists
-    const user = await this.userService.findUserById(
-      JSON.parse(session).userId
-    );
+    const user = await this.userService.findUserById(JSON.parse(session).userId);
     if (!user)
       throw new ForbiddenException({
         message: "Invalid token, user doesn't exist",
       });
 
     // Check if user is verified
-    if (!user.verified)
-      throw new ForbiddenException({ message: 'Account not verified' });
+    if (!user.verified) throw new ForbiddenException({ message: 'Account not verified' });
 
     return user;
   }

@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import './slideshow.scss';
 import Marquee from 'react-marquee-slider';
 import times from 'lodash/times';
 import NoTimeToDie from '../../../assets/NoTimeToDie.jpg';
-import { ImageApi } from '../../api/image.api';
-import { ImageSchema } from '../../schema/image.schema';
 
 interface ElementProps {
   height: number;
@@ -27,11 +25,11 @@ const Element: React.FC<ElementProps> = ({ height, cover = true, id }) => {
 };
 
 const SlideShow: React.FC = () => {
-  const api = new ImageApi();
-  const [images, setImages] = useState<Array<ImageSchema>>();
-  useEffect(() => {
-    api.getImages(6).then((images) => setImages(images));
-  });
+  // const api = new ImageApi();
+  // const [images, setImages] = useState<Array<ImageSchema>>();
+  // useEffect(() => {
+  //   api.getImages(6).then((images) => setImages(images));
+  // });
 
   return (
     <div className={'slide-show'}>

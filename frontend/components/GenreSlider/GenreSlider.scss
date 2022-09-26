@@ -1,0 +1,61 @@
+.genre-slider {
+  //padding: 0 4%;
+  position: relative;
+  overflow-x: hidden;
+
+  /* ======================================== Show Box ========================================= */
+  &__content {
+    white-space: nowrap;
+
+
+    .genre {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 0.5rem;
+      border: 2px solid white;
+      border-radius: var(--border-radius-def);
+      font-weight: 600;
+      font-size: 1rem;
+      background-color: transparent;
+      padding: 1rem 2rem;
+    }
+  }
+
+  /* ======================================== Arrows ========================================= */
+  &:hover,
+  &:active {
+    .genre-slider__arrow {
+      display: flex;
+    }
+  }
+}
+
+.left {
+  left: -7%;
+  top: 3%;
+  display: flex;
+}
+
+.right {
+  right: 25%;
+  top: 3%;
+  display: flex;
+}
+
+.genre-slider__arrow {
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  height: 3rem;
+  width: 3rem;
+  z-index: 1;
+  font-size: 0.5rem;
+  color: #ffffff;
+  background-color: rgba(20, 20, 20, 0.7);
+  transition-duration: 0.4s;
+  padding: 0;
+  border-radius: 50%;
+}
+
+

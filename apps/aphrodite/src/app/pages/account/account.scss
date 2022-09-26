@@ -33,6 +33,10 @@
     }
   }
 
+  &__message {
+    background-color: red;
+  }
+
   .Form {
     width: 27.5%;
     border-radius: 1rem;
@@ -41,6 +45,8 @@
     justify-content: center;
     z-index: 1;
     background: rgba(000, 000, 000, 0.75);
+    backdrop-filter: blur(1.5rem);
+    -webkit-backdrop-filter: blur(2rem);
 
     @include tablet {
       width: 80%;
@@ -109,6 +115,12 @@
       color: white;
       font-size: 1.2rem;
       margin: 1rem 2rem 3rem 2rem;
+      cursor: pointer;
+    }
+
+    .submitting {
+      background-color: grey;
+      cursor: not-allowed;
     }
   }
 }
