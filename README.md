@@ -4,6 +4,125 @@ Dionysus is the god of the grape-harvest, winemaking, orchards and fruit, vegeta
 madness, religious ecstasy,
 festivity, and theatre in ancient Greek religion and myth. He is also known as Bacchus by the Greeks.
 
+<table>
+  <tr>
+    <td align="center" width="110">
+      <a href="https://www.typescriptlang.org/" target="_blank" rel="noreferrer"> 
+        <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="typescript" width="40" height="40"/> 
+        <br>
+        Typescript
+      </a>
+    </td>
+    <td align="center" width="110">
+      <a href="https://nodejs.org" target="_blank" rel="noreferrer"> 
+        <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original-wordmark.svg" alt="nodejs" width="40" height="40"/> 
+        <br>
+        NodeJS
+      </a> 
+    </td>
+    <td align="center" width="110">
+      <a href="https://expressjs.com" target="_blank" rel="noreferrer"> 
+        <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/express/express-original-wordmark.svg" alt="express" width="40" height="40"/>
+        <br>
+        Express
+      </a> 
+    </td>
+    <td align="center" width="110">
+      <a href="https://nestjs.com/" target="_blank" rel="noreferrer"> 
+        <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nestjs/nestjs-plain.svg" alt="nestjs" width="40" height="40"/> 
+        <br>
+        NestJS
+      </a> 
+    </td>
+    <td align="center" width="110">
+      <a href="https://reactjs.org/" target="_blank" rel="noreferrer"> 
+        <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original-wordmark.svg" alt="react" width="40" height="40"/> 
+        <br>
+        ReactJS
+      </a> 
+    </td>
+    <td align="center" width="110">
+        <a href="https://www.rabbitmq.com" target="_blank" rel="noreferrer"> 
+        <img src="https://www.vectorlogo.zone/logos/rabbitmq/rabbitmq-icon.svg" alt="rabbitMQ" width="40" height="40"/> 
+        <br>
+        Rabbitmq
+      </a> 
+    </td>
+    <td align="center" width="110">
+      <a href="https://www.docker.com/" target="_blank" rel="noreferrer"> 
+        <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-original-wordmark.svg" alt="docker" width="40" height="40"/> 
+        <br>
+        Docker
+      </a> 
+    </td>
+    <td align="center" width="110">
+      <a href="https://www.jenkins.io" target="_blank" rel="noreferrer"> 
+        <img src="https://www.vectorlogo.zone/logos/jenkins/jenkins-icon.svg" alt="jenkins" width="40" height="40"/> 
+        <br>
+        Jenkins
+      </a> 
+    </td>
+</tr>
+<tr>
+    <td align="center" width="110">
+      <a href="https://grafana.com" target="_blank" rel="noreferrer"> 
+        <img src="https://www.vectorlogo.zone/logos/grafana/grafana-icon.svg" alt="grafana" width="40" height="40"/> 
+        <br>
+        Grafana
+      </a> 
+    </td>
+    <td align="center" width="110">
+      <a href="https://jestjs.io" target="_blank" rel="noreferrer"> 
+        <img src="https://www.vectorlogo.zone/logos/jestjsio/jestjsio-icon.svg" alt="jest" width="40" height="40"/> 
+        <br>
+        Jest
+      </a> 
+    </td>
+<td align="center" width="110">
+<a href="https://www.elastic.co" target="_blank" rel="noreferrer">
+<img src="https://www.vectorlogo.zone/logos/elastic/elastic-icon.svg" alt="elasticsearch" width="40" height="40"/> 
+<br>
+ElasticSearch
+</a> 
+</td>
+<td align="center" width="110">
+<a href="https://redis.io" target="_blank" rel="noreferrer"> 
+<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/redis/redis-original-wordmark.svg" alt="redis" width="40" height="40"/> 
+<br>
+Redis
+</a>
+</td>
+<td align="center" width="110">
+<a href="https://www.postgresql.org" target="_blank" rel="noreferrer"> 
+<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/postgresql/postgresql-original-wordmark.svg" alt="postgresql" width="40" height="40"/> 
+<br>
+Postgresql
+</a> 
+</td>
+<td align="center" width="110">
+<a href="https://www.elastic.co/kibana" target="_blank" rel="noreferrer"> 
+<img src="https://www.vectorlogo.zone/logos/elasticco_kibana/elasticco_kibana-icon.svg" alt="kibana" width="40" height="40"/> 
+<br>
+Kibana
+</a> 
+</td>
+<td>
+<a href="https://www.nginx.com" target="_blank" rel="noreferrer">
+<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nginx/nginx-original.svg" alt="nginx" width="40" height="40"/>
+<br>
+nginx
+</a>
+</td>
+<td>
+<a href="https://www.nx.dev" target="_blank" rel="noreferrer">
+<img src="https://github.com/AbbasSrour/dionysus/blob/main/assets/nx.png" alt="nx" width="40" height="40"/>
+<br>
+nx
+</a>
+</td>
+  </tr>
+</table>
+
 ![stack](https://github.com/AbbasSrour/dionysus/blob/dev/assets/Dionysus.Stack.png)
 
 A movie streaming service built with a Microservice Architecture to facilitate rapid development and deployment, easier
