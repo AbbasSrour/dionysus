@@ -31,7 +31,7 @@ async function bootstrap() {
   // Middleware
   app.use(cookieParser());
   app.enableCors({
-    // origin: config.getOrThrow<string>('origin'),
+    origin: config.getOrThrow<string>('origin'),
     credentials: true,
   });
 
