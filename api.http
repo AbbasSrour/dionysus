@@ -1,29 +1,34 @@
-GET http://localhost:4004/api/scrape/loki
+GET http://localhost:2000/api/scrape/loki
 Accept: application/json
 
 ###
-GET http://localhost:4004/api/scrape/Dr.Strange Into The Multiverse
+GET http://localhost:2000/api/scrape/Dr.Strange Into The Multiverse
 Accept: application/json
 
 ###
-GET http://localhost:4004/api/scrape/Iron Man
+GET http://localhost:2000/api/scrape/Iron Man
 Accept: application/json
 
 ###
-GET http://localhost:4004/api/scrape/WandaVision
+GET http://localhost:2000/api/scrape/WandaVision
 Accept: application/json
 
 ###
-GET http://localhost:4004/api/scrape/dismissed
+GET http://localhost:2000/api/scrape/dismissed
 Accept: application/json
 
 ###
-GET http://localhost:4004/api/scrape/uncharted
+GET http://localhost:2000/api/scrape/uncharted
 Accept: application/json
 
 ###
-GET http://localhost:4004/api/scrape/dr.strange
+GET http://localhost:2000/api/scrape/dr.strange
 Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/arcane
+Accept: application/json
+
 
 ###
 GET https://localhost:2000/api/user/email/abbas.mj.srour@gmail.com/available
@@ -51,9 +56,18 @@ Content-Type: application/json
   "password": "NewDay12345$"
 }
 
-
 ###
 GET https://localhost:2000/api/user
 Accept: application/json
+
+###
+GET http://localhost:2000/api/image?page=6
+Accept: application/json
+
+###
+GET http://localhost:2000/api/movie/2
+Accept: application/json
+
+
 
 

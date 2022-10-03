@@ -10,6 +10,7 @@ import {
 import { APOLLOPROXY } from '../common/constants';
 import { RmqService } from '@dio/common';
 import { InsertDto } from './dto/insert.dto';
+import { lastValueFrom } from 'rxjs';
 
 @Controller('scrape')
 export class ScrapeController {
@@ -31,14 +32,26 @@ export class ScrapeController {
   async scrape(@Payload() payload: string, @Ctx() context: RmqContext) {
     const shows = this.ScrapeMethod(payload);
     await this.apolloProxy.emit('insert', shows);
-    /* this.rmqService.ack(context); */
+    this.rmqService.ack(context);
     return shows;
   }
 
   async ScrapeMethod(searchTerm: string) {
     const showList = await this.scrapeService.searchImdb(searchTerm);
+    console.log(searchTerm);
+    console.log(showList);
     const shows = Array<InsertDto>();
+
     for (const imdbId of showList) {
+      if (shows.length > 50) break;
+      console.log(shows.length);
+
+      const exists = await lastValueFrom<boolean>(this.apolloProxy.send('check', imdbId));
+      if (exists) {
+        console.log(exists);
+        break;
+      }
+
       const showPage = await this.scrapeService.getImdbShowPage(imdbId);
       if (!showPage) continue;
 
@@ -67,9 +80,25 @@ export class ScrapeController {
         writers: await this.scrapeService.scrapeWriters(showPage),
       };
 
+      (await this.scrapeService.scrapeSimilarShows(showPage)).forEach((id) => {
+        let present = false;
+        for (const imdbId of showList) {
+          if (id === imdbId) {
+            present = true;
+            break;
+          }
+        }
+        if (!present) showList.push(id);
+      });
+
+      console.log({
+        inserted: imdbId,
+        name: show.show.name,
+      });
       this.apolloProxy.emit('insert', show);
       shows.push(show);
     }
+
     return shows;
   }
 }

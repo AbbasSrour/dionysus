@@ -28,7 +28,8 @@ export class ScrapeService {
     private tmdbService: TmdbService,
     private serverService: ServerService,
     private config: ConfigService,
-  ) {}
+  ) {
+  }
 
   async searchImdb(query: string): Promise<string[]> {
     return await this.imdbService.searchImdb(query);
@@ -198,7 +199,7 @@ export class ScrapeService {
     });
     tmdbImages.backdrops.forEach((image) => {
       images.push({
-        url: `${this.config.get<string>('tmdb.address')}/original/${image.file_path}`,
+        url: `${this.config.get<string>('tmdb.imageAddress')}${image.file_path}`,
         type: 'backdrop',
         width: image.width,
         height: image.height,
@@ -209,7 +210,7 @@ export class ScrapeService {
     });
     tmdbImages.logos.forEach((image) => {
       images.push({
-        url: `${this.config.get<string>('tmdb.address')}/original/${image.file_path}`,
+        url: `${this.config.get<string>('tmdb.imageAddress')}${image.file_path}`,
         type: 'logo',
         width: image.width,
         height: image.height,
@@ -220,7 +221,7 @@ export class ScrapeService {
     });
     tmdbImages.posters.forEach((image) => {
       images.push({
-        url: `${this.config.get<string>('tmdb.address')}/original/${image.file_path}`,
+        url: `${this.config.get<string>('tmdb.imageAddress')}${image.file_path}`,
         type: 'poster',
         width: image.width,
         height: image.height,
@@ -284,5 +285,9 @@ export class ScrapeService {
 
   async scrapeWriters(imdbPage: cheerio.CheerioAPI): Promise<Array<WriterType>> {
     return await this.imdbService.MoviePage.getWriters(imdbPage);
+  }
+
+  async scrapeSimilarShows(imdbPage: cheerio.CheerioAPI): Promise<Array<string>> {
+    return await this.imdbService.MoviePage.getSimilarShows(imdbPage);
   }
 }

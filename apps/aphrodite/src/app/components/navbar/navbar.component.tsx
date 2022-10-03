@@ -18,6 +18,7 @@ import {
   BsCollection as ListIconOutline,
   BsCollectionFill as ListIconFill,
 } from 'react-icons/bs';
+import { SearchButton } from '../search-button/search-button.compnent';
 
 const headerNav = [
   {
@@ -111,7 +112,8 @@ const Navbar: React.FC = () => {
           ))}
         </ul>
       ) : null}
-      {/*{!accountPage && !mobile ? <SearchBar /> : null}*/}
+      {!accountPage && !mobile ? <SearchButton /> : null}
+      {/*{!accountPage && !mobile ? <AnimatedSearchButton /> : null}*/}
       {!accountPage ? (
         <div className={'navbar__user'}>
           <img src={darth} />

@@ -1,11 +1,10 @@
-import { BaseApi } from './base.api';
+import { KyResponse } from 'ky';
+import BaseApi from './base.api';
 
 export class UserApi {
-  private url = '/user';
-  private api = new BaseApi();
+  private api = new BaseApi('/user').getApi();
 
-  async getCurrentUser() {
-    console.log('hello world');
-    return this.api.get(this.url);
+  async getCurrentUser(): Promise<KyResponse> {
+    return this.api.get('');
   }
 }

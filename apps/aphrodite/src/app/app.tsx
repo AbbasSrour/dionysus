@@ -1,9 +1,4 @@
 import { Route, Routes } from 'react-router-dom';
-// import AccountPage from './pages/Account/Account.page';
-// import ShowPage from './pages/Show/Show.page';
-// import Navbar from './components/Navbar/Navbar.component';
-// import SearchPage from './pages/Search/Search.page';
-// import HomePage from './pages/Home/Home.page';
 import './app.module.scss';
 import Navbar from './components/navbar/navbar.component';
 import AccountPage from './pages/account/account.page';

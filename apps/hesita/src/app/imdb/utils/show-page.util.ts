@@ -23,7 +23,7 @@ export class ShowPageUtil {
   async getRating($: cheerio.CheerioAPI): Promise<number> {
     return parseFloat(
       $(
-        "div[data-testid='hero-rating-bar__aggregate-rating__score'] > span:first",
+        'div[data-testid=\'hero-rating-bar__aggregate-rating__score\'] > span:first',
       ).text(),
     );
   }
@@ -105,5 +105,15 @@ export class ShowPageUtil {
       StudioArray.push(studio);
     });
     return StudioArray;
+  }
+
+  async getSimilarShows($: cheerio.CheerioAPI) {
+    const imdbIds = new Array<string>();
+    $('section[data-testid="MoreLikeThis"] > div[data-testid="shoveler"] > div[data-testid="shoveler-items-container"] > div')
+      .each((i, elem) => {
+        const idRegex = /(\/title\/)|(\/\?ref_=tt_sims_tt_i_[0-9]+(.*))/g;
+        imdbIds.push($(elem).find('div:first-of-type').find('a').attr('href').replace(idRegex, ''));
+      });
+    return imdbIds;
   }
 }

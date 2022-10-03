@@ -7,6 +7,7 @@
   background-position: top;
   background-size: cover;
   background-repeat: no-repeat;
+  margin-bottom: 5rem;
 
   &::before {
     content: "";
@@ -24,8 +25,11 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 100px;
-    background-image: linear-gradient(to top, var(--cr-body-bg), rgba(black, 0));
+    height: 10%;
+    //background: -webkit-gradient(linear, left top, right top, color-stop(0%, transparent), color-stop(50%,#fff), color-stop(100%,transparent)); /* Chrome, Safari4+ */
+    //background-image: -moz-linear-gradient(top, var(--cr-body-bg) 0%, rgba(black, 0) 100%);;
+    //background-image: -webkit-linear-gradient(top, var(--cr-body-bg) 0%, rgba(black, 0) 100%); /* Chrome10+, Safari5.1+ */
+    background-image: linear-gradient(to top, #0f0f0f, rgba(black, 0));
   }
 
   &__container {
@@ -63,7 +67,7 @@
         }
 
         img {
-          width: 400px;
+          width: 30rem;
         }
       }
 

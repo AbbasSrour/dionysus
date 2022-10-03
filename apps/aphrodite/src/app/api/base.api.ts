@@ -1,23 +1,21 @@
-import ky, { KyResponse } from 'ky';
+import ky from 'ky';
+import { KyInstance } from 'ky/distribution/types/ky';
 
-export class BaseApi {
-  baseUrl = 'https://localhost:2000/api';
+export default class BaseApi {
+  private readonly baseUrl = 'http://localhost:2000/api';
+  private readonly url: string;
 
-  async get(url: string, searchParams?: object) {
-    return ky.get(`${this.baseUrl}${url}`, {
-      searchParams: { ...searchParams },
-      credentials: 'include',
-    });
+  constructor(prefix: string) {
+    this.url = this.baseUrl + prefix;
   }
 
-  async post(
-    url: string,
-    { searchParams, body }: { searchParams?: object; body?: object },
-  ): Promise<KyResponse> {
-    return ky.post(`${this.baseUrl}${url}`, {
-      searchParams: { ...searchParams },
-      json: { ...body },
+  getApi(): KyInstance {
+    return ky.create({
+      prefixUrl: this.url,
       credentials: 'include',
+      headers: {
+        'content-type': 'application/json',
+      },
     });
   }
 }

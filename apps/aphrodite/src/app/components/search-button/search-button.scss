@@ -1,0 +1,54 @@
+.icons {
+  margin: auto;
+  fill: white;
+}
+
+.search {
+  display: flex;
+  align-self: center;
+  padding: 0.3rem;
+
+  &__icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 45%;
+    cursor: pointer;
+
+    display: flex;
+    justify-content: center;
+
+    svg {
+      font-size: 2.5rem;
+    }
+
+  }
+
+
+  input {
+    background-color: red;
+    height: 3rem;
+    border-radius: 1.2rem;
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 0;
+    outline: none;
+    padding-left: 4rem;
+    font-size: 1.5rem;
+    color: white;
+  }
+
+  button {
+    border-radius: 1rem;
+    background-color: transparent;
+    border: 0;
+  }
+}
+
+.trans-background {
+  transition: ease 0.3s;
+  background-color: transparent;
+
+  &:hover {
+    border-radius: 50%;
+    background-color: rgba(white, 0.3);
+  }
+}

@@ -613,7 +613,6 @@ services:
       dockerfile: Dockerfile
     container_name: nginx
     ports:
-      #      - '2000:443'
       - '2000:443'
       - '3000:3000'
       - '5601:5601'

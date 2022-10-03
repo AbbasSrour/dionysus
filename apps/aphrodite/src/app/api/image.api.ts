@@ -1,11 +1,16 @@
-import { BaseApi } from './base.api';
+import BaseApi from './base.api';
+import { ImageSchema } from '../schema/image.schema';
 
 export class ImageApi {
-  private api = new BaseApi();
-  private url = '/image';
+  private api = new BaseApi('/image').getApi();
 
   async getImages(page: number) {
-    const response = await this.api.get(`${this.url}`, { page });
-    return await response.json();
+    const api = new BaseApi('').getApi();
+    const response = await api.get('image', {
+      searchParams: {
+        page,
+      },
+    });
+    return await response.json<Array<ImageSchema>>();
   }
 }
