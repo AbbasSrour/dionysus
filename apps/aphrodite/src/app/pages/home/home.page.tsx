@@ -5,6 +5,8 @@ import MovieApi from '../../api/movie.api';
 import { MovieSchema } from '../../schema/movie.schema';
 import Slider from '../../components/slider/slider.component';
 import studioData from '../../data/studios.data';
+import SeriesApi from '../../api/series.api';
+import { SeriesSchema } from '../../schema/series.schema';
 
 const HomePage = () => {
   // const [color, setColor] = useState<Array<Array<number>> | null>(null);
@@ -19,9 +21,18 @@ const HomePage = () => {
   // }, [header]);
 
   const [shows, setShows] = useState<Array<MovieSchema>>();
-  const api = new MovieApi();
+  const [topMovies, setTopMovies] = useState<Array<MovieSchema>>();
+  const [topSeries, setTopSeries] = useState<Array<SeriesSchema>>();
+  const [trendingMovies, setTrendingMovies] = useState<Array<MovieSchema>>();
+
+  const movieApi = new MovieApi();
+  const seriesApi = new SeriesApi();
+
   useEffect(() => {
-    api.getMovies(4).then((movies) => setShows(movies));
+    movieApi.getMovies(1).then((movies) => setShows(movies));
+    movieApi.getTopMovies(2).then((movies) => setTopMovies(movies));
+    seriesApi.getTopSeries(2).then((series) => setTopSeries(series));
+    movieApi.getTrendingMovies().then((movies) => setTrendingMovies(movies));
   }, []);
 
   return (
@@ -45,19 +56,31 @@ const HomePage = () => {
           type={'show'}
         />
       ) : null}
-      {shows ? (
+      {trendingMovies ? (
         <Slider
-          data={shows}
+          data={trendingMovies}
           sliderName={'Trending Movies'}
           poster={false}
           type={'show'}
         />
       ) : null}
-      {shows ? (
-        <Slider data={shows} sliderName={'Top Tv Shows'} poster={false} type={'show'} />
+      <Slider
+        data={studioData}
+        poster={false}
+        type={'studio'}
+        spacing={5}
+        sliderName={'Networks'}
+      />
+      {topSeries ? (
+        <Slider
+          data={topSeries}
+          sliderName={'Top Tv Shows'}
+          poster={false}
+          type={'show'}
+        />
       ) : null}
-      {shows ? (
-        <Slider data={shows} sliderName={'Top Movies'} poster={false} type={'show'} />
+      {topMovies ? (
+        <Slider data={topMovies} sliderName={'Top Movies'} poster={false} type={'show'} />
       ) : null}
     </div>
   );

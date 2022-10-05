@@ -6,7 +6,13 @@
   --cr-trans-darker: rgba(20, 20, 20, 0.9);
 
 
+  //todo remove first one
   --sh-box-def: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  --def-box-sh: rgb(0 0 0 / 69%) 0px 26px 30px -10px, rgb(0 0 0 / 73%) 0px 16px 10px -10px;
+  --ani-def-box-sh: rgb(0 0 0 / 80%) 0px 40px 58px -16px, rgb(0 0 0 / 72%) 0px 30px 22px -10px;
+
+  --def-border: 3px solid rgba(249, 249, 249, 0.1);
+  --ani-def-border: 3px solid rgba(249, 249, 249, 0.8);
 
   --height-header-def: 8rem;
   --height-header-shrink: 5rem;

@@ -1,5 +1,6 @@
 .show-box {
   position: relative;
+  box-shadow: var(--def-box-sh);
 
   &:first-of-type {
     padding-left: 0;
@@ -14,23 +15,6 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-  }
-
-  .hide {
-    z-index: -2;
-    opacity: 0;
-  }
-
-  .show {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
-  .trans {
-    opacity: 1;
-    z-index: 1;
-    transition: opacity 0.1s ease-in-out 0s, z-index 0s ease-in-out;
   }
 
   .logo {
@@ -51,8 +35,67 @@
     z-index: -1;
   }
 
+  &__data {
+    position: absolute;
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    margin-left: 1rem;
+
+    & > * {
+      margin-bottom: 0.4rem !important;
+    }
+
+    h2 {
+      margin: 0;
+      padding: 0;
+      display: inline-block;
+      white-space: normal;
+      font-size: 1rem;
+      overflow-wrap: break-word;
+      max-width: 70%;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: row;
+      padding: 0;
+      margin: 0;
+      align-content: center;
+      font-size: 0.7rem;
+
+      li {
+        display: flex;
+        align-content: center;
+        align-items: center;
+        margin-right: 0.4rem;
+        font-weight: 500;
+        height: fit-content;
+
+        p {
+          margin: 0;
+          padding: 0;
+        }
+
+        svg {
+          font-size: 0.7rem;
+          fill: gold;
+        }
+      }
+    }
+
+    .genres {
+      list-style: inside;
+      color: white;
+    }
+  }
+
   &:hover,
   &:active {
+    background-color: var(--cr-trans-def);
+
     .video-player {
       z-index: 0;
     }
@@ -63,4 +106,54 @@
       transition: opacity 0.5s ease-in-out 0.5s, z-index 2s ease-in-out;
     }
   }
+
+  .hide {
+    z-index: -2;
+    opacity: 0;
+    grid-row-start: 1;
+    grid-column-start: 1;
+  }
+
+  .show {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .trans {
+    opacity: 1;
+    z-index: 1;
+    transition: opacity 0.1s ease-in-out 0s, z-index 0s ease-in-out;
+  }
 }
+
+.poster {
+  .show-box__data {
+    top: 40%;
+
+    .btns {
+      margin-bottom: 1rem !important;
+    }
+
+    h2 {
+      max-width: 90%;
+    }
+
+    .summary {
+      margin: 0.5rem 0 0 0;
+      padding: 0;
+      display: inline-block;
+      white-space: normal;
+      font-size: 0.8rem;
+      overflow-wrap: break-word;
+      max-width: 90%;
+    }
+  }
+}
+
+.backdrop {
+  .show-box__data {
+    bottom: 7.6%;
+  }
+}
+

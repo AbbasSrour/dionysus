@@ -4,6 +4,7 @@ import {
   ClientProxy,
   Ctx,
   EventPattern,
+  MessagePattern,
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
@@ -36,6 +37,11 @@ export class ScrapeController {
     return shows;
   }
 
+  @MessagePattern('trending')
+  async trendingMovies(@Payload() payload: string) {
+    return await this.scrapeService.getTrending(payload);
+  }
+
   async ScrapeMethod(searchTerm: string) {
     const showList = await this.scrapeService.searchImdb(searchTerm);
     console.log(searchTerm);
@@ -44,7 +50,6 @@ export class ScrapeController {
 
     for (const imdbId of showList) {
       if (shows.length > 50) break;
-      console.log(shows.length);
 
       const exists = await lastValueFrom<boolean>(this.apolloProxy.send('check', imdbId));
       if (exists) {

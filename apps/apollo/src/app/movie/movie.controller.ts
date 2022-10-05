@@ -28,6 +28,16 @@ export class MovieController {
     return await this.movieService.createMovie(body);
   }
 
+  @Get('/top')
+  async getTopMovies(@Query('page') page = 1): Promise<Array<MoviePojo>> {
+    return await this.movieService.getTop(page);
+  }
+
+  @Get('/trending')
+  async getTrendingMovies(@Query('page') page = 1): Promise<Array<MoviePojo>> {
+    return await this.movieService.getTrending();
+  }
+
   @Get('/:id')
   async getMovieById(@Param('id') id: number): Promise<MoviePojo> {
     const movie = await this.movieService.getMovie(id);

@@ -3,46 +3,97 @@ import { PrismaService } from '../common/prisma';
 import { SeriesEntity } from './series.entity';
 import { CreateSeriesDto, UpdateSeriesDto } from './dto';
 import { dateDifferenceUtil } from '../events/utilities/date-difference.util';
+import { Series, Show } from '@prisma/client-apollo';
+import { SeriesPojo } from './pojo/series.pojo';
 
 @Injectable()
 export class SeriesService {
   constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
 
-  async getSerieses(page: number): Promise<Array<SeriesEntity>> {
+  async getSerieses(page: number): Promise<Array<SeriesPojo>> {
     const take = page * 10;
-    const seriesArr = new Array<SeriesEntity>();
+    const seriesArr = new Array<SeriesPojo>();
 
     const data = await this.client.series.findMany({ take });
     for (const elem of data) {
-      const show = await this.client.show.findUniqueOrThrow({
-        where: { showId: elem.showId },
-      });
-      const entry = {
-        ...show,
-        ...elem,
-      };
-      const { createdAt, updatedAt, ...series } = entry;
+      const series = await this.getSeries(elem.seriesId);
       seriesArr.push(series);
     }
     return seriesArr;
   }
 
-  async getSeriesById(seriesId: number): Promise<SeriesEntity> {
+  async getSeries(seriesId: number): Promise<SeriesPojo> {
     const series = await this.client.series.findUniqueOrThrow({
       where: {
         seriesId,
       },
+      select: {
+        seriesId: true,
+        showId: true,
+        type: true,
+        avgEpisodeLength: true,
+      },
     });
-
     const show = await this.client.show.findUniqueOrThrow({
       where: {
         showId: series.showId,
       },
+      include: {
+        Imdb: true,
+        ShowGenre: {
+          select: {
+            genre: true,
+          },
+        },
+      },
     });
-    const data = { ...show, ...series };
 
-    const { createdAt, updatedAt, ...seriesEntity } = data;
-    return seriesEntity;
+    const poster = this.client.image.findFirst({
+      where: {
+        isDefault: true,
+        showId: show.showId,
+        type: 'poster',
+      },
+      take: 1,
+    });
+    const backdrop = this.client.image.findFirst({
+      where: {
+        showId: show.showId,
+        type: 'backdrop',
+      },
+      take: 1,
+    });
+    const logo = this.client.image.findFirst({
+      where: {
+        showId: show.showId,
+        type: 'logo',
+      },
+      take: 1,
+    });
+    const trailer = this.client.video.findFirst({
+      where: {
+        showId: show.showId,
+        type: 'Trailer',
+      },
+    });
+
+    const data = await Promise.all([poster, backdrop, logo, trailer]);
+
+    const seriesPojo = {
+      ...show,
+      ...series,
+      poster: data[0],
+      backdrop: data[1],
+      logo: data[2],
+      trailer: data[3],
+    };
+
+    const seriesData = { ...seriesPojo, genres: seriesPojo['ShowGenre'] };
+
+    delete seriesData.ShowGenre;
+    delete seriesData.createdAt;
+    delete seriesData.updatedAt;
+    return seriesData;
   }
 
   async findSeries(name: string, releaseYear: number): Promise<SeriesEntity> {
@@ -54,7 +105,38 @@ export class SeriesService {
         },
       },
     });
-    return await this.getSeriesById(show.showId);
+    return await this.getSeries(show.showId);
+  }
+
+  async getTop(page: number): Promise<Array<SeriesPojo>> {
+    const take = page * 10;
+    const ids = await this.client.series.findMany({
+      select: {
+        seriesId: true,
+      },
+      take,
+      orderBy: [
+        {
+          show: {
+            Imdb: {
+              voteCount: 'desc',
+            },
+          },
+        },
+        {
+          show: {
+            Imdb: {
+              rating: 'desc',
+            },
+          },
+        },
+      ],
+    });
+    const seriess = new Array<SeriesPojo>();
+    for (const id of ids) {
+      seriess.push(await this.getSeries(id.seriesId));
+    }
+    return seriess;
   }
 
   async createSeries(input: CreateSeriesDto) {

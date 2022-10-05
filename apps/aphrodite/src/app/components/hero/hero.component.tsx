@@ -44,7 +44,7 @@ const HeroHeader: React.FC = () => {
               <h2>{heroShow?.name}</h2>
             )}
           </div>
-          <div className="overview">{heroShow?.summary}</div>
+          <p className="overview">{heroShow?.summary}</p>
           <div className="btns">
             <Button circular={true} clean={false}>
               Play

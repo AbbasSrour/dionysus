@@ -1,5 +1,6 @@
 import { ImageSchema } from './image.schema';
 import { VideoSchema } from './video.schema';
+import { GenreSchema } from './genre.schema';
 
 export interface SeriesSchema {
   showId: number;
@@ -16,8 +17,10 @@ export interface SeriesSchema {
   logo?: ImageSchema;
   trailer?: VideoSchema;
 
-  imdb: {
+  Imdb: {
     rating: number;
     voteCount: number;
   };
+
+  genres: Array<{ genre: GenreSchema }>;
 }

@@ -61,6 +61,24 @@ export class TmdbService {
     return parseInt(resBody.tv_results[0].id);
   }
 
+  async getImdbId(tmdbId: number, type: string): Promise<string> {
+    const endpoint = type === 'Movie' ? 'movie' : 'tv';
+    const res = await got.get(
+      `${this.config.getOrThrow<string>(
+        'tmdb.address',
+      )}${endpoint}/${tmdbId}/external_ids`,
+      {
+        searchParams: {
+          api_key: this.config.getOrThrow('tmdb.apiKey'),
+        },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    return (await JSON.parse(res.body)).imdb_id;
+  }
+
   async scrapeImagesFromTmdb(tmdbId: number, type: string): Promise<tmdbImageResponse> {
     let url: string;
     if (type === 'TV Series' || type === 'TV Mini Series')
@@ -93,5 +111,28 @@ export class TmdbService {
       },
     });
     return await JSON.parse(videos.body);
+  }
+
+  async trending(type: string): Promise<Array<string>> {
+    let url: string;
+    if (type === 'TV Series')
+      url = `${this.config.get<string>('tmdb.address')}/trending/tv/week`;
+    else url = `${this.config.get<string>('tmdb.address')}/trending/movie/week`;
+    const response = await got.get(url, {
+      searchParams: {
+        api_key: this.config.get('tmdb.apiKey'),
+        include_video_language: 'en,null',
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const shows = await JSON.parse(response.body).results;
+    const imdbIds = new Array<string>();
+    for (const show of shows) {
+      const id = await this.getImdbId(show.id, type);
+      imdbIds.push(id);
+    }
+    return imdbIds;
   }
 }

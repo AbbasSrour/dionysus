@@ -74,15 +74,28 @@
       .overview {
         font-weight: 700;
         font-size: 1.2rem;
+        text-align: justify;
+        text-justify: inter-word;
       }
 
       .btns {
         display: flex;
+        align-items: center;
+        justify-items: center;
+        align-content: center;
+        justify-content: center;
+        margin-left: auto;
+        margin-right: auto;
         width: fit-content;
       }
 
+      .btns > * {
+        width: 12rem;
+        font-size: 0.8rem;
+      }
+
       .btns > * ~ * {
-        margin-left: 2rem;
+        margin: 0 1.5rem;
       }
     }
 

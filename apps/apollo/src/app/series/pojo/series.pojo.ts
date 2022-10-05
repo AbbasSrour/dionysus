@@ -1,15 +1,15 @@
 import { Imdb, Image, Video, Genre } from '@prisma/client-apollo';
 
-export class MoviePojo {
-  movieId: number;
+export class SeriesPojo {
+  seriesId: number;
   showId: number;
   name: string;
   releaseYear: number;
   summary: string;
   pgRating: string;
   length: number;
-  budget: number;
-  revenue: number;
+  avgEpisodeLength: number;
+  type: string;
 
   logo: Image;
   poster: Image;

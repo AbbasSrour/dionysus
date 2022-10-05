@@ -20,6 +20,10 @@ export default class MovieApi {
   }
 
   async getTrendingMovies(): Promise<Array<MovieSchema>> {
-    return this.api.get(`/trending`).json<Array<MovieSchema>>();
+    return this.api.get(`trending`).json<Array<MovieSchema>>();
+  }
+
+  async getTopMovies(page: number): Promise<Array<MovieSchema>> {
+    return this.api.get('top', { searchParams: { page } }).json<Array<MovieSchema>>();
   }
 }

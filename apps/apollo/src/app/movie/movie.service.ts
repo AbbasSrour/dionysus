@@ -1,13 +1,20 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/prisma';
 import { CreateMovieDto, UpdateMovieDto } from './dto';
 import { MovieEntity } from './movie.entity';
 import { dateDifferenceUtil } from '../events/utilities/date-difference.util';
 import { MoviePojo } from './pojo/movie.pojo';
+import { HesitaConstant } from '../common/constants/hesita-proxy.constant';
+import { ClientProxy } from '@nestjs/microservices';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class MovieService {
-  constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
+  constructor(
+    private readonly client: PrismaService,
+    private readonly logger: Logger,
+    @Inject(HesitaConstant) private readonly hesitaProxy: ClientProxy,
+  ) {}
 
   async getMovie(movieId: number): Promise<MoviePojo> {
     const movie = await this.client.movie.findUniqueOrThrow({
@@ -24,6 +31,14 @@ export class MovieService {
     const show = await this.client.show.findUniqueOrThrow({
       where: {
         showId: movie.showId,
+      },
+      include: {
+        Imdb: true,
+        ShowGenre: {
+          select: {
+            genre: true,
+          },
+        },
       },
     });
 
@@ -67,11 +82,12 @@ export class MovieService {
       trailer: data[3],
     };
 
-    console.log(moviePojo);
+    const movieData = { ...moviePojo, genres: moviePojo['ShowGenre'] };
 
-    delete moviePojo.createdAt;
-    delete moviePojo.updatedAt;
-    return moviePojo;
+    delete movieData.ShowGenre;
+    delete movieData.createdAt;
+    delete movieData.updatedAt;
+    return movieData;
   }
 
   async getMovies(page: number): Promise<Array<MoviePojo>> {
@@ -82,6 +98,65 @@ export class MovieService {
     for (const elem of data) {
       const movie = await this.getMovie(elem.movieId);
       movies.push(movie);
+    }
+    return movies;
+  }
+
+  // async getTrending(): Promise<Array<MoviePojo>> {}
+
+  async getTop(page: number): Promise<Array<MoviePojo>> {
+    const take = page * 10;
+    const ids = await this.client.movie.findMany({
+      select: {
+        movieId: true,
+      },
+      take,
+      orderBy: [
+        {
+          show: {
+            Imdb: {
+              voteCount: 'desc',
+            },
+          },
+        },
+        {
+          show: {
+            Imdb: {
+              rating: 'desc',
+            },
+          },
+        },
+      ],
+    });
+    const movies = new Array<MoviePojo>();
+    for (const id of ids) {
+      movies.push(await this.getMovie(id.movieId));
+    }
+    return movies;
+  }
+
+  async getTrending() {
+    const imdbIds: Array<string> = await lastValueFrom(
+      this.hesitaProxy.send('trending', 'Movie'),
+    );
+    const movies = new Array<MoviePojo>();
+    for (const imdbId of imdbIds) {
+      const movie = await this.client.show.findFirst({
+        where: {
+          Imdb: {
+            imdbId,
+          },
+        },
+        include: {
+          Movie: {
+            select: {
+              movieId: true,
+            },
+          },
+        },
+      });
+      if (!movie) continue;
+      movies.push(await this.getMovie(movie.Movie.movieId));
     }
     return movies;
   }

@@ -30,7 +30,7 @@ const SlideShow: React.FC = () => {
   const api = new ImageApi();
   const [images, setImages] = useState<Array<ImageSchema> | null>(null);
   useEffect(() => {
-    api.getImages(6).then((images) => setImages(images));
+    api.getImages(6, true).then((images) => setImages(images));
   }, []);
 
   return images ? (
