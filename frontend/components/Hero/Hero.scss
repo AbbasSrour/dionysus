@@ -75,6 +75,10 @@
       .btns {
         display: flex;
         width: fit-content;
+
+        & > * {
+          width: 15rem;
+        }
       }
 
       .btns > * ~ * {
