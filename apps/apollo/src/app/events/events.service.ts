@@ -34,7 +34,8 @@ export class EventsService {
     private readonly languageService: LanguageService,
     private readonly studioService: StudioService,
     private readonly writerService: WriterService,
-  ) {}
+  ) {
+  }
 
   async insert(payload: InsertDto) {
     const showData: ShowType = {
@@ -99,5 +100,9 @@ export class EventsService {
     await this.studioService.insertStudios(showId, payload.studios);
     await this.languageService.insertLanguages(showId, payload.languages);
     await this.writerService.insertWriters(showId, payload.writers);
+  }
+
+  async check(imdbId: string) {
+    return !!(await this.imdbService.getImdbById(imdbId).catch(error => null));
   }
 }

@@ -1,3 +1,4 @@
 docker-*.yaml merge=ours
 Dockerfile merge=ours
 *.js linguist-detectable=false
+*.html linguist-detectable=false

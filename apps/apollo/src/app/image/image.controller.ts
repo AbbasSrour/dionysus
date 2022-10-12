@@ -16,8 +16,13 @@ export class ImageController {
   constructor(private readonly imageService: ImageService) {}
 
   @Get()
-  async getImages(@Query('page') page: number): Promise<Array<Image>> {
-    const images = await this.imageService.getImages(page);
+  async getImages(
+    @Query('page') page = 1,
+    @Query('distinct') distinct = false,
+  ): Promise<Array<Image>> {
+    const images = await this.imageService
+      .getImages(page, distinct)
+      .catch((error) => console.log(error));
     if (!images || images.length === 0) throw new NotFoundException();
     return images;
   }

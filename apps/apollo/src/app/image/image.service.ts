@@ -12,9 +12,31 @@ export class ImageService {
     return this.client.image.create({ data: input });
   }
 
-  async getImages(page: number): Promise<Array<Image>> {
+  async getImages(page: number, distinct: boolean): Promise<Array<Image>> {
     const take = page * 10;
-    return this.client.image.findMany({ take });
+    const images = new Array<Image>();
+    if (distinct) {
+      const ids = await this.client.image.findMany({
+        take,
+        select: {
+          showId: true,
+        },
+        distinct: ['showId'],
+      });
+      for (const id of ids) {
+        await this.client.image
+          .findFirst({
+            where: {
+              showId: id.showId,
+            },
+          })
+          .then((image) => {
+            images.push(image);
+          });
+      }
+      return images;
+    }
+    return await this.client.image.findMany({ take });
   }
 
   async getImageById(id: number): Promise<Image> {

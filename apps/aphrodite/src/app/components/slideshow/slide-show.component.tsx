@@ -1,22 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './slideshow.scss';
 import Marquee from 'react-marquee-slider';
 import times from 'lodash/times';
-import NoTimeToDie from '../../../assets/NoTimeToDie.jpg';
+import { ImageApi } from '../../api/image.api';
+import { ImageSchema } from '../../schema/image.schema';
 
 interface ElementProps {
   height: number;
   cover?: boolean;
   id: number;
+  image: ImageSchema;
 }
 
-const Element: React.FC<ElementProps> = ({ height, cover = true, id }) => {
+const Element: React.FC<ElementProps> = ({ height, cover = true, id, image }) => {
   return (
     <div
       className={'marquee-elem'}
       key={`marquee-element-${Math.random() * Math.random() * id}`}
       style={{
-        backgroundImage: `url(${NoTimeToDie})`,
+        backgroundImage: `url(${image.url})`,
         width: `${cover ? height * 1.8 : height / 1.5}vh`,
         height: `${height}vh`,
       }}
@@ -25,13 +27,13 @@ const Element: React.FC<ElementProps> = ({ height, cover = true, id }) => {
 };
 
 const SlideShow: React.FC = () => {
-  // const api = new ImageApi();
-  // const [images, setImages] = useState<Array<ImageSchema>>();
-  // useEffect(() => {
-  //   api.getImages(6).then((images) => setImages(images));
-  // });
+  const api = new ImageApi();
+  const [images, setImages] = useState<Array<ImageSchema> | null>(null);
+  useEffect(() => {
+    api.getImages(6, true).then((images) => setImages(images));
+  }, []);
 
-  return (
+  return images ? (
     <div className={'slide-show'}>
       <div className={'slide-show__wrapper'}>
         <Marquee
@@ -44,7 +46,7 @@ const SlideShow: React.FC = () => {
           onFinish={() => null}
         >
           {times(7, Number).map((id) => (
-            <Element id={id} height={15} />
+            <Element id={id} height={15} image={images[id]} />
           ))}
         </Marquee>
       </div>
@@ -59,7 +61,7 @@ const SlideShow: React.FC = () => {
           onFinish={() => null}
         >
           {times(7, Number).map((id) => (
-            <Element id={id} height={15} />
+            <Element id={id} height={15} image={images[id + 7]} />
           ))}
         </Marquee>
       </div>
@@ -74,7 +76,7 @@ const SlideShow: React.FC = () => {
           onFinish={() => null}
         >
           {times(15, Number).map((id) => (
-            <Element id={id} height={25} cover={false} />
+            <Element id={id} height={25} cover={false} image={images[id + 14]} />
           ))}
         </Marquee>
         <div style={{ marginBottom: '20px', marginTop: '20px' }}>
@@ -88,7 +90,7 @@ const SlideShow: React.FC = () => {
             onFinish={() => null}
           >
             {times(7, Number).map((id) => (
-              <Element id={id} height={15} />
+              <Element id={id} height={15} image={images[id + 29]} />
             ))}
           </Marquee>
         </div>
@@ -103,13 +105,13 @@ const SlideShow: React.FC = () => {
             onFinish={() => null}
           >
             {times(7, Number).map((id) => (
-              <Element id={id} height={15} />
+              <Element id={id} height={15} image={images[id + 33]} />
             ))}
           </Marquee>
         </div>
       </div>
     </div>
-  );
+  ) : null;
 };
 
 export default SlideShow;

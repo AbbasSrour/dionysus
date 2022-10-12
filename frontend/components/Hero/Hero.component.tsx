@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import "./Hero.scss";
-import { Button, OutlinedButton } from "../Button/Button.component";
-import { Api } from "../../api/ApiConfig";
-import { Show } from "../../schemas/show.schema";
+import React, { useEffect, useState } from 'react';
+import './Hero.scss';
+import { Button, OutlinedButton } from '../Button/Button.component';
+import { Api } from '../../api/ApiConfig';
+import { Show } from '../../schemas/show.schema';
 
 const HeroHeader: React.FC = (props) => {
   const [mobile, setMobile] = useState(false);
@@ -12,8 +12,8 @@ const HeroHeader: React.FC = (props) => {
     let myShow = new Show();
     let item;
     const res = myShow
-      .initPopular("movie")
-      .then((res) => myShow.addDefaultImage("all"))
+      .initPopular('movie')
+      .then((res) => myShow.addDefaultImage('all'))
       .then((res) => setHeroShow(myShow));
 
     console.log(heroShow);
@@ -26,17 +26,15 @@ const HeroHeader: React.FC = (props) => {
     };
     handleWindowResize();
 
-    window.addEventListener("resize", handleWindowResize);
-    return () => window.removeEventListener("resize", handleWindowResize);
+    window.addEventListener('resize', handleWindowResize);
+    return () => window.removeEventListener('resize', handleWindowResize);
   }, [window.innerWidth]);
 
   return (
     <div
       className="hero-section"
       style={{
-        backgroundImage: `url(${
-          mobile ? heroShow?.poster : heroShow?.backdrop
-        })`,
+        backgroundImage: `url(${mobile ? heroShow?.poster : heroShow?.backdrop})`,
       }}
     >
       <div className="hero-section__container">

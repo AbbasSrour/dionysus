@@ -16,7 +16,19 @@ export class GenreService {
     return this.client.genre.create({ data: genre });
   }
 
-  async getGenres(): Promise<Array<Genre>> {
+  async getGenres(type?: string): Promise<Array<Genre>> {
+    if (type)
+      return await this.client.genre.findMany({
+        where: {
+          ShowGenre: {
+            some: {
+              show: {
+                isNot: type === 'movie' ? { Movie: null } : { Series: null },
+              },
+            },
+          },
+        },
+      });
     return this.client.genre.findMany();
   }
 

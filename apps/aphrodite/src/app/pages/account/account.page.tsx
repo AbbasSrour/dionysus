@@ -11,16 +11,17 @@ import {
   RegisterSchema,
 } from '../../schema/auth.schema';
 import { AuthApi } from '../../api/auth.api';
-import SlideShow from '../../components/slideshow/slide-show.component';
 import { useNavigate } from 'react-router-dom';
 import { UserApi } from '../../api/user.api';
+import { UserSchema } from '../../schema/user.schema';
+import SlideShow from '../../components/slideshow/slide-show.component';
 
 const AccountPage = () => {
   // if the response of login or register is an error
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
-  const [register, setRegister] = useState(false);
+  const [registerForm, setRegisterForm] = useState(false);
 
   const authApi = new AuthApi();
   const userApi = new UserApi();
@@ -29,11 +30,11 @@ const AccountPage = () => {
   useEffect(() => {
     const check = async () => {
       const res = await userApi.getCurrentUser().catch((error) => null);
-      // if (res && (await res.json()).userId) setLoggedIn(true);
+      const body = await res?.json<UserSchema>();
+      if (res) setLoggedIn(true);
     };
-    check();
-    console.log(loggedIn);
 
+    check();
     if (loggedIn) navigate('/');
   }, [loggedIn]);
 
@@ -42,15 +43,15 @@ const AccountPage = () => {
     actions: FormikHelpers<LoginInput>,
   ) => {
     try {
-      setError(null);
       const { email, password } = values;
+      setError(null);
+      setMessage(null);
 
       const res = await authApi
         .login({ email, password })
         .catch(async (error) => setError((await error.response.json()).message));
       if (res && res.status === 200) {
         navigate('/');
-        actions.resetForm();
       }
     } catch (error: any) {
       console.log(error);
@@ -74,6 +75,8 @@ const AccountPage = () => {
   ) => {
     try {
       const { email, password, userName, confirmPassword } = values;
+      setError(null);
+      setMessage(null);
 
       const res = await authApi
         .register({
@@ -83,7 +86,7 @@ const AccountPage = () => {
           confirmPassword,
         })
         .catch((error) => setError(error.response.message));
-      if (res && res.status === 201) setRegister(false);
+      if (res && res.status === 201) setRegisterForm(false);
 
       actions.resetForm();
     } catch (error: any) {
@@ -111,33 +114,41 @@ const AccountPage = () => {
       <motion.div className="Form" layout={true}>
         <div className={'Form__links'}>
           <button
-            style={!register ? { color: 'white' } : { color: 'grey' }}
+            style={!registerForm ? { color: 'white' } : { color: 'grey' }}
             onClick={() => {
               registerFormik.resetForm();
-              setRegister(false);
+              setRegisterForm(false);
+              setMessage(null);
+              setError(null);
             }}
           >
             Login
           </button>
           <div className={'separator'} />
           <button
-            style={register ? { color: 'white' } : { color: 'grey' }}
+            style={registerForm ? { color: 'white' } : { color: 'grey' }}
             onClick={() => {
               loginFormik.resetForm();
-              setRegister(true);
+              setRegisterForm(true);
+              setError(null);
+              setMessage(null);
             }}
           >
             Register
           </button>
         </div>
-        <div className={'AccountPage__message'}>
-          {error ? <span className={'error'}>{error}</span> : null}
-          {message ? <span className={'info'}>{message}</span> : null}
-        </div>
+        {error || message ? (
+          <div
+            className={error ? 'AccountPage__message error' : 'AccountPage__message info'}
+          >
+            {error ? <span>{error}</span> : null}
+            {message ? <span>{message}</span> : null}
+          </div>
+        ) : null}
         <form
-          onSubmit={register ? registerFormik.handleSubmit : loginFormik.handleSubmit}
+          onSubmit={registerForm ? registerFormik.handleSubmit : loginFormik.handleSubmit}
         >
-          {!register ? (
+          {!registerForm ? (
             <>
               <Input
                 type="text"
@@ -155,7 +166,7 @@ const AccountPage = () => {
                 autoComplete={'email'}
               />
               <Input
-                type="text"
+                type="password"
                 nameID="password"
                 label="Password"
                 value={loginFormik.values.password}
@@ -246,15 +257,17 @@ const AccountPage = () => {
           )}
           <button
             className={
-              (register && registerFormik.isSubmitting) ||
-              (!register && loginFormik.isSubmitting)
+              (registerForm && registerFormik.isSubmitting) ||
+              (!registerForm && loginFormik.isSubmitting)
                 ? 'Form__button submitting'
                 : 'Form__button'
             }
             type={'submit'}
-            disabled={register ? registerFormik.isSubmitting : loginFormik.isSubmitting}
+            disabled={
+              registerForm ? registerFormik.isSubmitting : loginFormik.isSubmitting
+            }
           >
-            {register ? 'Register' : 'Login'}
+            {registerForm ? 'Register' : 'Login'}
           </button>
         </form>
       </motion.div>

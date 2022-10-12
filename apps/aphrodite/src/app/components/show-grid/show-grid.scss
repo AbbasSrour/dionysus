@@ -1,0 +1,8 @@
+.show-grid {
+  display: grid;
+  box-sizing: content-box;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  margin: 3rem 5rem;
+  height: fit-content;
+  grid-gap: 3rem 3rem;
+}

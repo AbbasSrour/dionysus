@@ -1,0 +1,82 @@
+GET http://localhost:2000/api/scrape/loki
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/Dr.Strange Into The Multiverse
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/Iron Man
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/WandaVision
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/dismissed
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/uncharted
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/dr.strange
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/arcane
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/little woman
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/crawl
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/jocker
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/breaking bad
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/rick and morty
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/mr.robot
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/money heist
+Accept: application/json
+
+###
+GET http://localhost:2000/api/scrape/top gun mav
+Accept: application/json
+
+###
+GET https://localhost:2000/api/user/email/abbas.mj.srour@gmail.com/available
+Accept: application/json
+
+###
+GET https://localhost:2000/api/user
+Accept: application/json
+
+###
+GET http://localhost:2000/api/image?page=6
+Accept: application/json
+
+###
+GET http://localhost:2000/api/series/trending
+Accept: application/json
+
+###
+GET http://localhost:2000/api/movie?genre=49
+Accept: application/json

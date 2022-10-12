@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpException,
   InternalServerErrorException,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -156,6 +157,13 @@ export class AuthController {
     const verificationCode = await this.authService.createVerificationCode(user);
     await this.email.sendVerificationCode(user, verificationCode);
     return { message: 'Success, a verification link was sent to your email' };
+  }
+
+  @Get('/email/available/:email')
+  async check(@Param('email') email: string) {
+    const user = await this.userService.findUserByEmail({ email }).catch(() => null);
+    if (!user) throw new NotFoundException({ message: 'email is not available' });
+    return { exists: true };
   }
 
   @Get('/forgot-password/:email')

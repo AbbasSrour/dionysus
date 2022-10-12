@@ -1,17 +1,14 @@
-import { BaseApi } from './base.api';
 import { LoginInput, RegisterInput } from '../schema/auth.schema';
 import { KyResponse } from 'ky';
+import BaseApi from './base.api';
 
 export class AuthApi {
-  private api = new BaseApi();
-  private authUrl = '/auth';
-  private userUrl = '/user';
+  private api = new BaseApi('/auth').getApi();
 
   emailExists(email: string): Promise<boolean> {
-    console.log('hello world');
     return new Promise((resolve, reject) => {
       this.api
-        .get(`${this.userUrl}/email/${email}/available`)
+        .get(`email/available/${email}`)
         .then((res) => {
           resolve(false);
         })
@@ -25,8 +22,8 @@ export class AuthApi {
 
   async login(input: LoginInput) {
     const { email, password } = input;
-    return await this.api.post(`${this.authUrl}/login/local`, {
-      body: {
+    return this.api.post(`login/local`, {
+      json: {
         email,
         password,
       },
@@ -35,8 +32,8 @@ export class AuthApi {
 
   async register(input: RegisterInput): Promise<KyResponse> {
     const { email, password, userName, confirmPassword } = input;
-    return await this.api.post(`${this.authUrl}/register/local`, {
-      body: {
+    return this.api.post(`register/local`, {
+      json: {
         email,
         password,
         userName,

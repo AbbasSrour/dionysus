@@ -10,14 +10,18 @@ import {
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto';
 import { MovieEntity } from './movie.entity';
+import { MoviePojo } from './pojo/movie.pojo';
 
 @Controller('movie')
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
   @Get()
-  async getMovies(@Query('page') page: number): Promise<Array<MovieEntity>> {
-    const movies = await this.movieService.getMovies(page);
+  async getMovies(
+    @Query('page') page = 1,
+    @Query('genreId') genreId?: number,
+  ): Promise<Array<MoviePojo>> {
+    const movies = await this.movieService.getMovies(page, genreId);
     if (!movies || movies.length === 0) throw new NotFoundException();
     return movies;
   }
@@ -27,9 +31,19 @@ export class MovieController {
     return await this.movieService.createMovie(body);
   }
 
+  @Get('/top')
+  async getTopMovies(@Query('page') page = 1): Promise<Array<MoviePojo>> {
+    return await this.movieService.getTop(page);
+  }
+
+  @Get('/trending')
+  async getTrendingMovies(@Query('page') page = 1): Promise<Array<MoviePojo>> {
+    return await this.movieService.getTrending();
+  }
+
   @Get('/:id')
-  async getMovieById(@Param('id') id: number): Promise<MovieEntity> {
-    const movie = await this.movieService.getMovieById(id);
+  async getMovieById(@Param('id') id: number): Promise<MoviePojo> {
+    const movie = await this.movieService.getMovie(id);
     if (!movie) throw new NotFoundException();
     return movie;
   }

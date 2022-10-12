@@ -2,54 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import './navbar.scss';
 import { Link, useLocation } from 'react-router-dom';
 import darth from '../../../assets/darth.png';
-import {
-  AiFillHome as HomeIconFill,
-  AiOutlineHome as HomeIconOutline,
-} from 'react-icons/ai';
-import {
-  MdMovie as MoviesIconFill,
-  MdOutlineMovie as MoviesIconOutline,
-} from 'react-icons/md';
-import {
-  RiTvFill as SeriesIconFill,
-  RiTvLine as SeriesIconOutline,
-} from 'react-icons/ri';
-import {
-  BsCollection as ListIconOutline,
-  BsCollectionFill as ListIconFill,
-} from 'react-icons/bs';
-
-const headerNav = [
-  {
-    display: 'Home',
-    path: '/',
-    icon: <HomeIconOutline className={'icon'} />,
-    activeIcon: <HomeIconFill className={'icon'} />,
-  },
-  {
-    display: 'Movies',
-    path: '/movie',
-    icon: <MoviesIconOutline className={'icon'} />,
-    activeIcon: <MoviesIconFill className={'icon'} />,
-  },
-  {
-    display: 'Series',
-    path: '/series',
-    icon: <SeriesIconOutline className={'icon'} />,
-    activeIcon: <SeriesIconFill className={'icon'} />,
-  },
-  {
-    display: 'My List',
-    path: '/saved',
-    icon: <ListIconOutline className={'icon'} />,
-    activeIcon: <ListIconFill className={'icon'} />,
-  },
-];
+import { SearchButton } from '../search-button/search-button.compnent';
+import pages from '../../data/pages.data';
 
 const Navbar: React.FC = () => {
-  const { pathname } = useLocation();
   const [accountPage, setAccountPage] = useState<boolean>(true);
   const [mobile, setMobile] = useState<boolean>(false);
+
+  const { pathname } = useLocation();
 
   // To hide and un-hide components base on screen size
   useEffect(() => {
@@ -70,7 +30,7 @@ const Navbar: React.FC = () => {
   }, [pathname]);
 
   const headerRef = useRef<HTMLDivElement>(null);
-  const active = headerNav.findIndex((element) => element.path === pathname);
+  const active = pages.findIndex((element) => element.path === pathname);
 
   // Change the style on scroll
   useEffect(() => {
@@ -88,8 +48,8 @@ const Navbar: React.FC = () => {
   }, []);
 
   return (
-    <div ref={headerRef} className="navbar">
-      <div className="navbar__logo">
+    <div ref={headerRef} className='navbar'>
+      <div className='navbar__logo'>
         <Link
           to={accountPage ? '/account' : '/'}
           style={mobile && accountPage ? { display: 'none' } : {}}
@@ -98,8 +58,8 @@ const Navbar: React.FC = () => {
         </Link>
       </div>
       {!accountPage ? (
-        <ul className="navbar__nav">
-          {headerNav.map((element, i) => (
+        <ul className='navbar__nav'>
+          {pages.map((element, i) => (
             <li key={i} className={`${i === active ? 'active' : ''}`}>
               <Link to={element.path} className={'Links'}>
                 <div className={'icon-wrapper'}>
@@ -111,7 +71,8 @@ const Navbar: React.FC = () => {
           ))}
         </ul>
       ) : null}
-      {/*{!accountPage && !mobile ? <SearchBar /> : null}*/}
+      {!accountPage && !mobile ? <SearchButton /> : null}
+      {/*{!accountPage && !mobile ? <AnimatedSearchButton /> : null}*/}
       {!accountPage ? (
         <div className={'navbar__user'}>
           <img src={darth} />

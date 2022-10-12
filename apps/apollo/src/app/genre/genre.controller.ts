@@ -1,10 +1,12 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   NotFoundException,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
 import { GenreService } from './genre.service';
 import { Genre, ShowGenre } from '@prisma/client-apollo';
@@ -15,8 +17,9 @@ export class GenreController {
   constructor(private readonly genreService: GenreService) {}
 
   @Get()
-  async getGenres(): Promise<Array<Genre>> {
-    const genres = await this.genreService.getGenres();
+  async getGenres(@Query('type') type?: string): Promise<Array<Genre>> {
+    if (type !== 'movie' && type !== 'series') throw new BadRequestException();
+    const genres = await this.genreService.getGenres(type);
     if (!genres || genres.length === 0) throw new NotFoundException();
     return genres;
   }
