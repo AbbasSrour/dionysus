@@ -6,12 +6,11 @@ import { SeriesPojo } from './pojo/series.pojo';
 
 @Controller('series')
 export class SeriesController {
-  constructor(private readonly seriesService: SeriesService) {
-  }
+  constructor(private readonly seriesService: SeriesService) {}
 
   @Get()
-  async getSeries(@Query('page') page: number) {
-    return this.seriesService.getSerieses(page);
+  async getSeries(@Query('page') page = 1, @Query('genreId') genreId?: number) {
+    return this.seriesService.getSeriesArr(page, genreId);
   }
 
   @Post()
@@ -24,6 +23,10 @@ export class SeriesController {
     return await this.seriesService.getTop(page);
   }
 
+  @Get('trending')
+  async getTrending(@Query('page') page = 1): Promise<Array<SeriesPojo>> {
+    return await this.seriesService.getTrending();
+  }
 
   @Get('/:id')
   async getSeriesById(@Param('id') id: number): Promise<SeriesEntity> {

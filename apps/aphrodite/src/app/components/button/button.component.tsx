@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import './button.scss';
 import { MdPlayForWork as EnterIcon } from 'react-icons/md';
 import {
@@ -11,25 +11,27 @@ import {
 } from 'react-icons/fi';
 
 interface Props {
-  clickHandler?: string;
+  link?: string;
   clean: boolean;
   circular: boolean;
   children: React.ReactNode;
 }
 
-export const Button: React.FC<Props> = ({ clickHandler, clean, circular, children }) => {
+export const Button: React.FC<Props> = ({ link, clean, circular, children }) => {
   return (
-    <div className={clean ? 'btn clean full' : 'btn stylish full'}>
-      <span>{children}</span>
-      <div className={'icon'}>
-        <i className="play outlined">
-          {circular ? <PlayIconCircleOutlined /> : <PlayIconOutlined />}
-        </i>
-        <i className={'play fill'}>
-          {circular ? <PlayIconCircleFill /> : <PlayIconFill />}
-        </i>
+    <a href={link}>
+      <div className={clean ? 'btn clean full' : 'btn stylish full'}>
+        <span>{children}</span>
+        <div className={'icon'}>
+          <i className="play outlined">
+            {circular ? <PlayIconCircleOutlined /> : <PlayIconOutlined />}
+          </i>
+          <i className={'play fill'}>
+            {circular ? <PlayIconCircleFill /> : <PlayIconFill />}
+          </i>
+        </div>
       </div>
-    </div>
+    </a>
   );
 };
 

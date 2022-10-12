@@ -17,8 +17,11 @@ export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
   @Get()
-  async getMovies(@Query('page') page = 1): Promise<Array<MoviePojo>> {
-    const movies = await this.movieService.getMovies(page);
+  async getMovies(
+    @Query('page') page = 1,
+    @Query('genreId') genreId?: number,
+  ): Promise<Array<MoviePojo>> {
+    const movies = await this.movieService.getMovies(page, genreId);
     if (!movies || movies.length === 0) throw new NotFoundException();
     return movies;
   }

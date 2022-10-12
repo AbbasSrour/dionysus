@@ -1,6 +1,13 @@
 .show-box {
   position: relative;
   box-shadow: var(--def-box-sh);
+  transition-duration: 0.5s;
+
+  &:hover {
+    transform: scale(1.1);
+    transition-duration: 0.5s;
+    z-index: 10;
+  }
 
   &:first-of-type {
     padding-left: 0;
@@ -24,6 +31,8 @@
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
+    font-size: 2rem;
+    color: white;
   }
 
   .video-player {
@@ -35,7 +44,58 @@
     z-index: -1;
   }
 
-  &__data {
+  .hide {
+    z-index: -2;
+    opacity: 0;
+    grid-row-start: 1;
+    grid-column-start: 1;
+  }
+
+  .show {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .trans {
+    opacity: 1;
+    z-index: 1;
+    transition: opacity 0.1s ease-in-out 0s, z-index 0s ease-in-out;
+  }
+}
+
+.poster {
+  .show-box__data {
+    top: 40%;
+
+    .btns {
+      margin-bottom: 1rem !important;
+    }
+
+    h2 {
+      max-width: 90%;
+    }
+
+    .summary {
+      margin: 0.5rem 0 0 0;
+      padding: 0;
+      display: inline-block;
+      white-space: normal;
+      font-size: 0.8rem;
+      overflow-wrap: break-word;
+      max-width: 90%;
+    }
+  }
+}
+
+.backdrop {
+  .show-box__data {
+    bottom: 7.6%;
+  }
+}
+
+.info {
+  .show-box__data {
     position: absolute;
     width: 100%;
     height: fit-content;
@@ -106,54 +166,13 @@
       transition: opacity 0.5s ease-in-out 0.5s, z-index 2s ease-in-out;
     }
   }
-
-  .hide {
-    z-index: -2;
-    opacity: 0;
-    grid-row-start: 1;
-    grid-column-start: 1;
-  }
-
-  .show {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
-  .trans {
-    opacity: 1;
-    z-index: 1;
-    transition: opacity 0.1s ease-in-out 0s, z-index 0s ease-in-out;
-  }
 }
 
-.poster {
-  .show-box__data {
-    top: 40%;
+.clean {
+  border: var(--def-border);
+  transition: all 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 0s;
 
-    .btns {
-      margin-bottom: 1rem !important;
-    }
-
-    h2 {
-      max-width: 90%;
-    }
-
-    .summary {
-      margin: 0.5rem 0 0 0;
-      padding: 0;
-      display: inline-block;
-      white-space: normal;
-      font-size: 0.8rem;
-      overflow-wrap: break-word;
-      max-width: 90%;
-    }
+  &:hover {
+    border: var(--ani-def-border);
   }
 }
-
-.backdrop {
-  .show-box__data {
-    bottom: 7.6%;
-  }
-}
-

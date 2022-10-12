@@ -1,0 +1,155 @@
+@use './apps/aphrodite/src/app/styles/Mixin' as *;
+
+.model {
+  background-color: var(--cr-body-bg);
+
+  &__banner {
+    position: relative;
+
+    height: 50vh;
+
+    background-size: cover;
+    background-position: top;
+    background-repeat: no-repeat;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      @include overlay();
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      background-image: linear-gradient(to top, var(--cr-body-bg), rgba(black, 0));
+    }
+  }
+
+  &__content {
+    @include flex(flex-start, flex-start);
+    max-width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: -18rem;
+    position: relative;
+    padding: 0 0;
+    color: white;
+
+    &__poster {
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      border-radius: var(--border-radius-def);
+      width: 25%;
+      height: 34rem;
+
+      @include mobile {
+        display: none;
+      }
+    }
+
+    &__info {
+      width: 75%;
+      padding-left: 2rem;
+      position: relative;
+
+      @include mobile {
+        width: 100%;
+        padding-left: 0;
+      }
+
+      .title {
+        display: flex;
+        align-content: center;
+        justify-content: left;
+
+        h2 {
+          font-size: 4rem;
+          font-weight: 700;
+        }
+
+        img {
+          width: 400px;
+          margin-bottom: 2rem;
+        }
+      }
+
+      .list {
+        display: flex;
+        flex-direction: row;
+        padding: 0;
+        margin: 0;
+        align-content: center;
+        font-size: 1.5rem;
+
+        li {
+          display: flex;
+          align-content: center;
+          align-items: center;
+          margin-right: 0.8rem;
+          font-weight: 500;
+          height: fit-content;
+
+          p {
+            margin: 0;
+            padding: 0;
+          }
+
+          svg {
+            font-size: 1.5rem;
+            fill: gold;
+          }
+        }
+      }
+
+      .genres {
+        margin: 3rem 0 0 0;
+        width: 70%;
+        height: 5rem;
+
+        &__item {
+          padding: 0.5rem 1.5rem;
+          border: 0.2rem solid white;
+          border-radius: 2rem;
+          font-size: 0.8rem;
+          font-weight: 600;
+          background-color: rgba(var(--cr-body-bg), 0.5);
+          margin-right: 0.5rem;
+        }
+      }
+
+      .overview {
+        font-size: 1.3rem;
+        margin-top: -0.3rem;
+        margin-bottom: 2rem;
+      }
+
+      .btns {
+        display: flex;
+        width: fit-content;
+
+        & > * {
+          margin-right: 2rem;
+          height: 4rem;
+          width: 12rem;
+
+          .icon {
+            line-height: 4.6rem;
+          }
+
+          & > * {
+            line-height: 4rem;
+          }
+        }
+      }
+    }
+  }
+}

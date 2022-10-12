@@ -7,6 +7,7 @@ import Slider from '../../components/slider/slider.component';
 import studioData from '../../data/studios.data';
 import SeriesApi from '../../api/series.api';
 import { SeriesSchema } from '../../schema/series.schema';
+import { GenreApi } from '../../api/genre.api';
 
 const HomePage = () => {
   // const [color, setColor] = useState<Array<Array<number>> | null>(null);
@@ -24,16 +25,21 @@ const HomePage = () => {
   const [topMovies, setTopMovies] = useState<Array<MovieSchema>>();
   const [topSeries, setTopSeries] = useState<Array<SeriesSchema>>();
   const [trendingMovies, setTrendingMovies] = useState<Array<MovieSchema>>();
+  const [trendingSeries, setTrendingSeries] = useState<any>();
 
   const movieApi = new MovieApi();
   const seriesApi = new SeriesApi();
+  const genreApi = new GenreApi();
 
   useEffect(() => {
-    movieApi.getMovies(1).then((movies) => setShows(movies));
+    movieApi.getMovies({ page: 1 }).then((movies) => setShows(movies));
     movieApi.getTopMovies(2).then((movies) => setTopMovies(movies));
     seriesApi.getTopSeries(2).then((series) => setTopSeries(series));
     movieApi.getTrendingMovies().then((movies) => setTrendingMovies(movies));
+    seriesApi.getTrendingSeries().then((sereies) => setTrendingSeries(sereies));
   }, []);
+
+  console.log(trendingSeries);
 
   return (
     <div className={'home-page page'}>
@@ -48,9 +54,9 @@ const HomePage = () => {
         spacing={5}
         sliderName={'Studios'}
       />
-      {shows ? (
+      {trendingSeries ? (
         <Slider
-          data={shows}
+          data={trendingSeries}
           sliderName={'Trending TV Shows'}
           poster={false}
           type={'show'}

@@ -1,0 +1,115 @@
+.show-bar {
+  width: 70%;
+  margin: 3rem auto 0 auto;
+  overflow-x: hidden;
+  padding-bottom: 10rem;
+  position: relative;
+
+  .inactive {
+    color: grey;
+    border: 0;
+  }
+
+  .active {
+    color: white;
+
+  }
+
+  .list {
+    display: flex;
+    flex-direction: row;
+    color: white;
+    font-size: 2rem;
+    padding: 0;
+    margin-bottom: 1rem;
+
+    li {
+      height: 100%;
+      text-decoration: none;
+      list-style: none;
+      margin: 0 3rem 0 0;
+      padding: 0;
+      cursor: pointer;
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: -46%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        transition: width 0.5s ease;
+        height: 3px;
+        background-color: white;
+        border-radius: 1rem;
+      }
+
+
+      &.active::after,
+      &:hover::after {
+        width: 110%;
+      }
+    }
+  }
+
+  .border {
+    width: 100%;
+    height: 1%;
+    border-top: 0.1rem solid grey;
+    margin-bottom: 3rem;
+  }
+
+  &__content {
+    .details {
+      & > * {
+        margin-bottom: 3rem;
+      }
+
+      .show-box {
+      }
+
+      .title {
+        font-size: 2rem;
+        color: white;
+        padding-left: 1rem;
+        border-left: 0.3rem solid red;
+        margin-bottom: 1.5rem;
+      }
+
+      .summary {
+        p {
+          font-size: 1.2rem;
+          color: white;
+        }
+      }
+
+      .cast {
+
+      }
+
+      .general {
+      }
+
+      .list {
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        list-style: none;
+
+        .item {
+          display: flex;
+          border-bottom: 0.1rem solid white;
+          margin-bottom: 1rem;
+          padding: 1rem;
+          margin-left: 0;
+          color: white;
+
+          span {
+            font-size: 1.7rem;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,20 +1,42 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/prisma';
 import { SeriesEntity } from './series.entity';
 import { CreateSeriesDto, UpdateSeriesDto } from './dto';
 import { dateDifferenceUtil } from '../events/utilities/date-difference.util';
 import { Series, Show } from '@prisma/client-apollo';
 import { SeriesPojo } from './pojo/series.pojo';
+import { lastValueFrom } from 'rxjs';
+import { HesitaConstant } from '../common/constants/hesita-proxy.constant';
+import { ClientProxy } from '@nestjs/microservices';
+import { MoviePojo } from '../movie/pojo/movie.pojo';
 
 @Injectable()
 export class SeriesService {
-  constructor(private readonly client: PrismaService, private readonly logger: Logger) {}
+  constructor(
+    private readonly client: PrismaService,
+    private readonly logger: Logger,
+    @Inject(HesitaConstant) private readonly hesitaProxy: ClientProxy,
+  ) {}
 
-  async getSerieses(page: number): Promise<Array<SeriesPojo>> {
+  async getSeriesArr(page: number, genreId?: number): Promise<Array<SeriesPojo>> {
     const take = page * 10;
     const seriesArr = new Array<SeriesPojo>();
+    let data;
 
-    const data = await this.client.series.findMany({ take });
+    if (genreId)
+      data = await this.client.series.findMany({
+        take,
+        where: {
+          show: {
+            ShowGenre: {
+              some: {
+                genreId,
+              },
+            },
+          },
+        },
+      });
+    else data = await this.client.series.findMany({ take });
     for (const elem of data) {
       const series = await this.getSeries(elem.seriesId);
       seriesArr.push(series);
@@ -137,6 +159,32 @@ export class SeriesService {
       seriess.push(await this.getSeries(id.seriesId));
     }
     return seriess;
+  }
+
+  async getTrending() {
+    const imdbIds: Array<string> = await lastValueFrom(
+      this.hesitaProxy.send('trending', 'Series'),
+    );
+    const seriesArr = new Array<SeriesPojo>();
+    for (const imdbId of imdbIds) {
+      const series = await this.client.show.findFirst({
+        where: {
+          Imdb: {
+            imdbId,
+          },
+        },
+        include: {
+          Series: {
+            select: {
+              seriesId: true,
+            },
+          },
+        },
+      });
+      if (!series) continue;
+      seriesArr.push(await this.getSeries(series.Series.seriesId));
+    }
+    return seriesArr;
   }
 
   async createSeries(input: CreateSeriesDto) {

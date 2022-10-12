@@ -115,7 +115,7 @@ export class TmdbService {
 
   async trending(type: string): Promise<Array<string>> {
     let url: string;
-    if (type === 'TV Series')
+    if (type === 'Series')
       url = `${this.config.get<string>('tmdb.address')}/trending/tv/week`;
     else url = `${this.config.get<string>('tmdb.address')}/trending/movie/week`;
     const response = await got.get(url, {

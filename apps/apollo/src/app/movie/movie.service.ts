@@ -90,11 +90,25 @@ export class MovieService {
     return movieData;
   }
 
-  async getMovies(page: number): Promise<Array<MoviePojo>> {
+  async getMovies(page: number, genreId?: number): Promise<Array<MoviePojo>> {
     const take = page * 10;
     const movies = new Array<MoviePojo>();
+    let data;
 
-    const data = await this.client.movie.findMany({ take });
+    if (genreId)
+      data = await this.client.movie.findMany({
+        take,
+        where: {
+          show: {
+            ShowGenre: {
+              some: {
+                genreId,
+              },
+            },
+          },
+        },
+      });
+    else data = await this.client.movie.findMany({ take });
     for (const elem of data) {
       const movie = await this.getMovie(elem.movieId);
       movies.push(movie);

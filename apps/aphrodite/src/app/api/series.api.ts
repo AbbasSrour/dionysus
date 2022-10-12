@@ -1,29 +1,50 @@
-import BaseApi from './base.api';
-import { SeriesSchema } from '../schema/series.schema';
+import BaseApi from './base.api'
+import { SeriesSchema } from '../schema/series.schema'
 
 export default class SeriesApi {
-  private readonly api = new BaseApi('/series').getApi();
+  private readonly api = new BaseApi('/series').getApi()
 
   async getSeries(id: number): Promise<SeriesSchema> {
-    return this.api.get(`${id}`).json<SeriesSchema>();
+    return this.api.get(`${id}`).json<SeriesSchema>()
   }
 
-  async getSeriesArr(page: number): Promise<Array<SeriesSchema>> {
-    return new BaseApi('')
+  async getSeriesArr(searchParams: {
+    page?: number
+    genreId?: number
+  }): Promise<Array<SeriesSchema>> {
+    let shows = await new BaseApi('')
       .getApi()
       .get('series', {
-        searchParams: {
-          page,
-        },
+        searchParams,
       })
-      .json<Array<SeriesSchema>>();
+      .json<Array<SeriesSchema>>()
+    for (let show of shows) {
+      if (show.backdrop == null) {
+        shows.splice(shows.indexOf(show), 1)
+      }
+    }
+    return shows
   }
 
   async getTrendingSeries(): Promise<Array<SeriesSchema>> {
-    return this.api.get(`trending`).json<Array<SeriesSchema>>();
+    let shows = await this.api.get(`trending`).json<Array<SeriesSchema>>()
+    for (let show of shows) {
+      if (show.backdrop == null) {
+        shows.splice(shows.indexOf(show), 1)
+      }
+    }
+    return shows
   }
 
   async getTopSeries(page: number): Promise<Array<SeriesSchema>> {
-    return this.api.get('top', { searchParams: { page } }).json<Array<SeriesSchema>>();
+    let shows = await this.api
+      .get('top', { searchParams: { page } })
+      .json<Array<SeriesSchema>>()
+    for (let show of shows) {
+      if (show.backdrop == null) {
+        shows.splice(shows.indexOf(show), 1)
+      }
+    }
+    return shows
   }
 }
